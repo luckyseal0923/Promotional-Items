@@ -1,222 +1,130 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-  <meta charset="UTF-8" />
-  <title>公關品申請系統</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8" />
+<title>公關品申請系統</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Noto Sans TC", Arial, sans-serif;
-      background: #f6f7f9;
-      margin: 0;
-      padding: 20px;
-    }
+<style>
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Noto Sans TC", Arial, sans-serif;
+  background:#f6f7f9;
+  padding:20px;
+}
+h1 { text-align:center; }
 
-    h1 {
-      text-align: center;
-      margin-bottom: 16px;
-    }
+table {
+  width:100%;
+  border-collapse:collapse;
+  margin-top:16px;
+}
+th, td {
+  border:1px solid #ddd;
+  padding:8px;
+  text-align:center;
+}
+th { background:#f0f0f0; }
 
-    form {
-      background: #ffffff;
-      padding: 20px;
-      border-radius: 8px;
-      max-width: 1100px;
-      margin: auto;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    }
+.stock {
+  font-size:13px;
+  color:#555;
+}
+.stock.low {
+  color:#d9534f;
+  font-weight:bold;
+}
 
-    fieldset {
-      border: none;
-      margin-bottom: 24px;
-    }
-
-    legend {
-      font-weight: bold;
-      margin-bottom: 12px;
-      font-size: 16px;
-    }
-
-    .row {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 12px;
-    }
-
-    .row label {
-      flex: 1;
-      font-size: 14px;
-    }
-
-    input[type="text"],
-    input[type="number"] {
-      width: 100%;
-      padding: 6px;
-      margin-top: 4px;
-      box-sizing: border-box;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 12px;
-    }
-
-    th, td {
-      border: 1px solid #ddd;
-      padding: 8px;
-      font-size: 14px;
-      text-align: center;
-      vertical-align: middle;
-    }
-
-    th {
-      background: #f0f0f0;
-    }
-
-    .product-img {
-      width: 80px;
-      height: 80px;
-      object-fit: cover;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      background: #fafafa;
-    }
-
-    tr.disabled {
-      background: #eee;
-      color: #999;
-    }
-
-    tr.disabled input {
-      background: #ddd;
-    }
-
-    .submit-area {
-      text-align: center;
-      margin-top: 24px;
-    }
-
-    button {
-      padding: 10px 30px;
-      font-size: 16px;
-      background: #0A84FF;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: #006edc;
-    }
-  </style>
+.total-box {
+  margin-top:20px;
+  text-align:right;
+  font-size:20px;
+  font-weight:bold;
+}
+input[type="number"] {
+  width:100px;
+}
+</style>
 </head>
 
 <body>
 
 <h1>公關品申請系統</h1>
 
-<form id="applyForm">
+<table>
+<thead>
+<tr>
+  <th>品項</th>
+  <th>單價</th>
+  <th>庫存量</th>
+  <th>申請數量</th>
+</tr>
+</thead>
+<tbody id="itemsTable"></tbody>
+</table>
 
-  <!-- 基本資料 -->
-  <fieldset>
-    <legend>一、申請單位資料（必填）</legend>
+<div class="total-box">
+  總金額：NT$ <span id="totalAmount">0</span>
+</div>
 
-    <div class="row">
-      <label>
-        單位主管姓名*
-        <input type="text" name="manager" required>
-      </label>
-      <label>
-        申請人*
-        <input type="text" name="applicant" required>
-      </label>
-    </div>
+<script>
+/* ===============================
+   公關品資料（之後會改成 Sheet）
+================================ */
+const items = [
+  { id:'PR001', name:'綠底手提袋（大）', price:20.7, stock:120 },
+  { id:'PR002', name:'白底手提紙袋（小）', price:15.5, stock:30 },
+  { id:'PR003', name:'醫院三色筆（含觸控）', price:8, stock:5 }
+];
 
-    <div class="row">
-      <label>
-        申請單位名稱*
-        <input type="text" name="department" required>
-      </label>
-      <label>
-        成本中心代號*
-        <input type="text" name="cost_center" required>
-      </label>
-    </div>
+const tbody = document.getElementById('itemsTable');
+const totalAmountEl = document.getElementById('totalAmount');
 
-    <div class="row">
-      <label>
-        分機*
-        <input type="text" name="extension" required>
-      </label>
-      <label>
-        領取事由*
-        <input type="text" name="reason" required>
-      </label>
-    </div>
-  </fieldset>
+/* ===============================
+   建立表格
+================================ */
+items.forEach(item => {
+  const tr = document.createElement('tr');
 
-  <!-- 公關品 -->
-  <fieldset>
-    <legend>二、公關品申請數量（請填數量）</legend>
+  tr.innerHTML = `
+    <td>${item.name}</td>
+    <td>$${item.price}</td>
+    <td class="stock ${item.stock <= 10 ? 'low':''}">
+      ${item.stock}
+    </td>
+    <td>
+      <input type="number"
+        min="0"
+        max="${item.stock}"
+        value="0"
+        data-id="${item.id}">
+    </td>
+  `;
 
-    <table>
-      <thead>
-        <tr>
-          <th>照片</th>
-          <th>品項</th>
-          <th>單價</th>
-          <th>申請數量</th>
-        </tr>
-      </thead>
-      <tbody>
+  tbody.appendChild(tr);
+});
 
-        <tr>
-          <td><img class="product-img" src="https://via.placeholder.com/80?text=Bag" /></td>
-          <td>綠底手提袋（大）</td>
-          <td>$20.7</td>
-          <td><input type="number" name="PR001" min="0"></td>
-        </tr>
+/* ===============================
+   即時計算總金額
+================================ */
+tbody.addEventListener('input', () => {
+  let total = 0;
 
-        <tr>
-          <td><img class="product-img" src="https://via.placeholder.com/80?text=Paper+Bag" /></td>
-          <td>白底手提紙袋（小）</td>
-          <td>$15.5</td>
-          <td><input type="number" name="PR002" min="0"></td>
-        </tr>
+  document.querySelectorAll('input[type="number"]').forEach(input => {
+    const id = input.dataset.id;
+    const qty = Number(input.value) || 0;
+    const item = items.find(i => i.id === id);
 
-        <tr>
-          <td><img class="product-img" src="https://via.placeholder.com/80?text=Pen" /></td>
-          <td>醫院三色筆（含觸控）</td>
-          <td>$8</td>
-          <td><input type="number" name="PR004" min="0"></td>
-        </tr>
+    if (qty > item.stock) {
+      input.value = item.stock;
+      alert(`「${item.name}」庫存不足`);
+    }
 
-        <tr class="disabled">
-          <td><img class="product-img" src="https://via.placeholder.com/80?text=Sold+Out" /></td>
-          <td>台灣印記（四季春＋飄逸杯）▲已用罄</td>
-          <td>$800</td>
-          <td><input type="number" disabled></td>
-        </tr>
+    total += qty * item.price;
+  });
 
-        <tr>
-          <td><img class="product-img" src="https://via.placeholder.com/80?text=Gift" /></td>
-          <td>北醫平安包</td>
-          <td>$460</td>
-          <td><input type="number" name="PR016" min="0"></td>
-        </tr>
-
-      </tbody>
-    </table>
-  </fieldset>
-
-  <div class="submit-area">
-    <button type="submit">送出申請</button>
-  </div>
-
-</form>
+  totalAmountEl.textContent = total.toFixed(2);
+});
+</script>
 
 </body>
 </html>
