@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8" />
+<title>公關品申請－後台管理</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<style>
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Noto Sans TC", Arial, sans-serif;
+  background:#f4f6f8;
+  padding:20px;
+}
+
+h1 {
+  text-align:center;
+  margin-bottom:24px;
+}
+
+.board {
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap:20px;
+  max-width:1300px;
+  margin:auto;
+}
+
+.card {
+  background:#fff;
+  border-radius:12px;
+  padding:16px;
+  box-shadow:0 2px 10px rgba(0,0,0,0.08);
+}
+
+.header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:6px;
+}
+
+.status {
+  padding:4px 10px;
+  border-radius:20px;
+  font-size:12px;
+  font-weight:bold;
+}
+
+.applied { background:#e3f2fd; color:#1565c0; }
+.payment { background:#fff3cd; color:#856404; }
+.preparing { background:#ede7f6; color:#4527a0; }
+.ready { background:#e8f5e9; color:#2e7d32; }
+
+.info {
+  font-size:14px;
+  margin-bottom:6px;
+}
+
+.items {
+  font-size:13px;
+  color:#555;
+  border-top:1px dashed #ddd;
+  margin-top:8px;
+  padding-top:8px;
+}
+
+.actions {
+  margin-top:12px;
+  display:flex;
+  gap:8px;
+}
+
+.actions button {
+  flex:1;
+  padding:8px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+  font-size:14px;
+}
+
+.btn-prepare { background:#6f42c1; color:#fff; }
+.btn-mail { background:#28a745; color:#fff; }
+.btn-disabled { background:#ccc; color:#666; cursor:not-allowed; }
+</style>
+</head>
+
+<body>
+
+<h1>🛠 公關品申請－後台管理</h1>
+
+<div class="board" id="board"></div>
+
+<script>
+/* ===============================
+   狀態定義與排序
+================================ */
+const STATUS_ORDER = {
+  applied: 1,
+  payment: 2,
+  preparing: 3,
+  ready: 4
+};
+
+/* ===============================
+   模擬案件資料（Phase 1）
+================================ */
+const orders = [
+  {
+    applicant: '王小明',
+    dept: '急診醫學部',
+    email: 'ed001@hospital.org',
+    date: '2026/02/04',
+    total: 1240,
+    status: 'applied',
+    items: ['綠底手提袋（大）× 20', '醫院三色筆 × 30']
+  },
+  {
+    applicant: '李小華',
+    dept: '護理部',
+    email: 'ns010@hospital.org',
+    date: '2026/02/03',
+    total: 780,
+    status: 'payment',
+    items: ['北歐風陶瓷馬克杯 × 3']
+  },
+  {
+    applicant: '陳大同',
+    dept: '行政室',
+    email: 'admin@hospital.org',
+    date: '2026/02/02',
+    total: 2600,
+    status: 'preparing',
+    items: ['小畫茶包禮盒 × 5', '牡丹圓茶包禮盒 × 2']
+  },
+  {
+    applicant: '林怡君',
+    dept: '教學部',
+    email: 'edu@hospital.org',
+    date: '2026/01/31',
+    total: 460,
+    status: 'ready',
+    items: ['北醫平安包 × 1']
+  }
+];
+
+/* ===============================
+   狀態文字
+================================ */
+const STATUS_LABEL = {
+  applied: '提出申請',
+  payment: '繳費處理中',
+  preparing: '商品準備中',
+  ready: '已通知領取'
+};
+
+/* ===============================
+   排序＋渲染
+================================ */
+orders
+  .sort((a,b) => STATUS_ORDER[a.status] - STATUS_ORDER[b.status])
+  .forEach
