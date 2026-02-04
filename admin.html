@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8" />
-<title>公關品申請－後台管理</title>
+<title>公關品申請－後台管理（虛擬）</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 <style>
@@ -19,28 +19,31 @@ h1 {
 
 .board {
   display:grid;
-  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
   gap:20px;
-  max-width:1300px;
+  max-width:1400px;
   margin:auto;
 }
 
 .card {
   background:#fff;
-  border-radius:12px;
-  padding:16px;
-  box-shadow:0 2px 10px rgba(0,0,0,0.08);
+  border-radius:14px;
+  padding:18px;
+  box-shadow:0 2px 12px rgba(0,0,0,0.08);
 }
 
 .header {
   display:flex;
   justify-content:space-between;
   align-items:center;
-  margin-bottom:6px;
 }
 
-.status {
-  padding:4px 10px;
+.header strong {
+  font-size:16px;
+}
+
+.status-badge {
+  padding:4px 12px;
   border-radius:20px;
   font-size:12px;
   font-weight:bold;
@@ -53,110 +56,222 @@ h1 {
 
 .info {
   font-size:14px;
-  margin-bottom:6px;
+  margin-top:6px;
 }
 
+/* ===== 狀態條 ===== */
+.timeline {
+  display:flex;
+  margin:16px 0;
+}
+
+.step {
+  flex:1;
+  text-align:center;
+  font-size:12px;
+  color:#aaa;
+  position:relative;
+}
+
+.step::before {
+  content:'';
+  width:14px;
+  height:14px;
+  background:#ccc;
+  border-radius:50%;
+  display:block;
+  margin:0 auto 6px;
+}
+
+.step::after {
+  content:'';
+  position:absolute;
+  top:7px;
+  left:50%;
+  width:100%;
+  height:2px;
+  background:#ccc;
+  z-index:-1;
+}
+
+.step:last-child::after { display:none; }
+
+.step.done {
+  color:#0A84FF;
+}
+.step.done::before,
+.step.done::after {
+  background:#0A84FF;
+}
+
+.step.current {
+  color:#28a745;
+  font-weight:bold;
+}
+.step.current::before {
+  background:#28a745;
+}
+
+/* ===== 品項 ===== */
 .items {
   font-size:13px;
   color:#555;
   border-top:1px dashed #ddd;
-  margin-top:8px;
-  padding-top:8px;
+  padding-top:10px;
+  margin-top:10px;
 }
 
+/* ===== 操作 ===== */
 .actions {
-  margin-top:12px;
+  margin-top:14px;
   display:flex;
-  gap:8px;
+  gap:10px;
 }
 
 .actions button {
   flex:1;
-  padding:8px;
+  padding:10px;
   border:none;
-  border-radius:6px;
-  cursor:pointer;
+  border-radius:8px;
   font-size:14px;
+  cursor:pointer;
 }
 
-.btn-prepare { background:#6f42c1; color:#fff; }
-.btn-mail { background:#28a745; color:#fff; }
-.btn-disabled { background:#ccc; color:#666; cursor:not-allowed; }
+.btn-prepare {
+  background:#6f42c1;
+  color:#fff;
+}
+
+.btn-notify {
+  background:#28a745;
+  color:#fff;
+}
+
+.btn-disabled {
+  background:#ccc;
+  color:#666;
+  cursor:not-allowed;
+}
 </style>
 </head>
 
 <body>
 
-<h1>🛠 公關品申請－後台管理</h1>
+<h1>🛠 公關品申請－後台管理（虛擬卡片）</h1>
 
-<div class="board" id="board"></div>
+<div class="board">
 
-<script>
-/* ===============================
-   狀態定義與排序
-================================ */
-const STATUS_ORDER = {
-  applied: 1,
-  payment: 2,
-  preparing: 3,
-  ready: 4
-};
+<!-- 卡片 1 -->
+<div class="card">
+  <div class="header">
+    <strong>王小明｜急診醫學部</strong>
+    <span class="status-badge applied">提出申請</span>
+  </div>
 
-/* ===============================
-   模擬案件資料（Phase 1）
-================================ */
-const orders = [
-  {
-    applicant: '王小明',
-    dept: '急診醫學部',
-    email: 'ed001@hospital.org',
-    date: '2026/02/04',
-    total: 1240,
-    status: 'applied',
-    items: ['綠底手提袋（大）× 20', '醫院三色筆 × 30']
-  },
-  {
-    applicant: '李小華',
-    dept: '護理部',
-    email: 'ns010@hospital.org',
-    date: '2026/02/03',
-    total: 780,
-    status: 'payment',
-    items: ['北歐風陶瓷馬克杯 × 3']
-  },
-  {
-    applicant: '陳大同',
-    dept: '行政室',
-    email: 'admin@hospital.org',
-    date: '2026/02/02',
-    total: 2600,
-    status: 'preparing',
-    items: ['小畫茶包禮盒 × 5', '牡丹圓茶包禮盒 × 2']
-  },
-  {
-    applicant: '林怡君',
-    dept: '教學部',
-    email: 'edu@hospital.org',
-    date: '2026/01/31',
-    total: 460,
-    status: 'ready',
-    items: ['北醫平安包 × 1']
-  }
-];
+  <div class="info">申請日期：2026/02/04</div>
+  <div class="info">Email：ed001@hospital.org</div>
+  <div class="info">總金額：NT$ 1,240</div>
 
-/* ===============================
-   狀態文字
-================================ */
-const STATUS_LABEL = {
-  applied: '提出申請',
-  payment: '繳費處理中',
-  preparing: '商品準備中',
-  ready: '已通知領取'
-};
+  <div class="timeline">
+    <div class="step current">提出申請</div>
+    <div class="step">繳費處理中</div>
+    <div class="step">商品準備中</div>
+    <div class="step">已通知領取</div>
+  </div>
 
-/* ===============================
-   排序＋渲染
-================================ */
-orders
-  .sort((a,b) => STATUS_ORDER[a.status] - STATUS_ORDER[b.status])
-  .forEach
+  <div class="items">
+    綠底手提袋（大）× 20<br>
+    醫院三色筆 × 30
+  </div>
+
+  <div class="actions">
+    <button class="btn-disabled" disabled>尚無可操作</button>
+  </div>
+</div>
+
+<!-- 卡片 2 -->
+<div class="card">
+  <div class="header">
+    <strong>李小華｜護理部</strong>
+    <span class="status-badge payment">繳費處理中</span>
+  </div>
+
+  <div class="info">申請日期：2026/02/03</div>
+  <div class="info">Email：ns010@hospital.org</div>
+  <div class="info">總金額：NT$ 780</div>
+
+  <div class="timeline">
+    <div class="step done">提出申請</div>
+    <div class="step current">繳費處理中</div>
+    <div class="step">商品準備中</div>
+    <div class="step">已通知領取</div>
+  </div>
+
+  <div class="items">
+    北歐風陶瓷馬克杯 × 3
+  </div>
+
+  <div class="actions">
+    <button class="btn-disabled" disabled>等待繳費完成</button>
+  </div>
+</div>
+
+<!-- 卡片 3 -->
+<div class="card">
+  <div class="header">
+    <strong>陳大同｜行政室</strong>
+    <span class="status-badge preparing">商品準備中</span>
+  </div>
+
+  <div class="info">申請日期：2026/02/02</div>
+  <div class="info">Email：admin@hospital.org</div>
+  <div class="info">總金額：NT$ 2,600</div>
+
+  <div class="timeline">
+    <div class="step done">提出申請</div>
+    <div class="step done">繳費處理中</div>
+    <div class="step current">商品準備中</div>
+    <div class="step">已通知領取</div>
+  </div>
+
+  <div class="items">
+    小畫茶包禮盒 × 5<br>
+    牡丹圓茶包禮盒 × 2
+  </div>
+
+  <div class="actions">
+    <button class="btn-notify">🔔 通知可領取（虛擬）</button>
+  </div>
+</div>
+
+<!-- 卡片 4 -->
+<div class="card">
+  <div class="header">
+    <strong>林怡君｜教學部</strong>
+    <span class="status-badge ready">已通知領取</span>
+  </div>
+
+  <div class="info">申請日期：2026/01/31</div>
+  <div class="info">Email：edu@hospital.org</div>
+  <div class="info">總金額：NT$ 460</div>
+
+  <div class="timeline">
+    <div class="step done">提出申請</div>
+    <div class="step done">繳費處理中</div>
+    <div class="step done">商品準備中</div>
+    <div class="step current">已通知領取</div>
+  </div>
+
+  <div class="items">
+    北醫平安包 × 1
+  </div>
+
+  <div class="actions">
+    <button class="btn-disabled" disabled>流程已完成</button>
+  </div>
+</div>
+
+</div>
+
+</body>
+</html>
