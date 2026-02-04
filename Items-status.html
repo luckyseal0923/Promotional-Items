@@ -17,54 +17,105 @@ h1 {
   margin-bottom:24px;
 }
 
-/* 卡片容器 */
 .board {
   display:grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap:16px;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap:20px;
   max-width:1200px;
   margin:auto;
 }
 
-/* 單張卡片 */
 .card {
   background:#fff;
-  border-radius:10px;
+  border-radius:12px;
   padding:16px;
-  box-shadow:0 2px 8px rgba(0,0,0,0.08);
+  box-shadow:0 2px 10px rgba(0,0,0,0.08);
 }
 
 .card h3 {
-  margin:0 0 8px;
+  margin:0 0 6px;
 }
-
-/* 狀態標籤 */
-.status {
-  display:inline-block;
-  padding:4px 10px;
-  border-radius:20px;
-  font-size:13px;
-  font-weight:bold;
-  margin-bottom:8px;
-}
-
-/* 各狀態顏色 */
-.status.applied { background:#d9edf7; color:#31708f; }
-.status.payment { background:#fff3cd; color:#856404; }
-.status.preparing { background:#e2e3ff; color:#383d7a; }
-.status.ready { background:#d4edda; color:#155724; }
 
 .info {
   font-size:14px;
   margin-bottom:6px;
 }
 
-.items {
+/* ===== 狀態條 ===== */
+.timeline {
+  display:flex;
+  align-items:center;
+  margin:14px 0;
+}
+
+.step {
+  flex:1;
+  text-align:center;
+  font-size:12px;
+  position:relative;
+  color:#999;
+}
+
+.step::before {
+  content:'';
+  display:block;
+  width:14px;
+  height:14px;
+  margin:0 auto 6px;
+  border-radius:50%;
+  background:#ccc;
+}
+
+.step::after {
+  content:'';
+  position:absolute;
+  top:7px;
+  left:50%;
+  width:100%;
+  height:2px;
+  background:#ccc;
+  z-index:-1;
+}
+
+.step:last-child::after {
+  display:none;
+}
+
+.step.done {
+  color:#0A84FF;
+}
+.step.done::before {
+  background:#0A84FF;
+}
+.step.done::after {
+  background:#0A84FF;
+}
+
+.step.current {
+  color:#28a745;
+  font-weight:bold;
+}
+.step.current::before {
+  background:#28a745;
+}
+
+/* ===== 展開區 ===== */
+.details {
+  display:none;
+  margin-top:10px;
   font-size:13px;
   color:#555;
-  margin-top:8px;
   border-top:1px dashed #ddd;
-  padding-top:8px;
+  padding-top:10px;
+}
+
+.toggle-btn {
+  margin-top:10px;
+  background:none;
+  border:none;
+  color:#0A84FF;
+  cursor:pointer;
+  font-size:14px;
 }
 </style>
 </head>
@@ -75,53 +126,62 @@ h1 {
 
 <div class="board">
 
-  <!-- 卡片 1 -->
+  <!-- 卡片 -->
   <div class="card">
-    <span class="status applied">提出申請</span>
     <h3>王小明｜急診醫學部</h3>
     <div class="info">申請日期：2026/02/04</div>
     <div class="info">總金額：NT$ 1,240</div>
-    <div class="items">
+
+    <!-- 狀態條 -->
+    <div class="timeline">
+      <div class="step done">提出申請</div>
+      <div class="step current">繳費處理中</div>
+      <div class="step">商品準備中</div>
+      <div class="step">已通知領取</div>
+    </div>
+
+    <button class="toggle-btn" onclick="toggleDetails(this)">
+      查看案件明細
+    </button>
+
+    <div class="details">
       綠底手提袋（大）× 20<br>
       醫院三色筆 × 30
     </div>
   </div>
 
-  <!-- 卡片 2 -->
+  <!-- 另一張卡 -->
   <div class="card">
-    <span class="status payment">繳費處理中</span>
-    <h3>李小華｜護理部</h3>
-    <div class="info">申請日期：2026/02/03</div>
-    <div class="info">總金額：NT$ 780</div>
-    <div class="items">
-      北歐風陶瓷馬克杯 × 3
-    </div>
-  </div>
-
-  <!-- 卡片 3 -->
-  <div class="card">
-    <span class="status preparing">商品準備中</span>
-    <h3>陳大同｜行政室</h3>
-    <div class="info">申請日期：2026/02/02</div>
-    <div class="info">總金額：NT$ 2,600</div>
-    <div class="items">
-      小畫茶包禮盒 × 5<br>
-      牡丹圓茶包禮盒 × 2
-    </div>
-  </div>
-
-  <!-- 卡片 4 -->
-  <div class="card">
-    <span class="status ready">已通知領取</span>
     <h3>林怡君｜教學部</h3>
     <div class="info">申請日期：2026/01/31</div>
     <div class="info">總金額：NT$ 460</div>
-    <div class="items">
+
+    <div class="timeline">
+      <div class="step done">提出申請</div>
+      <div class="step done">繳費處理中</div>
+      <div class="step done">商品準備中</div>
+      <div class="step current">已通知領取</div>
+    </div>
+
+    <button class="toggle-btn" onclick="toggleDetails(this)">
+      查看案件明細
+    </button>
+
+    <div class="details">
       北醫平安包 × 1
     </div>
   </div>
 
 </div>
+
+<script>
+function toggleDetails(btn) {
+  const details = btn.nextElementSibling;
+  const isOpen = details.style.display === 'block';
+  details.style.display = isOpen ? 'none' : 'block';
+  btn.textContent = isOpen ? '查看案件明細' : '收合案件明細';
+}
+</script>
 
 </body>
 </html>
