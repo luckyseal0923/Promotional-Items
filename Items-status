@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8" />
+<title>公關品申請狀態看板</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<style>
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Noto Sans TC", Arial, sans-serif;
+  background:#f6f7f9;
+  padding:20px;
+}
+
+h1 {
+  text-align:center;
+  margin-bottom:24px;
+}
+
+/* 卡片容器 */
+.board {
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap:16px;
+  max-width:1200px;
+  margin:auto;
+}
+
+/* 單張卡片 */
+.card {
+  background:#fff;
+  border-radius:10px;
+  padding:16px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.08);
+}
+
+.card h3 {
+  margin:0 0 8px;
+}
+
+/* 狀態標籤 */
+.status {
+  display:inline-block;
+  padding:4px 10px;
+  border-radius:20px;
+  font-size:13px;
+  font-weight:bold;
+  margin-bottom:8px;
+}
+
+/* 各狀態顏色 */
+.status.applied { background:#d9edf7; color:#31708f; }
+.status.payment { background:#fff3cd; color:#856404; }
+.status.preparing { background:#e2e3ff; color:#383d7a; }
+.status.ready { background:#d4edda; color:#155724; }
+
+.info {
+  font-size:14px;
+  margin-bottom:6px;
+}
+
+.items {
+  font-size:13px;
+  color:#555;
+  margin-top:8px;
+  border-top:1px dashed #ddd;
+  padding-top:8px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>📦 公關品申請狀態看板</h1>
+
+<div class="board">
+
+  <!-- 卡片 1 -->
+  <div class="card">
+    <span class="status applied">提出申請</span>
+    <h3>王小明｜急診醫學部</h3>
+    <div class="info">申請日期：2026/02/04</div>
+    <div class="info">總金額：NT$ 1,240</div>
+    <div class="items">
+      綠底手提袋（大）× 20<br>
+      醫院三色筆 × 30
+    </div>
+  </div>
+
+  <!-- 卡片 2 -->
+  <div class="card">
+    <span class="status payment">繳費處理中</span>
+    <h3>李小華｜護理部</h3>
+    <div class="info">申請日期：2026/02/03</div>
+    <div class="info">總金額：NT$ 780</div>
+    <div class="items">
+      北歐風陶瓷馬克杯 × 3
+    </div>
+  </div>
+
+  <!-- 卡片 3 -->
+  <div class="card">
+    <span class="status preparing">商品準備中</span>
+    <h3>陳大同｜行政室</h3>
+    <div class="info">申請日期：2026/02/02</div>
+    <div class="info">總金額：NT$ 2,600</div>
+    <div class="items">
+      小畫茶包禮盒 × 5<br>
+      牡丹圓茶包禮盒 × 2
+    </div>
+  </div>
+
+  <!-- 卡片 4 -->
+  <div class="card">
+    <span class="status ready">已通知領取</span>
+    <h3>林怡君｜教學部</h3>
+    <div class="info">申請日期：2026/01/31</div>
+    <div class="info">總金額：NT$ 460</div>
+    <div class="items">
+      北醫平安包 × 1
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
