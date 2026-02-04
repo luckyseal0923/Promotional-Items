@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <title>公關品申請系統</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Noto Sans TC", Arial, sans-serif;
+      background: #f6f7f9;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    form {
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 1100px;
+      margin: auto;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    fieldset {
+      border: none;
+      margin-bottom: 24px;
+    }
+
+    legend {
+      font-weight: bold;
+      margin-bottom: 12px;
+      font-size: 16px;
+    }
+
+    .row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .row label {
+      flex: 1;
+      font-size: 14px;
+    }
+
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      padding: 6px;
+      margin-top: 4px;
+      box-sizing: border-box;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      font-size: 14px;
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    th {
+      background: #f0f0f0;
+    }
+
+    .product-img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      background: #fafafa;
+    }
+
+    tr.disabled {
+      background: #eee;
+      color: #999;
+    }
+
+    tr.disabled input {
+      background: #ddd;
+    }
+
+    .submit-area {
+      text-align: center;
+      margin-top: 24px;
+    }
+
+    button {
+      padding: 10px 30px;
+      font-size: 16px;
+      background: #0A84FF;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #006edc;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>公關品申請系統</h1>
+
+<form id="applyForm">
+
+  <!-- 基本資料 -->
+  <fieldset>
+    <legend>一、申請單位資料（必填）</legend>
+
+    <div class="row">
+      <label>
+        單位主管姓名*
+        <input type="text" name="manager" required>
+      </label>
+      <label>
+        申請人*
+        <input type="text" name="applicant" required>
+      </label>
+    </div>
+
+    <div class="row">
+      <label>
+        申請單位名稱*
+        <input type="text" name="department" required>
+      </label>
+      <label>
+        成本中心代號*
+        <input type="text" name="cost_center" required>
+      </label>
+    </div>
+
+    <div class="row">
+      <label>
+        分機*
+        <input type="text" name="extension" required>
+      </label>
+      <label>
+        領取事由*
+        <input type="text" name="reason" required>
+      </label>
+    </div>
+  </fieldset>
+
+  <!-- 公關品 -->
+  <fieldset>
+    <legend>二、公關品申請數量（請填數量）</legend>
+
+    <table>
+      <thead>
+        <tr>
+          <th>照片</th>
+          <th>品項</th>
+          <th>單價</th>
+          <th>申請數量</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <tr>
+          <td><img class="product-img" src="https://via.placeholder.com/80?text=Bag" /></td>
+          <td>綠底手提袋（大）</td>
+          <td>$20.7</td>
+          <td><input type="number" name="PR001" min="0"></td>
+        </tr>
+
+        <tr>
+          <td><img class="product-img" src="https://via.placeholder.com/80?text=Paper+Bag" /></td>
+          <td>白底手提紙袋（小）</td>
+          <td>$15.5</td>
+          <td><input type="number" name="PR002" min="0"></td>
+        </tr>
+
+        <tr>
+          <td><img class="product-img" src="https://via.placeholder.com/80?text=Pen" /></td>
+          <td>醫院三色筆（含觸控）</td>
+          <td>$8</td>
+          <td><input type="number" name="PR004" min="0"></td>
+        </tr>
+
+        <tr class="disabled">
+          <td><img class="product-img" src="https://via.placeholder.com/80?text=Sold+Out" /></td>
+          <td>台灣印記（四季春＋飄逸杯）▲已用罄</td>
+          <td>$800</td>
+          <td><input type="number" disabled></td>
+        </tr>
+
+        <tr>
+          <td><img class="product-img" src="https://via.placeholder.com/80?text=Gift" /></td>
+          <td>北醫平安包</td>
+          <td>$460</td>
+          <td><input type="number" name="PR016" min="0"></td>
+        </tr>
+
+      </tbody>
+    </table>
+  </fieldset>
+
+  <div class="submit-area">
+    <button type="submit">送出申請</button>
+  </div>
+
+</form>
+
+</body>
+</html>
