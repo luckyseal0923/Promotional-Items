@@ -178,51 +178,6 @@ button:hover {
     width:100%;
   }
 }
-  /* ===============================
-   Mobile RWD（手機版庫存顯示）
-================================ */
-.stock-mobile {
-  display: none;
-  font-size: 14px;
-  color: #555;
-  margin-top: 4px;
-}
-
-/* 手機版 */
-@media (max-width: 768px) {
-  table thead {
-    display: none; /* 手機不需要表頭 */
-  }
-
-  table, tbody, tr, td {
-    display: block;
-    width: 100%;
-  }
-
-  tr {
-    padding: 12px 0;
-    border-bottom: 1px solid #ddd;
-  }
-
-  td {
-    text-align: left;
-    border: none;
-    padding: 6px 0;
-  }
-
-  .stock-number {
-    display: none; /* 隱藏純數字 */
-  }
-
-  .stock-mobile {
-    display: block; /* 顯示「庫存：xx」 */
-  }
-
-  input[type="number"] {
-    margin-top: 6px;
-  }
-}
-
 </style>
 </head>
 
@@ -324,7 +279,7 @@ function renderTable() {
         ${item.image ? `<span class="item-toggle" data-img="${item.image}">看圖 ▸</span>` : ''}
       </td>
       <td>NT$ ${item.price}</td>
-      <td class="stock ${item.stock <= 10 ? 'low' : ''}">${item.stock}</td>
+      <td class="stock ${item.stock <= 10 ? 'low' : ''}">庫存：${item.stock}</td>
       <td>
         <input type="number" min="0" max="${item.stock}" data-id="${item.id}" placeholder="請輸入數量">
       </td>
