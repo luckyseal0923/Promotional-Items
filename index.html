@@ -6,7 +6,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 <style>
-/* ===== 基本樣式 ===== */
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Noto Sans TC", Arial, sans-serif;
   background:#f6f7f9;
@@ -96,17 +95,12 @@ button {
 button:hover {
   background:#006edc;
 }
-
-/* ===== 品項切換按鈕 ===== */
 .item-toggle {
   margin-left:8px;
   font-size:14px;
   cursor:pointer;
   color:#0A84FF;
-  user-select:none;
 }
-
-/* ===== 圖片 Modal ===== */
 .modal {
   display:none;
   position:fixed;
@@ -130,18 +124,9 @@ button:hover {
   color:#fff;
   cursor:pointer;
 }
-
-/* ===== 📱 手機版優化 ===== */
-@media (max-width: 768px) {
-
-  table, thead, tbody, tr, th, td {
-    display:block;
-  }
-
-  thead {
-    display:none;
-  }
-
+@media (max-width:768px){
+  table, thead, tbody, tr, th, td { display:block; }
+  thead { display:none; }
   tbody tr {
     background:#fff;
     margin-bottom:16px;
@@ -149,34 +134,9 @@ button:hover {
     border-radius:14px;
     box-shadow:0 2px 10px rgba(0,0,0,0.08);
   }
-
-  td {
-    border:none;
-    text-align:left;
-    padding:8px 0;
-  }
-
-  td.name {
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    font-size:16px;
-  }
-
-  .item-toggle {
-    font-size:15px;
-    padding:6px 14px;
-    background:#e7f1ff;
-    border-radius:20px;
-  }
-
-  input[type="number"] {
-    font-size:16px;
-  }
-
-  button[type="submit"] {
-    width:100%;
-  }
+  td { border:none; text-align:left; padding:8px 0; }
+  td.name { display:flex; justify-content:space-between; align-items:center; }
+  button[type="submit"] { width:100%; }
 }
 </style>
 </head>
@@ -191,22 +151,22 @@ button:hover {
   <legend>一、申請單位資料（必填）</legend>
 
   <div class="row">
-    <label>申請人*<input type="text" required></label>
-    <label>院內員編*<input type="text" required></label>
+    <label>申請人*<input type="text" name="applicant" required></label>
+    <label>院內員編*<input type="text" name="staffId" required></label>
   </div>
 
   <div class="row">
-    <label>申請者電話*<input type="text" required></label>
-    <label>電子信箱*<input type="text" required></label>
+    <label>申請者電話*<input type="text" name="phone" required></label>
+    <label>電子信箱*<input type="text" name="email" required></label>
   </div>
 
   <div class="row">
-    <label>申請單位*<input type="text" required></label>
-    <label>成本中心*<input type="text" required></label>
+    <label>申請單位*<input type="text" name="department" required></label>
+    <label>成本中心*<input type="text" name="costCenter" required></label>
   </div>
 
   <div class="row">
-    <label>領取事由*<input type="text" required></label>
+    <label>領取事由*<input type="text" name="reason" required></label>
   </div>
 </fieldset>
 
@@ -236,16 +196,12 @@ button:hover {
 
 </form>
 
-<!-- 圖片 Modal -->
 <div class="modal" id="imgModal">
   <span class="modal-close" id="modalClose">✕</span>
   <img id="modalImg">
 </div>
 
 <script>
-  /* ===============================
-   Google Apps Script API
-================================ */
 const API_URL = 'https://script.google.com/macros/s/AKfycbw1vq3thaTCw8OyR39lcGmaQHPHdtIgaF5JPlb_-gXPGB4ZqxfoA6wpKRlS3qJeFqjy/exec';
 const SHEET_ID = '19hRS6fdUnHeDMysq32LWsYXiVovcDqXjSQphBu3wsuk';
 const SHEET_NAME = 'Items-list';
@@ -260,136 +216,89 @@ const modalClose = document.getElementById('modalClose');
 let items = [];
 
 fetch(url)
-  .then(res => res.text())
-  .then(text => {
-    const json = JSON.parse(text.substring(47).slice(0, -2));
-    items = json.table.rows.map(row => ({
-      id: row.c[0]?.v,
-      name: row.c[1]?.v,
-      price: Number(row.c[3]?.v) || 0,
-      stock: Number(row.c[4]?.v) || 0,
-      image: row.c[5]?.v || ''
+  .then(r => r.text())
+  .then(t => {
+    const json = JSON.parse(t.substring(47).slice(0, -2));
+    items = json.table.rows.map(r => ({
+      id: r.c[0]?.v,
+      name: r.c[1]?.v,
+      price: Number(r.c[3]?.v) || 0,
+      stock: Number(r.c[4]?.v) || 0,
+      image: r.c[5]?.v || ''
     }));
     renderTable();
   });
 
-function renderTable() {
-  tbody.innerHTML = '';
-  items.forEach(item => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td class="name">
-        ${item.name}
-        ${item.image ? `<span class="item-toggle" data-img="${item.image}">看圖 ▸</span>` : ''}
-      </td>
-      <td>NT$ ${item.price}</td>
-      <td class="stock ${item.stock <= 10 ? 'low' : ''}">庫存：${item.stock}</td>
-      <td>
-        <input type="number" min="0" max="${item.stock}" data-id="${item.id}" placeholder="請輸入數量">
-      </td>
-    `;
+function renderTable(){
+  tbody.innerHTML='';
+  items.forEach(i=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td class="name">${i.name}${i.image?`<span class="item-toggle" data-img="${i.image}">看圖 ▸</span>`:''}</td>
+      <td>NT$ ${i.price}</td>
+      <td class="${i.stock<=10?'stock low':'stock'}">庫存：${i.stock}</td>
+      <td><input type="number" min="0" max="${i.stock}" data-id="${i.id}" placeholder="請輸入數量"></td>`;
     tbody.appendChild(tr);
   });
 }
 
-tbody.addEventListener('click', e => {
-  if (!e.target.classList.contains('item-toggle')) return;
-  document.querySelectorAll('.item-toggle').forEach(b => b.textContent = '看圖 ▸');
-  e.target.textContent = '看圖 ▾';
-  modalImg.src = e.target.dataset.img;
-  modal.style.display = 'flex';
-});
-
-modalClose.onclick = () => {
-  modal.style.display = 'none';
-  document.querySelectorAll('.item-toggle').forEach(b => b.textContent = '看圖 ▸');
+tbody.onclick=e=>{
+  if(!e.target.classList.contains('item-toggle'))return;
+  modalImg.src=e.target.dataset.img;
+  modal.style.display='flex';
 };
+modalClose.onclick=()=>modal.style.display='none';
+modal.onclick=e=>{if(e.target===modal)modalClose.click();};
 
-modal.onclick = e => {
-  if (e.target === modal) modalClose.click();
-};
-
-tbody.addEventListener('input', () => {
-  let total = 0;
-  document.querySelectorAll('input[type="number"]').forEach(input => {
-    const item = items.find(i => i.id == input.dataset.id);
-    const qty = Number(input.value) || 0;
-    if (item) total += qty * item.price;
+tbody.oninput=()=>{
+  let total=0;
+  document.querySelectorAll('#itemsTable input').forEach(inp=>{
+    const it=items.find(i=>i.id==inp.dataset.id);
+    total+=it?(Number(inp.value)||0)*it.price:0;
   });
-  totalAmountEl.textContent = total.toFixed(0);
-});
-/* ===============================
-   送出申請 → 寫入 Google Sheet
-================================ */
-document.getElementById('applyForm').addEventListener('submit', async (e) => {
+  totalAmountEl.textContent=total.toFixed(0);
+};
+
+document.getElementById('applyForm').onsubmit=async e=>{
   e.preventDefault();
 
-  /* 1. 申請人基本資料 */
-  const formData = {
-    applicant: document.querySelector('input[placeholder=""]').closest('form')
+  const f=e.target;
+  const payload={
+    applicant:f.applicant.value,
+    staffId:f.staffId.value,
+    phone:f.phone.value,
+    email:f.email.value,
+    department:f.department.value,
+    costCenter:f.costCenter.value,
+    reason:f.reason.value,
+    items:[]
   };
 
-  const applicant = document.querySelectorAll('input[type="text"]');
-
-  const payload = {
-    applicant: applicant[0].value.trim(),
-    staffId: applicant[1].value.trim(),
-    phone: applicant[2].value.trim(),
-    email: applicant[3].value.trim(),
-    department: applicant[4].value.trim(),
-    costCenter: applicant[5].value.trim(),
-    reason: applicant[6].value.trim(),
-    items: []
-  };
-
-  /* 2. 申請品項（只抓有填數量的） */
-  document.querySelectorAll('#itemsTable input[type="number"]').forEach(input => {
-    const qty = Number(input.value);
-    if (!qty || qty <= 0) return;
-
-    const item = items.find(i => i.id == input.dataset.id);
-    if (!item) return;
-
-    payload.items.push({
-      itemId: item.id,
-      itemName: item.name,
-      price: item.price,
-      quantity: qty
-    });
+  document.querySelectorAll('#itemsTable input').forEach(inp=>{
+    const q=Number(inp.value);
+    if(q>0){
+      const it=items.find(i=>i.id==inp.dataset.id);
+      if(it)payload.items.push({itemId:it.id,itemName:it.name,price:it.price,quantity:q});
+    }
   });
 
-  if (payload.items.length === 0) {
-    alert('請至少申請一項公關品');
-    return;
+  if(payload.items.length===0){alert('請至少選一項');return;}
+
+  const res=await fetch(API_URL,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(payload)
+  });
+  const r=await res.json();
+  if(r.status==='success'){
+    alert('申請完成');
+    f.reset();
+    totalAmountEl.textContent='0';
+  }else{
+    alert('寫入失敗');
+    console.error(r);
   }
-
-  /* 3. 呼叫 Apps Script API */
-  try {
-    const res = await fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-
-    const result = await res.json();
-
-    if (result.status === 'success') {
-      alert('申請已送出，已成功寫入系統');
-      document.getElementById('applyForm').reset();
-      totalAmountEl.textContent = '0';
-    } else {
-      alert('送出失敗，請聯絡管理者');
-      console.error(result);
-    }
-
-  } catch (err) {
-    alert('系統連線失敗');
-    console.error(err);
-  }
-});
-</script>
-
-  
+};
 </script>
 
 </body>
