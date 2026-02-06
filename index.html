@@ -185,7 +185,7 @@ button:hover {
 
 <h1>公關品申請系統</h1>
 
-<form>
+<form id="applyForm">
 
 <fieldset>
   <legend>一、申請單位資料（必填）</legend>
@@ -243,6 +243,10 @@ button:hover {
 </div>
 
 <script>
+  /* ===============================
+   Google Apps Script API
+================================ */
+const API_URL = 'https://script.google.com/macros/s/AKfycbw1vq3thaTCw8OyR39lcGmaQHPHdtIgaF5JPlb_-gXPGB4ZqxfoA6wpKRlS3qJeFqjy/exec';
 const SHEET_ID = '19hRS6fdUnHeDMysq32LWsYXiVovcDqXjSQphBu3wsuk';
 const SHEET_NAME = 'Items-list';
 const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${SHEET_NAME}&tqx=out:json`;
@@ -314,6 +318,78 @@ tbody.addEventListener('input', () => {
   });
   totalAmountEl.textContent = total.toFixed(0);
 });
+/* ===============================
+   送出申請 → 寫入 Google Sheet
+================================ */
+document.getElementById('applyForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  /* 1. 申請人基本資料 */
+  const formData = {
+    applicant: document.querySelector('input[placeholder=""]').closest('form')
+  };
+
+  const applicant = document.querySelectorAll('input[type="text"]');
+
+  const payload = {
+    applicant: applicant[0].value.trim(),
+    staffId: applicant[1].value.trim(),
+    phone: applicant[2].value.trim(),
+    email: applicant[3].value.trim(),
+    department: applicant[4].value.trim(),
+    costCenter: applicant[5].value.trim(),
+    reason: applicant[6].value.trim(),
+    items: []
+  };
+
+  /* 2. 申請品項（只抓有填數量的） */
+  document.querySelectorAll('#itemsTable input[type="number"]').forEach(input => {
+    const qty = Number(input.value);
+    if (!qty || qty <= 0) return;
+
+    const item = items.find(i => i.id == input.dataset.id);
+    if (!item) return;
+
+    payload.items.push({
+      itemId: item.id,
+      itemName: item.name,
+      price: item.price,
+      quantity: qty
+    });
+  });
+
+  if (payload.items.length === 0) {
+    alert('請至少申請一項公關品');
+    return;
+  }
+
+  /* 3. 呼叫 Apps Script API */
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    const result = await res.json();
+
+    if (result.status === 'success') {
+      alert('申請已送出，已成功寫入系統');
+      document.getElementById('applyForm').reset();
+      totalAmountEl.textContent = '0';
+    } else {
+      alert('送出失敗，請聯絡管理者');
+      console.error(result);
+    }
+
+  } catch (err) {
+    alert('系統連線失敗');
+    console.error(err);
+  }
+});
+</script>
+
+  
 </script>
 
 </body>
