@@ -212,3 +212,12 @@ function renderItems(items) {
     tbody.querySelectorAll('input').forEach(input => {
       const idx = input.dataset.index;
       const qty = Number(input.value) || 0;
+      total += qty * items[idx].price;
+    });
+    totalAmountEl.textContent = total.toFixed(2);
+  });
+}
+</script>
+
+</body>
+</html>
