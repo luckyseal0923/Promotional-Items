@@ -58,7 +58,7 @@ table {
 }
 th, td {
   border-bottom:1px solid #ddd;
-  padding:10px;
+  padding:12px;
   text-align:center;
 }
 th {
@@ -66,13 +66,6 @@ th {
 }
 td.name {
   text-align:left;
-}
-.item-img {
-  width:80px;
-  height:80px;
-  object-fit:contain;
-  background:#f8f9fa;
-  border-radius:6px;
 }
 .stock.low {
   color:#d9534f;
@@ -100,6 +93,39 @@ button {
 button:hover {
   background:#006edc;
 }
+
+/* ===== 品項圖片切換 ===== */
+.item-toggle {
+  cursor:pointer;
+  color:#0A84FF;
+  font-weight:500;
+  user-select:none;
+}
+
+/* ===== 圖片 Modal ===== */
+.modal {
+  display:none;
+  position:fixed;
+  z-index:999;
+  inset:0;
+  background:rgba(0,0,0,0.6);
+  align-items:center;
+  justify-content:center;
+}
+.modal img {
+  max-width:80%;
+  max-height:80%;
+  border-radius:12px;
+  background:#fff;
+}
+.modal-close {
+  position:absolute;
+  top:20px;
+  right:24px;
+  font-size:28px;
+  color:#fff;
+  cursor:pointer;
+}
 </style>
 </head>
 
@@ -114,11 +140,11 @@ button:hover {
 
   <div class="row">
     <label>申請人*<input type="text" required></label>
-    <label>人員編號*<input type="text" required></label>
+    <label>院內員編*<input type="text" required></label>
   </div>
 
   <div class="row">
-    <label>申請電話*<input type="text" required></label>
+    <label>申請者電話*<input type="text" required></label>
     <label>電子信箱*<input type="text" required></label>
   </div>
 
@@ -138,7 +164,6 @@ button:hover {
   <table>
     <thead>
       <tr>
-        <th>圖片</th>
         <th>品項</th>
         <th>單價</th>
         <th>庫存</th>
@@ -159,6 +184,12 @@ button:hover {
 
 </form>
 
+<!-- ===== 圖片 Modal ===== -->
+<div class="modal" id="imgModal">
+  <span class="modal-close" id="modalClose">✕</span>
+  <img id="modalImg" src="">
+</div>
+
 <script>
 /* ===============================
    Google Sheet 設定
@@ -171,11 +202,12 @@ const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${
 const tbody = document.getElementById('itemsTable');
 const totalAmountEl = document.getElementById('totalAmount');
 
+const modal = document.getElementById('imgModal');
+const modalImg = document.getElementById('modalImg');
+const modalClose = document.getElementById('modalClose');
+
 let items = [];
 
-/* ===============================
-   載入 Google Sheet
-================================ */
 fetch(url)
   .then(res => res.text())
   .then(text => {
@@ -183,19 +215,16 @@ fetch(url)
     const rows = json.table.rows;
 
     items = rows.map(row => ({
-      id: row.c[0]?.v,                 // Num
-      name: row.c[1]?.v,               // Item_TW
-      price: Number(row.c[3]?.v) || 0, // Price
-      stock: Number(row.c[4]?.v) || 0, // Inventory
-      image: row.c[5]?.v || ''         // Image URL
+      id: row.c[0]?.v,
+      name: row.c[1]?.v,
+      price: Number(row.c[3]?.v) || 0,
+      stock: Number(row.c[4]?.v) || 0,
+      image: row.c[5]?.v || ''
     }));
 
     renderTable();
   });
 
-/* ===============================
-   建立表格（含圖片展開）
-================================ */
 function renderTable() {
   tbody.innerHTML = '';
 
@@ -203,18 +232,12 @@ function renderTable() {
     const tr = document.createElement('tr');
 
     tr.innerHTML = `
-      <td style="width:80px">
-        ${item.image ? `
-          <button type="button" class="img-toggle" data-id="${item.id}">▶</button>
-          <div class="img-box" id="img-${item.id}" style="display:none;margin-top:6px">
-            <img src="${item.image}" style="width:120px;height:auto;border-radius:6px">
-          </div>
-        ` : '-'}
+      <td class="name">
+        ${item.name}
+        ${item.image ? `<span class="item-toggle" data-img="${item.image}"> ▸</span>` : ''}
       </td>
 
-      <td>${item.name}</td>
-
-      <td>$${item.price}</td>
+      <td>NT$ ${item.price}</td>
 
       <td class="stock ${item.stock <= 10 ? 'low' : ''}">
         ${item.stock}
@@ -224,8 +247,8 @@ function renderTable() {
         <input type="number"
           min="0"
           max="${item.stock}"
-          value="0"
-          data-id="${item.id}">
+          data-id="${item.id}"
+          placeholder="">
       </td>
     `;
 
@@ -233,35 +256,33 @@ function renderTable() {
   });
 }
 
-/* ===============================
-   圖片展開 / 收合
-================================ */
+/* ===== 點擊顯示圖片 ===== */
 tbody.addEventListener('click', e => {
-  if (!e.target.classList.contains('img-toggle')) return;
+  if (!e.target.classList.contains('item-toggle')) return;
 
-  const id = e.target.dataset.id;
-  const box = document.getElementById(`img-${id}`);
+  document.querySelectorAll('.item-toggle').forEach(el => el.textContent = ' ▸');
 
-  if (box.style.display === 'none') {
-    box.style.display = 'block';
-    e.target.textContent = '▼';
-  } else {
-    box.style.display = 'none';
-    e.target.textContent = '▶';
-  }
+  e.target.textContent = ' ▾';
+  modalImg.src = e.target.dataset.img;
+  modal.style.display = 'flex';
 });
 
-/* ===============================
-   即時計算總金額
-================================ */
+modalClose.addEventListener('click', () => {
+  modal.style.display = 'none';
+  document.querySelectorAll('.item-toggle').forEach(el => el.textContent = ' ▸');
+});
+
+modal.addEventListener('click', e => {
+  if (e.target === modal) modalClose.click();
+});
+
+/* ===== 金額計算 ===== */
 tbody.addEventListener('input', () => {
   let total = 0;
 
   document.querySelectorAll('#itemsTable input[type="number"]').forEach(input => {
-    const id = input.dataset.id;
     const qty = Number(input.value) || 0;
-    const item = items.find(i => i.id == id);
-
+    const item = items.find(i => i.id == input.dataset.id);
     if (!item) return;
 
     if (qty > item.stock) {
@@ -275,7 +296,6 @@ tbody.addEventListener('input', () => {
   totalAmountEl.textContent = total.toFixed(0);
 });
 </script>
-
 
 </body>
 </html>
