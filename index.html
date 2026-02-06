@@ -6,9 +6,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 <style>
-/* ===============================
-   基本樣式
-================================ */
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Noto Sans TC", Arial, sans-serif;
   background:#f6f7f9;
@@ -18,10 +15,6 @@ h1 {
   text-align:center;
   margin-bottom:24px;
 }
-
-/* ===============================
-   表單卡片
-================================ */
 form {
   background:#fff;
   max-width:1200px;
@@ -30,12 +23,10 @@ form {
   border-radius:12px;
   box-shadow:0 4px 14px rgba(0,0,0,0.08);
 }
-
 fieldset {
   border:none;
   margin-bottom:32px;
 }
-
 legend {
   font-weight:bold;
   margin-bottom:16px;
@@ -43,10 +34,6 @@ legend {
   border-left:4px solid #0A84FF;
   padding-left:10px;
 }
-
-/* ===============================
-   申請資料排版
-================================ */
 .row {
   display:flex;
   gap:16px;
@@ -63,12 +50,7 @@ input[type="number"] {
   margin-top:6px;
   border:1px solid #ccc;
   border-radius:6px;
-  box-sizing:border-box;
 }
-
-/* ===============================
-   表格
-================================ */
 table {
   width:100%;
   border-collapse:collapse;
@@ -78,19 +60,13 @@ th, td {
   border-bottom:1px solid #ddd;
   padding:10px;
   text-align:center;
-  vertical-align:middle;
 }
 th {
   background:#f1f3f5;
-  font-size:14px;
 }
 td.name {
   text-align:left;
 }
-
-/* ===============================
-   商品圖片
-================================ */
 .item-img {
   width:80px;
   height:80px;
@@ -98,22 +74,10 @@ td.name {
   background:#f8f9fa;
   border-radius:6px;
 }
-
-/* ===============================
-   庫存顯示
-================================ */
-.stock {
-  font-size:13px;
-  color:#555;
-}
 .stock.low {
   color:#d9534f;
   font-weight:bold;
 }
-
-/* ===============================
-   總金額與送出
-================================ */
 .total-box {
   margin-top:24px;
   text-align:right;
@@ -143,58 +107,31 @@ button:hover {
 
 <h1>公關品申請系統</h1>
 
-<form id="applyForm">
+<form>
 
-<!-- ===============================
-     一、申請單位資料
-================================ -->
 <fieldset>
   <legend>一、申請單位資料（必填）</legend>
 
   <div class="row">
-    <label>
-      申請人*
-      <input type="text" name="applicant" required>
-    </label>
-    <label>
-      人員編號*
-      <input type="text" name="staff_id" required>
-    </label>
+    <label>申請人*<input type="text" required></label>
+    <label>人員編號*<input type="text" required></label>
   </div>
 
   <div class="row">
-    <label>
-      申請電話*
-      <input type="text" name="phone" required>
-    </label>
-    <label>
-      電子信箱*
-      <input type="text" name="email" required>
-    </label>
+    <label>申請電話*<input type="text" required></label>
+    <label>電子信箱*<input type="text" required></label>
   </div>
 
   <div class="row">
-    <label>
-      申請單位*
-      <input type="text" name="department" required>
-    </label>
-    <label>
-      成本中心*
-      <input type="text" name="cost_center" required>
-    </label>
+    <label>申請單位*<input type="text" required></label>
+    <label>成本中心*<input type="text" required></label>
   </div>
 
   <div class="row">
-    <label>
-      領取事由*
-      <input type="text" name="reason" required>
-    </label>
+    <label>領取事由*<input type="text" required></label>
   </div>
 </fieldset>
 
-<!-- ===============================
-     二、公關品申請
-================================ -->
 <fieldset>
   <legend>二、公關品申請數量</legend>
 
@@ -224,80 +161,54 @@ button:hover {
 
 <script>
 /* ===============================
-   公關品資料（Phase 2）
+   🔧 請修改這裡
 ================================ */
-const items = [
-  {
-    id:'PR001',
-    name:'綠底手提袋（大）',
-    price:20.7,
-    stock:120,
-    image:'https://drive.google.com/uc?export=view&id=18DNuastvkEJGdEwRIf12bzHZX7okU2mi'
-  },
-  {
-    id:'PR002',
-    name:'白底手提紙袋（小）',
-    price:15.5,
-    stock:30,
-    image:'https://drive.google.com/uc?export=view&id=1B8W2EglHIGbYJFGDbUFc6U-_fsCqQe9S'
-  },
-  {
-    id:'PR003',
-    name:'醫院三色筆（含觸控）',
-    price:8,
-    stock:5,
-    image:'https://drive.google.com/uc?export=view&id=1pWzP70RuXVN6GaG2-nb7mYNWJDMa-WPw'
-  }
-];
+const SHEET_ID = '請填你的 Sheet ID';
+const SHEET_NAME = '請填工作表名稱';
+
+/* ===============================
+   載入 Google Sheet
+================================ */
+const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME}`;
+
+fetch(url)
+  .then(res => res.text())
+  .then(text => {
+    const json = JSON.parse(text.substring(47, text.length - 2));
+    const rows = json.table.rows;
+
+    const items = rows.map(r => ({
+      name: r.c[0]?.v,
+      price: Number(r.c[2]?.v),
+      stock: Number(r.c[3]?.v),
+      image: r.c[4]?.v
+    }));
+
+    renderItems(items);
+  });
 
 const tbody = document.getElementById('itemsTable');
 const totalAmountEl = document.getElementById('totalAmount');
 
-/* 建立表格 */
-items.forEach(item => {
-  const tr = document.createElement('tr');
+function renderItems(items) {
+  tbody.innerHTML = '';
 
-  tr.innerHTML = `
-    <td>
-      <img src="${item.image}" class="item-img">
-    </td>
-    <td class="name">${item.name}</td>
-    <td>$${item.price}</td>
-    <td class="stock ${item.stock <= 10 ? 'low':''}">
-      ${item.stock}
-    </td>
-    <td>
-      <input type="number"
-        min="0"
-        max="${item.stock}"
-        value="0"
-        data-id="${item.id}">
-    </td>
-  `;
-
-  tbody.appendChild(tr);
-});
-
-/* 即時計算總金額 */
-tbody.addEventListener('input', () => {
-  let total = 0;
-
-  document.querySelectorAll('#itemsTable input[type="number"]').forEach(input => {
-    const id = input.dataset.id;
-    const qty = Number(input.value) || 0;
-    const item = items.find(i => i.id === id);
-
-    if (qty > item.stock) {
-      input.value = item.stock;
-      alert(`「${item.name}」庫存不足`);
-    }
-
-    total += qty * item.price;
+  items.forEach((item, index) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><img src="${item.image}" class="item-img"></td>
+      <td class="name">${item.name}</td>
+      <td>$${item.price}</td>
+      <td class="${item.stock <= 10 ? 'stock low':'stock'}">${item.stock}</td>
+      <td>
+        <input type="number" min="0" max="${item.stock}" value="0" data-index="${index}">
+      </td>
+    `;
+    tbody.appendChild(tr);
   });
 
-  totalAmountEl.textContent = total.toFixed(2);
-});
-</script>
-
-</body>
-</html>
+  tbody.addEventListener('input', () => {
+    let total = 0;
+    tbody.querySelectorAll('input').forEach(input => {
+      const idx = input.dataset.index;
+      const qty = Number(input.value) || 0;
