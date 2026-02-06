@@ -161,63 +161,121 @@ button:hover {
 
 <script>
 /* ===============================
-   🔧 請修改這裡
+   Google Sheet 設定
 ================================ */
-const SHEET_ID = '1bU7ENJeI_SLLvb8FYw2kEsFoAnucMYPV';
+const SHEET_ID = '1bU7ENJeL_SLvb8FW2kEsFoAnucMYPV';
 const SHEET_NAME = 'Items-list';
 
-/* ===============================
-   載入 Google Sheet
-================================ */
-const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME}`;
-
-fetch(url)
-  .then(res => res.text())
-  .then(text => {
-    const json = JSON.parse(text.substring(47, text.length - 2));
-    const rows = json.table.rows;
-
-    const items = rows.map(r => ({
-      name: r.c[0]?.v,
-      price: Number(r.c[2]?.v),
-      stock: Number(r.c[3]?.v),
-      image: r.c[4]?.v
-    }));
-
-    renderItems(items);
-  });
+const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${SHEET_NAME}&tqx=out:json`;
 
 const tbody = document.getElementById('itemsTable');
 const totalAmountEl = document.getElementById('totalAmount');
 
-function renderItems(items) {
+let items = [];
+
+/* ===============================
+   載入 Google Sheet
+================================ */
+fetch(url)
+  .then(res => res.text())
+  .then(text => {
+    const json = JSON.parse(text.substring(47).slice(0, -2));
+    const rows = json.table.rows;
+
+    items = rows.map(row => ({
+      id: row.c[0]?.v,                 // Num
+      name: row.c[1]?.v,               // Item_TW
+      price: Number(row.c[3]?.v) || 0, // Price
+      stock: Number(row.c[4]?.v) || 0, // Inventory
+      image: row.c[5]?.v || ''         // Image URL
+    }));
+
+    renderTable();
+  });
+
+/* ===============================
+   建立表格（含圖片展開）
+================================ */
+function renderTable() {
   tbody.innerHTML = '';
 
-  items.forEach((item, index) => {
+  items.forEach(item => {
     const tr = document.createElement('tr');
+
     tr.innerHTML = `
-      <td><img src="${item.image}" class="item-img"></td>
-      <td class="name">${item.name}</td>
+      <td style="width:80px">
+        ${item.image ? `
+          <button type="button" class="img-toggle" data-id="${item.id}">▶</button>
+          <div class="img-box" id="img-${item.id}" style="display:none;margin-top:6px">
+            <img src="${item.image}" style="width:120px;height:auto;border-radius:6px">
+          </div>
+        ` : '-'}
+      </td>
+
+      <td>${item.name}</td>
+
       <td>$${item.price}</td>
-      <td class="${item.stock <= 10 ? 'stock low':'stock'}">${item.stock}</td>
+
+      <td class="stock ${item.stock <= 10 ? 'low' : ''}">
+        ${item.stock}
+      </td>
+
       <td>
-        <input type="number" min="0" max="${item.stock}" value="0" data-index="${index}">
+        <input type="number"
+          min="0"
+          max="${item.stock}"
+          value="0"
+          data-id="${item.id}">
       </td>
     `;
+
     tbody.appendChild(tr);
   });
-
-  tbody.addEventListener('input', () => {
-    let total = 0;
-    tbody.querySelectorAll('input').forEach(input => {
-      const idx = input.dataset.index;
-      const qty = Number(input.value) || 0;
-      total += qty * items[idx].price;
-    });
-    totalAmountEl.textContent = total.toFixed(2);
-  });
 }
+
+/* ===============================
+   圖片展開 / 收合
+================================ */
+tbody.addEventListener('click', e => {
+  if (!e.target.classList.contains('img-toggle')) return;
+
+  const id = e.target.dataset.id;
+  const box = document.getElementById(`img-${id}`);
+
+  if (box.style.display === 'none') {
+    box.style.display = 'block';
+    e.target.textContent = '▼';
+  } else {
+    box.style.display = 'none';
+    e.target.textContent = '▶';
+  }
+});
+
+/* ===============================
+   即時計算總金額
+================================ */
+tbody.addEventListener('input', () => {
+  let total = 0;
+
+  document.querySelectorAll('#itemsTable input[type="number"]').forEach(input => {
+    const id = input.dataset.id;
+    const qty = Number(input.value) || 0;
+    const item = items.find(i => i.id == id);
+
+    if (!item) return;
+
+    if (qty > item.stock) {
+      input.value = item.stock;
+      alert(`「${item.name}」庫存不足`);
+    }
+
+    total += qty * item.price;
+  });
+
+  totalAmountEl.textContent = total.toFixed(0);
+});
 </script>
+
 
 </body>
 </html>
