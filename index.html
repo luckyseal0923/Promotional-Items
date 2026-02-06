@@ -279,7 +279,7 @@ function renderTable() {
         ${item.image ? `<span class="item-toggle" data-img="${item.image}">看圖 ▸</span>` : ''}
       </td>
       <td>NT$ ${item.price}</td>
-      <td class="stock ${item.stock <= 10 ? 'low' : ''}">庫存：${item.stock}</td>
+      <td class="stock ${item.stock <= 10 ? 'low' : ''}">${item.stock}</td>
       <td>
         <input type="number" min="0" max="${item.stock}" data-id="${item.id}" placeholder="請輸入數量">
       </td>
