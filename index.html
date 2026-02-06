@@ -6,6 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 <style>
+/* ===== 基本樣式 ===== */
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Noto Sans TC", Arial, sans-serif;
   background:#f6f7f9;
@@ -46,10 +47,11 @@ label {
 input[type="text"],
 input[type="number"] {
   width:100%;
-  padding:8px;
+  padding:10px;
   margin-top:6px;
   border:1px solid #ccc;
-  border-radius:6px;
+  border-radius:8px;
+  font-size:16px;
 }
 table {
   width:100%;
@@ -58,7 +60,7 @@ table {
 }
 th, td {
   border-bottom:1px solid #ddd;
-  padding:12px;
+  padding:14px;
   text-align:center;
 }
 th {
@@ -66,6 +68,7 @@ th {
 }
 td.name {
   text-align:left;
+  font-weight:600;
 }
 .stock.low {
   color:#d9534f;
@@ -82,23 +85,24 @@ td.name {
   margin-top:32px;
 }
 button {
-  padding:12px 40px;
+  padding:14px 40px;
   font-size:17px;
   background:#0A84FF;
   color:#fff;
   border:none;
-  border-radius:8px;
+  border-radius:10px;
   cursor:pointer;
 }
 button:hover {
   background:#006edc;
 }
 
-/* ===== 品項圖片切換 ===== */
+/* ===== 品項切換按鈕 ===== */
 .item-toggle {
+  margin-left:8px;
+  font-size:14px;
   cursor:pointer;
   color:#0A84FF;
-  font-weight:500;
   user-select:none;
 }
 
@@ -106,15 +110,15 @@ button:hover {
 .modal {
   display:none;
   position:fixed;
-  z-index:999;
   inset:0;
   background:rgba(0,0,0,0.6);
+  z-index:999;
   align-items:center;
   justify-content:center;
 }
 .modal img {
-  max-width:80%;
-  max-height:80%;
+  max-width:90%;
+  max-height:90%;
   border-radius:12px;
   background:#fff;
 }
@@ -122,9 +126,57 @@ button:hover {
   position:absolute;
   top:20px;
   right:24px;
-  font-size:28px;
+  font-size:30px;
   color:#fff;
   cursor:pointer;
+}
+
+/* ===== 📱 手機版優化 ===== */
+@media (max-width: 768px) {
+
+  table, thead, tbody, tr, th, td {
+    display:block;
+  }
+
+  thead {
+    display:none;
+  }
+
+  tbody tr {
+    background:#fff;
+    margin-bottom:16px;
+    padding:16px;
+    border-radius:14px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.08);
+  }
+
+  td {
+    border:none;
+    text-align:left;
+    padding:8px 0;
+  }
+
+  td.name {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size:16px;
+  }
+
+  .item-toggle {
+    font-size:15px;
+    padding:6px 14px;
+    background:#e7f1ff;
+    border-radius:20px;
+  }
+
+  input[type="number"] {
+    font-size:16px;
+  }
+
+  button[type="submit"] {
+    width:100%;
+  }
 }
 </style>
 </head>
@@ -184,24 +236,19 @@ button:hover {
 
 </form>
 
-<!-- ===== 圖片 Modal ===== -->
+<!-- 圖片 Modal -->
 <div class="modal" id="imgModal">
   <span class="modal-close" id="modalClose">✕</span>
-  <img id="modalImg" src="">
+  <img id="modalImg">
 </div>
 
 <script>
-/* ===============================
-   Google Sheet 設定
-================================ */
 const SHEET_ID = '19hRS6fdUnHeDMysq32LWsYXiVovcDqXjSQphBu3wsuk';
 const SHEET_NAME = 'Items-list';
-
 const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${SHEET_NAME}&tqx=out:json`;
 
 const tbody = document.getElementById('itemsTable');
 const totalAmountEl = document.getElementById('totalAmount');
-
 const modal = document.getElementById('imgModal');
 const modalImg = document.getElementById('modalImg');
 const modalClose = document.getElementById('modalClose');
@@ -212,87 +259,59 @@ fetch(url)
   .then(res => res.text())
   .then(text => {
     const json = JSON.parse(text.substring(47).slice(0, -2));
-    const rows = json.table.rows;
-
-    items = rows.map(row => ({
+    items = json.table.rows.map(row => ({
       id: row.c[0]?.v,
       name: row.c[1]?.v,
       price: Number(row.c[3]?.v) || 0,
       stock: Number(row.c[4]?.v) || 0,
       image: row.c[5]?.v || ''
     }));
-
     renderTable();
   });
 
 function renderTable() {
   tbody.innerHTML = '';
-
   items.forEach(item => {
     const tr = document.createElement('tr');
-
     tr.innerHTML = `
       <td class="name">
         ${item.name}
-        ${item.image ? `<span class="item-toggle" data-img="${item.image}"> ▸</span>` : ''}
+        ${item.image ? `<span class="item-toggle" data-img="${item.image}">看圖 ▸</span>` : ''}
       </td>
-
       <td>NT$ ${item.price}</td>
-
-      <td class="stock ${item.stock <= 10 ? 'low' : ''}">
-        ${item.stock}
-      </td>
-
+      <td class="stock ${item.stock <= 10 ? 'low' : ''}">庫存：${item.stock}</td>
       <td>
-        <input type="number"
-          min="0"
-          max="${item.stock}"
-          data-id="${item.id}"
-          placeholder="">
+        <input type="number" min="0" max="${item.stock}" data-id="${item.id}" placeholder="請輸入數量">
       </td>
     `;
-
     tbody.appendChild(tr);
   });
 }
 
-/* ===== 點擊顯示圖片 ===== */
 tbody.addEventListener('click', e => {
   if (!e.target.classList.contains('item-toggle')) return;
-
-  document.querySelectorAll('.item-toggle').forEach(el => el.textContent = ' ▸');
-
-  e.target.textContent = ' ▾';
+  document.querySelectorAll('.item-toggle').forEach(b => b.textContent = '看圖 ▸');
+  e.target.textContent = '看圖 ▾';
   modalImg.src = e.target.dataset.img;
   modal.style.display = 'flex';
 });
 
-modalClose.addEventListener('click', () => {
+modalClose.onclick = () => {
   modal.style.display = 'none';
-  document.querySelectorAll('.item-toggle').forEach(el => el.textContent = ' ▸');
-});
+  document.querySelectorAll('.item-toggle').forEach(b => b.textContent = '看圖 ▸');
+};
 
-modal.addEventListener('click', e => {
+modal.onclick = e => {
   if (e.target === modal) modalClose.click();
-});
+};
 
-/* ===== 金額計算 ===== */
 tbody.addEventListener('input', () => {
   let total = 0;
-
-  document.querySelectorAll('#itemsTable input[type="number"]').forEach(input => {
-    const qty = Number(input.value) || 0;
+  document.querySelectorAll('input[type="number"]').forEach(input => {
     const item = items.find(i => i.id == input.dataset.id);
-    if (!item) return;
-
-    if (qty > item.stock) {
-      input.value = item.stock;
-      alert(`「${item.name}」庫存不足`);
-    }
-
-    total += qty * item.price;
+    const qty = Number(input.value) || 0;
+    if (item) total += qty * item.price;
   });
-
   totalAmountEl.textContent = total.toFixed(0);
 });
 </script>
