@@ -152,7 +152,7 @@ button:hover {
 
   <div class="row">
     <label>申請人*<input type="text" name="applicant_name" required></label>
-    <label>院內員編*<input type="text" name="staffId" required></label>
+    <label>院內員編*<input type="text" name="staff_id" required></label>
   </div>
 
   <div class="row">
@@ -215,7 +215,7 @@ const modalClose = document.getElementById('modalClose');
 
 let items = [];
 
-function generateTaskId() {
+function generatetask_id() {
   const d = new Date();
   const ymd = d.getFullYear().toString()
     + String(d.getMonth() + 1).padStart(2, '0')
@@ -281,14 +281,14 @@ document.getElementById('applyForm').onsubmit=async e=>{
   e.preventDefault();
 
   const f=e.target;
-  const taskId = generateTaskId();
+  const task_id = generatetask_id();
 
   const payload={
-    task_id: taskId,
+    task_id: task_id,
     applicant_name: f.applicant_name.value,
-    staff_id: f.staffId.value,
+    staff_id: f.staff_id.value,
     phone: f.phone.value,
-    applicant_email: f.applicnat_email.value,
+    applicant_email: f.applicant_email.value,
     department: f.department.value,
     cost_center: f.costCenter.value,
     reason: f.reason.value,
@@ -303,7 +303,7 @@ document.getElementById('applyForm').onsubmit=async e=>{
       const it=items.find(i=>i.item_id==inp.dataset.id);
       if(it){
         payload.items.push({
-          task_id: taskId,
+          task_id: task_id,
           item_id: it.item_id,
           item_name: it.item_name,
           unit_price: it.unit_price,
