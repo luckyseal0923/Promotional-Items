@@ -14,9 +14,35 @@ body {
 
 h1 {
   text-align:center;
-  margin-bottom:24px;
+  margin-bottom:20px;
 }
 
+/* ===== 查詢區 ===== */
+.search-box {
+  max-width:1200px;
+  margin:0 auto 24px;
+  display:flex;
+  gap:10px;
+}
+
+.search-box input {
+  flex:1;
+  padding:10px;
+  border-radius:8px;
+  border:1px solid #ccc;
+  font-size:14px;
+}
+
+.search-box button {
+  padding:10px 16px;
+  border:none;
+  border-radius:8px;
+  background:#0A84FF;
+  color:#fff;
+  cursor:pointer;
+}
+
+/* ===== 看板 ===== */
 .board {
   display:grid;
   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
@@ -33,12 +59,13 @@ h1 {
 }
 
 .card h3 {
-  margin:0 0 6px;
+  margin:0 0 4px;
+  font-size:16px;
 }
 
 .info {
   font-size:14px;
-  margin-bottom:6px;
+  margin-bottom:4px;
 }
 
 /* ===== 狀態條 ===== */
@@ -84,9 +111,7 @@ h1 {
 .step.done {
   color:#0A84FF;
 }
-.step.done::before {
-  background:#0A84FF;
-}
+.step.done::before,
 .step.done::after {
   background:#0A84FF;
 }
@@ -99,7 +124,15 @@ h1 {
   background:#28a745;
 }
 
-/* ===== 展開區 ===== */
+.step.exception {
+  color:#dc3545;
+  font-weight:bold;
+}
+.step.exception::before {
+  background:#dc3545;
+}
+
+/* ===== 明細 ===== */
 .details {
   display:none;
   margin-top:10px;
@@ -110,12 +143,42 @@ h1 {
 }
 
 .toggle-btn {
-  margin-top:10px;
+  margin-top:8px;
   background:none;
   border:none;
   color:#0A84FF;
   cursor:pointer;
   font-size:14px;
+}
+
+/* ===== 結案清單 ===== */
+.archive {
+  max-width:1200px;
+  margin:40px auto 0;
+}
+
+.archive h3 {
+  cursor:pointer;
+  font-size:16px;
+}
+
+.archive table {
+  width:100%;
+  border-collapse:collapse;
+  background:#fff;
+  margin-top:10px;
+  display:none;
+}
+
+.archive th, .archive td {
+  border-bottom:1px solid #eee;
+  padding:8px;
+  font-size:14px;
+  text-align:left;
+}
+
+.archive th {
+  background:#f0f2f5;
 }
 </style>
 </head>
@@ -124,63 +187,121 @@ h1 {
 
 <h1>📦 公關品申請狀態看板</h1>
 
-<div class="board">
+<!-- 查詢 -->
+<div class="search-box">
+  <input id="staffInput" placeholder="輸入員編查詢所有紀錄（例：A12345）" />
+  <button onclick="render()">查詢</button>
+</div>
 
-  <!-- 卡片 -->
-  <div class="card">
-    <h3>王小明｜急診醫學部</h3>
-    <div class="info">申請日期：2026/02/04</div>
-    <div class="info">總金額：NT$ 1,240</div>
+<!-- 進行中 -->
+<div class="board" id="activeBoard"></div>
 
-    <!-- 狀態條 -->
-    <div class="timeline">
-      <div class="step done">提出申請</div>
-      <div class="step current">繳費處理中</div>
-      <div class="step">商品準備中</div>
-      <div class="step">已通知領取</div>
-    </div>
-
-    <button class="toggle-btn" onclick="toggleDetails(this)">
-      查看案件明細
-    </button>
-
-    <div class="details">
-      綠底手提袋（大）× 20<br>
-      醫院三色筆 × 30
-    </div>
-  </div>
-
-  <!-- 另一張卡 -->
-  <div class="card">
-    <h3>林怡君｜教學部</h3>
-    <div class="info">申請日期：2026/01/31</div>
-    <div class="info">總金額：NT$ 460</div>
-
-    <div class="timeline">
-      <div class="step done">提出申請</div>
-      <div class="step done">繳費處理中</div>
-      <div class="step done">商品準備中</div>
-      <div class="step current">已通知領取</div>
-    </div>
-
-    <button class="toggle-btn" onclick="toggleDetails(this)">
-      查看案件明細
-    </button>
-
-    <div class="details">
-      北醫平安包 × 1
-    </div>
-  </div>
-
+<!-- 結案清單 -->
+<div class="archive">
+  <h3 onclick="toggleArchive()">▸ 結案清單（點擊展開｜近半年）</h3>
+  <table id="archiveTable">
+    <thead>
+      <tr>
+        <th>訂單編號</th>
+        <th>申請人</th>
+        <th>部門</th>
+        <th>申請日期</th>
+        <th>結案日期</th>
+      </tr>
+    </thead>
+    <tbody id="archiveBody"></tbody>
+  </table>
 </div>
 
 <script>
-function toggleDetails(btn) {
-  const details = btn.nextElementSibling;
-  const isOpen = details.style.display === 'block';
-  details.style.display = isOpen ? 'none' : 'block';
-  btn.textContent = isOpen ? '查看案件明細' : '收合案件明細';
+/* ===== 虛擬資料 ===== */
+const orders = [
+  {
+    task_id:'TASK-20260204-031',
+    name:'王小明',
+    staff:'A12345',
+    dept:'急診醫學部',
+    date:'2026/02/04',
+    close:'2026/02/10',
+    amount:1240,
+    status:'PREPARING',
+    items:['綠底手提袋 × 20','醫院三色筆 × 30']
+  },
+  {
+    task_id:'TASK-20260131-018',
+    name:'林怡君',
+    staff:'A12345',
+    dept:'教學部',
+    date:'2026/01/31',
+    close:'2026/02/02',
+    amount:460,
+    status:'READY',
+    items:['北醫平安包 × 1']
+  },
+  {
+    task_id:'TASK-20260201-044',
+    name:'王小明',
+    staff:'A12345',
+    dept:'急診醫學部',
+    date:'2026/02/01',
+    close:'',
+    amount:900,
+    status:'EXCEPTION',
+    items:['宣導資料夾 × 10']
+  }
+];
+
+function render(){
+  const staff = document.getElementById('staffInput').value.trim();
+  const active = document.getElementById('activeBoard');
+  const archive = document.getElementById('archiveBody');
+  active.innerHTML='';
+  archive.innerHTML='';
+
+  orders.filter(o => !staff || o.staff===staff).forEach(o=>{
+    if(o.status==='READY'){
+      archive.innerHTML+=`
+        <tr>
+          <td>${o.task_id}</td>
+          <td>${o.name}（${o.staff}）</td>
+          <td>${o.dept}</td>
+          <td>${o.date}</td>
+          <td>${o.close}</td>
+        </tr>`;
+    }else{
+      active.innerHTML+=`
+      <div class="card">
+        <h3>${o.task_id}</h3>
+        <div class="info">${o.name}（${o.staff}）｜${o.dept}</div>
+        <div class="info">申請日期：${o.date}</div>
+        <div class="info">總金額：NT$ ${o.amount}</div>
+
+        <div class="timeline">
+          <div class="step ${['SUBMITTED','PREPARING','READY','EXCEPTION'].includes(o.status)?'done':''}">申請提出</div>
+          <div class="step ${o.status==='PREPARING'?'current':''}">商品準備中</div>
+          <div class="step ${o.status==='READY'?'current':''}">已通知領取</div>
+          <div class="step ${o.status==='EXCEPTION'?'exception current':''}">異常通知</div>
+        </div>
+
+        <button class="toggle-btn" onclick="toggleDetails(this)">查看案件明細</button>
+        <div class="details">${o.items.join('<br>')}</div>
+      </div>`;
+    }
+  });
 }
+
+function toggleDetails(btn){
+  const d = btn.nextElementSibling;
+  d.style.display = d.style.display==='block'?'none':'block';
+  btn.textContent = d.style.display==='block'?'收合案件明細':'查看案件明細';
+}
+
+function toggleArchive(){
+  const t=document.getElementById('archiveTable');
+  t.style.display = t.style.display==='table'?'none':'table';
+}
+
+render();
 </script>
 
 </body>
