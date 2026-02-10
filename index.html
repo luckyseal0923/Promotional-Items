@@ -215,14 +215,23 @@ const modalClose = document.getElementById('modalClose');
 
 let items = [];
 
+function generateTaskId() {
+  const d = new Date();
+  const ymd = d.getFullYear().toString()
+    + String(d.getMonth() + 1).padStart(2, '0')
+    + String(d.getDate()).padStart(2, '0');
+  const rand = Math.floor(Math.random() * 900 + 100);
+  return `task-${ymd}-${rand}`;
+}
+
 fetch(url)
   .then(r => r.text())
   .then(t => {
     const json = JSON.parse(t.substring(47).slice(0, -2));
     items = json.table.rows.map(r => ({
-      id: r.c[0]?.v,
-      name: r.c[1]?.v,
-      price: Number(r.c[3]?.v) || 0,
+      item_id: r.c[0]?.v,
+      item_name: r.c[1]?.v,
+      unit_price: Number(r.c[3]?.v) || 0,
       stock: Number(r.c[4]?.v) || 0,
       image: r.c[5]?.v || ''
     }));
@@ -234,10 +243,19 @@ function renderTable(){
   items.forEach(i=>{
     const tr=document.createElement('tr');
     tr.innerHTML=`
-      <td class="name">${i.name}${i.image?`<span class="item-toggle" data-img="${i.image}">看圖 ▸</span>`:''}</td>
-      <td>NT$ ${i.price}</td>
+      <td class="name">
+        ${i.item_name}
+        ${i.image ? `<span class="item-toggle" data-img="${i.image}">看圖 ▸</span>` : ''}
+      </td>
+      <td>NT$ ${i.unit_price}</td>
       <td class="${i.stock<=10?'stock low':'stock'}">庫存：${i.stock}</td>
-      <td><input type="number" min="0" max="${i.stock}" data-id="${i.id}" placeholder="請輸入數量"></td>`;
+      <td>
+        <input type="number"
+               min="0"
+               max="${i.stock}"
+               data-id="${i.item_id}"
+               placeholder="請輸入數量">
+      </td>`;
     tbody.appendChild(tr);
   });
 }
@@ -253,8 +271,8 @@ modal.onclick=e=>{if(e.target===modal)modalClose.click();};
 tbody.oninput=()=>{
   let total=0;
   document.querySelectorAll('#itemsTable input').forEach(inp=>{
-    const it=items.find(i=>i.id==inp.dataset.id);
-    total+=it?(Number(inp.value)||0)*it.price:0;
+    const it=items.find(i=>i.item_id==inp.dataset.id);
+    total+=it?(Number(inp.value)||0)*it.unit_price:0;
   });
   totalAmountEl.textContent=total.toFixed(0);
 };
@@ -263,33 +281,51 @@ document.getElementById('applyForm').onsubmit=async e=>{
   e.preventDefault();
 
   const f=e.target;
+  const taskId = generateTaskId();
+
   const payload={
-    applicant:f.applicant.value,
-    staffId:f.staffId.value,
-    phone:f.phone.value,
-    email:f.email.value,
-    department:f.department.value,
-    costCenter:f.costCenter.value,
-    reason:f.reason.value,
-    items:[]
+    task_id: taskId,
+    applicant: f.applicant.value,
+    staff_id: f.staffId.value,
+    phone: f.phone.value,
+    email: f.email.value,
+    department: f.department.value,
+    cost_center: f.costCenter.value,
+    reason: f.reason.value,
+    status: 'SUBMITTED',
+    total_amount: Number(totalAmountEl.textContent),
+    items: []
   };
 
   document.querySelectorAll('#itemsTable input').forEach(inp=>{
     const q=Number(inp.value);
     if(q>0){
-      const it=items.find(i=>i.id==inp.dataset.id);
-      if(it)payload.items.push({itemId:it.id,itemName:it.name,price:it.price,quantity:q});
+      const it=items.find(i=>i.item_id==inp.dataset.id);
+      if(it){
+        payload.items.push({
+          task_id: taskId,
+          item_id: it.item_id,
+          item_name: it.item_name,
+          unit_price: it.unit_price,
+          quantity: q,
+          subtotal: it.unit_price * q
+        });
+      }
     }
   });
 
-  if(payload.items.length===0){alert('請至少選一項');return;}
+  if(payload.items.length===0){
+    alert('請至少選一項');
+    return;
+  }
 
-  const res=await fetch(API_URL,{
+  const res = await fetch(API_URL,{
     method:'POST',
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify(payload)
   });
-  const r=await res.json();
+
+  const r = await res.json();
   if(r.status==='success'){
     alert('申請完成');
     f.reset();
@@ -300,6 +336,7 @@ document.getElementById('applyForm').onsubmit=async e=>{
   }
 };
 </script>
+
 
 </body>
 </html>
