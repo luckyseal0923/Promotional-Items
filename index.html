@@ -151,13 +151,13 @@ button:hover {
   <legend>一、申請單位資料（必填）</legend>
 
   <div class="row">
-    <label>申請人*<input type="text" name="applicant" required></label>
+    <label>申請人*<input type="text" name="applicant_name" required></label>
     <label>院內員編*<input type="text" name="staffId" required></label>
   </div>
 
   <div class="row">
     <label>申請者電話*<input type="text" name="phone" required></label>
-    <label>電子信箱*<input type="text" name="email" required></label>
+    <label>電子信箱*<input type="text" name="applicant_email" required></label>
   </div>
 
   <div class="row">
@@ -285,10 +285,10 @@ document.getElementById('applyForm').onsubmit=async e=>{
 
   const payload={
     task_id: taskId,
-    applicant: f.applicant.value,
+    applicant_name: f.applicant_name.value,
     staff_id: f.staffId.value,
     phone: f.phone.value,
-    email: f.email.value,
+    applicant_email: f.applicnat_email.value,
     department: f.department.value,
     cost_center: f.costCenter.value,
     reason: f.reason.value,
