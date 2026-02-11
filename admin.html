@@ -2,276 +2,546 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8" />
-<title>公關品申請－後台管理（虛擬）</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Phase 3｜公關品申請系統－後臺管理</title>
 
 <style>
-body {
-  font-family: -apple-system, BlinkMacSystemFont, "Noto Sans TC", Arial, sans-serif;
-  background:#f4f6f8;
-  padding:20px;
-}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC",Arial,sans-serif;
+    background:#f6f7f9;
+    margin:0;
+    padding:20px;
+  }
+  h1{ text-align:center; margin:0 0 18px; }
+  .container{ max-width:1200px; margin:0 auto; }
 
-h1 {
-  text-align:center;
-  margin-bottom:24px;
-}
+  /* ===== 卡片 ===== */
+  .panel{
+    background:#fff;
+    border-radius:12px;
+    padding:16px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.08);
+    margin-bottom:18px;
+  }
 
-.board {
-  display:grid;
-  grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
-  gap:20px;
-  max-width:1400px;
-  margin:auto;
-}
+  /* ===== 上方列 ===== */
+  .topbar{
+    display:flex;
+    gap:10px;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    margin-bottom:12px;
+  }
+  .badge{
+    display:inline-block;
+    padding:4px 10px;
+    border-radius:999px;
+    font-size:12px;
+    background:#eef2ff;
+    color:#1e40af;
+  }
+  .btn{
+    border:none;
+    padding:10px 14px;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:14px;
+  }
+  .btn-primary{ background:#0A84FF; color:#fff; }
+  .btn-ghost{ background:#f1f5f9; color:#111; }
+  .btn-danger{ background:#dc3545; color:#fff; }
 
-.card {
-  background:#fff;
-  border-radius:14px;
-  padding:18px;
-  box-shadow:0 2px 12px rgba(0,0,0,0.08);
-}
+  /* ===== Tabs ===== */
+  .tabs{
+    display:flex;
+    gap:8px;
+    margin:10px 0 0;
+    flex-wrap:wrap;
+  }
+  .tab{
+    padding:10px 14px;
+    border-radius:999px;
+    cursor:pointer;
+    background:#f1f5f9;
+    font-size:14px;
+  }
+  .tab.active{
+    background:#0A84FF;
+    color:#fff;
+  }
 
-.header {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
+  /* ===== 表格 ===== */
+  table{
+    width:100%;
+    border-collapse:collapse;
+    background:#fff;
+    overflow:hidden;
+    border-radius:12px;
+  }
+  th, td{
+    padding:10px;
+    border-bottom:1px solid #eee;
+    text-align:left;
+    vertical-align:top;
+    font-size:14px;
+  }
+  th{ background:#f0f2f5; user-select:none; }
+  tr:hover td{ background:#fafafa; }
 
-.header strong {
-  font-size:16px;
-}
+  .muted{ color:#666; font-size:13px; }
+  .small{ font-size:12px; color:#666; }
 
-.status-badge {
-  padding:4px 12px;
-  border-radius:20px;
-  font-size:12px;
-  font-weight:bold;
-}
+  /* ===== 狀態 ===== */
+  .status-pill{
+    display:inline-block;
+    padding:4px 10px;
+    border-radius:999px;
+    font-size:12px;
+    background:#eef2f7;
+    color:#111;
+    white-space:nowrap;
+  }
+  .s-submitted{ background:#e0f2fe; color:#075985; }
+  .s-preparing{ background:#fff7ed; color:#9a3412; }
+  .s-ready{ background:#ecfdf5; color:#065f46; }
+  .s-exception{ background:#fee2e2; color:#991b1b; }
 
-.applied { background:#e3f2fd; color:#1565c0; }
-.payment { background:#fff3cd; color:#856404; }
-.preparing { background:#ede7f6; color:#4527a0; }
-.ready { background:#e8f5e9; color:#2e7d32; }
+  /* ===== Form ===== */
+  .grid{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:12px;
+  }
+  @media (max-width: 860px){
+    .grid{ grid-template-columns:1fr; }
+  }
+  label{ font-size:13px; color:#333; display:block; margin-bottom:6px; }
+  input, select, textarea{
+    width:100%;
+    padding:10px;
+    border:1px solid #ccc;
+    border-radius:10px;
+    font-size:14px;
+    box-sizing:border-box;
+    background:#fff;
+  }
+  textarea{ min-height:88px; resize:vertical; }
 
-.info {
-  font-size:14px;
-  margin-top:6px;
-}
+  .row{
+    display:flex;
+    gap:10px;
+    align-items:center;
+    flex-wrap:wrap;
+  }
 
-/* ===== 狀態條 ===== */
-.timeline {
-  display:flex;
-  margin:16px 0;
-}
+  /* ===== Modal ===== */
+  .modal-backdrop{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.35);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:16px;
+    z-index:50;
+  }
+  .modal{
+    width: min(900px, 100%);
+    background:#fff;
+    border-radius:14px;
+    box-shadow:0 10px 40px rgba(0,0,0,0.25);
+    overflow:hidden;
+  }
+  .modal-header{
+    padding:14px 16px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:#0A84FF;
+    color:#fff;
+  }
+  .modal-body{ padding:16px; }
+  .modal-footer{
+    padding:14px 16px;
+    background:#f8fafc;
+    display:flex;
+    gap:10px;
+    justify-content:flex-end;
+    flex-wrap:wrap;
+  }
 
-.step {
-  flex:1;
-  text-align:center;
-  font-size:12px;
-  color:#aaa;
-  position:relative;
-}
+  .hidden{ display:none; }
 
-.step::before {
-  content:'';
-  width:14px;
-  height:14px;
-  background:#ccc;
-  border-radius:50%;
-  display:block;
-  margin:0 auto 6px;
-}
-
-.step::after {
-  content:'';
-  position:absolute;
-  top:7px;
-  left:50%;
-  width:100%;
-  height:2px;
-  background:#ccc;
-  z-index:-1;
-}
-
-.step:last-child::after { display:none; }
-
-.step.done {
-  color:#0A84FF;
-}
-.step.done::before,
-.step.done::after {
-  background:#0A84FF;
-}
-
-.step.current {
-  color:#28a745;
-  font-weight:bold;
-}
-.step.current::before {
-  background:#28a745;
-}
-
-/* ===== 品項 ===== */
-.items {
-  font-size:13px;
-  color:#555;
-  border-top:1px dashed #ddd;
-  padding-top:10px;
-  margin-top:10px;
-}
-
-/* ===== 操作 ===== */
-.actions {
-  margin-top:14px;
-  display:flex;
-  gap:10px;
-}
-
-.actions button {
-  flex:1;
-  padding:10px;
-  border:none;
-  border-radius:8px;
-  font-size:14px;
-  cursor:pointer;
-}
-
-.btn-prepare {
-  background:#6f42c1;
-  color:#fff;
-}
-
-.btn-notify {
-  background:#28a745;
-  color:#fff;
-}
-
-.btn-disabled {
-  background:#ccc;
-  color:#666;
-  cursor:not-allowed;
-}
+  /* ===== Login ===== */
+  .login-wrap{
+    min-height: calc(100vh - 40px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .login-card{
+    width:min(520px, 100%);
+    background:#fff;
+    border-radius:14px;
+    padding:18px;
+    box-shadow:0 2px 16px rgba(0,0,0,0.10);
+  }
+  .login-card h2{ margin:0 0 12px; }
 </style>
 </head>
 
 <body>
 
-<h1>🛠 公關品申請－後台管理（虛擬卡片）</h1>
+<div id="loginPage" class="login-wrap">
+  <div class="login-card">
+    <h2>🔐 後臺登入（Phase 3 Admin Demo）</h2>
+    <div class="muted" style="margin-bottom:12px;">
+      這是展示版（虛擬帳號）。之後可接 n8n 做真正的白名單驗證。
+    </div>
 
-<div class="board">
+    <div style="margin-bottom:12px;">
+      <label>帳號</label>
+      <input id="loginUser" placeholder="例：admin" />
+    </div>
 
-<!-- 卡片 1 -->
-<div class="card">
-  <div class="header">
-    <strong>王小明｜急診醫學部</strong>
-    <span class="status-badge applied">提出申請</span>
-  </div>
+    <div style="margin-bottom:12px;">
+      <label>密碼</label>
+      <input id="loginPass" type="password" placeholder="例：1234" />
+    </div>
 
-  <div class="info">申請日期：2026/02/04</div>
-  <div class="info">Email：ed001@hospital.org</div>
-  <div class="info">總金額：NT$ 1,240</div>
-
-  <div class="timeline">
-    <div class="step current">提出申請</div>
-    <div class="step">繳費處理中</div>
-    <div class="step">商品準備中</div>
-    <div class="step">已通知領取</div>
-  </div>
-
-  <div class="items">
-    綠底手提袋（大）× 20<br>
-    醫院三色筆 × 30
-  </div>
-
-  <div class="actions">
-    <button class="btn-disabled" disabled>尚無可操作</button>
+    <div class="row">
+      <button class="btn btn-primary" onclick="doLogin()">登入</button>
+      <span class="small">測試帳密：admin / 1234</span>
+    </div>
   </div>
 </div>
 
-<!-- 卡片 2 -->
-<div class="card">
-  <div class="header">
-    <strong>李小華｜護理部</strong>
-    <span class="status-badge payment">繳費處理中</span>
+<div id="adminPage" class="container hidden">
+  <h1>🛠️ 公關品申請系統－後臺管理（Phase 3）</h1>
+
+  <!-- Top Panel -->
+  <div class="panel">
+    <div class="topbar">
+      <div>
+        <span class="badge" id="adminInfo">Admin: -</span>
+        <span class="badge" id="nowTime">-</span>
+      </div>
+      <div class="row">
+        <button class="btn btn-ghost" onclick="seedData()">重置虛擬資料</button>
+        <button class="btn btn-danger" onclick="logout()">登出</button>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <div class="tab active" id="tabOrders" onclick="switchTab('orders')">A. 訂單管理</div>
+      <div class="tab" id="tabInventory" onclick="switchTab('inventory')">B. 商品與庫存盤點</div>
+      <div class="tab" id="tabLogs" onclick="switchTab('logs')">C. 盤點紀錄</div>
+    </div>
   </div>
 
-  <div class="info">申請日期：2026/02/03</div>
-  <div class="info">Email：ns010@hospital.org</div>
-  <div class="info">總金額：NT$ 780</div>
+  <!-- A. Orders -->
+  <div id="viewOrders" class="panel">
+    <div class="topbar">
+      <div>
+        <b>訂單列表</b>
+        <div class="muted">可篩選、查看明細、更新狀態（含防呆）。</div>
+      </div>
 
-  <div class="timeline">
-    <div class="step done">提出申請</div>
-    <div class="step current">繳費處理中</div>
-    <div class="step">商品準備中</div>
-    <div class="step">已通知領取</div>
+      <div class="row">
+        <select id="filterStatus" onchange="renderOrders()">
+          <option value="">全部狀態</option>
+          <option value="SUBMITTED">申請提出</option>
+          <option value="PREPARING">商品準備中</option>
+          <option value="READY">已通知領取（結案）</option>
+          <option value="EXCEPTION">異常通知</option>
+        </select>
+        <input id="filterKeyword" placeholder="搜尋：task_id / 姓名 / 員編 / 部門" oninput="renderOrders()" />
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>訂單編號</th>
+          <th>申請人</th>
+          <th>部門</th>
+          <th>申請日期</th>
+          <th>總金額</th>
+          <th>狀態</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody id="ordersBody"></tbody>
+    </table>
   </div>
 
-  <div class="items">
-    北歐風陶瓷馬克杯 × 3
+  <!-- B. Inventory -->
+  <div id="viewInventory" class="panel hidden">
+    <div class="topbar">
+      <div>
+        <b>商品與庫存盤點</b>
+        <div class="muted">輸入「調整量」後更新，並自動寫入盤點紀錄（Stock Log）。</div>
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>商品</th>
+          <th>單價</th>
+          <th>現有庫存</th>
+          <th>盤點調整（+/-）</th>
+          <th>備註</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody id="itemsBody"></tbody>
+    </table>
   </div>
 
-  <div class="actions">
-    <button class="btn-disabled" disabled>等待繳費完成</button>
+  <!-- C. Logs -->
+  <div id="viewLogs" class="panel hidden">
+    <div class="topbar">
+      <div>
+        <b>盤點紀錄（Stock Log）</b>
+        <div class="muted">追蹤每次庫存異動：誰改、何時改、改了多少、原因。</div>
+      </div>
+      <div class="row">
+        <button class="btn btn-ghost" onclick="clearLogs()">清空紀錄（demo）</button>
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>時間</th>
+          <th>管理者</th>
+          <th>商品</th>
+          <th>原庫存</th>
+          <th>新庫存</th>
+          <th>備註</th>
+        </tr>
+      </thead>
+      <tbody id="logsBody"></tbody>
+    </table>
   </div>
 </div>
 
-<!-- 卡片 3 -->
-<div class="card">
-  <div class="header">
-    <strong>陳大同｜行政室</strong>
-    <span class="status-badge preparing">商品準備中</span>
-  </div>
+<!-- ===== 訂單明細 Modal ===== -->
+<div id="orderModalBackdrop" class="modal-backdrop">
+  <div class="modal">
+    <div class="modal-header">
+      <div><b id="modalTitle">訂單明細</b></div>
+      <button class="btn btn-ghost" onclick="closeOrderModal()">關閉</button>
+    </div>
 
-  <div class="info">申請日期：2026/02/02</div>
-  <div class="info">Email：admin@hospital.org</div>
-  <div class="info">總金額：NT$ 2,600</div>
+    <div class="modal-body">
+      <div class="grid">
+        <div class="panel" style="margin:0;">
+          <b>基本資訊</b>
+          <div class="muted" id="modalBaseInfo" style="margin-top:8px;"></div>
+        </div>
 
-  <div class="timeline">
-    <div class="step done">提出申請</div>
-    <div class="step done">繳費處理中</div>
-    <div class="step current">商品準備中</div>
-    <div class="step">已通知領取</div>
-  </div>
+        <div class="panel" style="margin:0;">
+          <b>狀態更新（Admin）</b>
+          <div style="margin-top:10px;">
+            <label>更新狀態</label>
+            <select id="modalStatus">
+              <option value="SUBMITTED">申請提出</option>
+              <option value="PREPARING">商品準備中</option>
+              <option value="READY">已通知領取（結案）</option>
+              <option value="EXCEPTION">異常通知</option>
+            </select>
+          </div>
 
-  <div class="items">
-    小畫茶包禮盒 × 5<br>
-    牡丹圓茶包禮盒 × 2
-  </div>
+          <div style="margin-top:10px;">
+            <label>處理備註（EXCEPTION 必填）</label>
+            <textarea id="modalNote" placeholder="例：品項缺貨，已通知改期 / 改單"></textarea>
+          </div>
 
-  <div class="actions">
-    <button class="btn-notify">🔔 通知可領取（虛擬）</button>
-  </div>
-</div>
+          <div class="muted" style="margin-top:8px;">
+            防呆：結案後不可再改；狀態不可倒退；異常需備註。
+          </div>
+        </div>
+      </div>
 
-<!-- 卡片 4 -->
-<div class="card">
-  <div class="header">
-    <strong>林怡君｜教學部</strong>
-    <span class="status-badge ready">已通知領取</span>
-  </div>
+      <div class="panel" style="margin-top:12px;">
+        <b>申請品項</b>
+        <div id="modalItems" style="margin-top:10px;" class="muted"></div>
+      </div>
+    </div>
 
-  <div class="info">申請日期：2026/01/31</div>
-  <div class="info">Email：edu@hospital.org</div>
-  <div class="info">總金額：NT$ 460</div>
-
-  <div class="timeline">
-    <div class="step done">提出申請</div>
-    <div class="step done">繳費處理中</div>
-    <div class="step done">商品準備中</div>
-    <div class="step current">已通知領取</div>
-  </div>
-
-  <div class="items">
-    北醫平安包 × 1
-  </div>
-
-  <div class="actions">
-    <button class="btn-disabled" disabled>流程已完成</button>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeOrderModal()">取消</button>
+      <button class="btn btn-primary" onclick="saveOrderStatus()">儲存狀態</button>
+    </div>
   </div>
 </div>
 
-</div>
+<script>
+/* =========================
+   Demo Session / Login
+========================= */
+let currentAdmin = null;
+const DEMO_USERS = [{ user:'admin', pass:'1234', name:'總務管理者-Admin' }];
 
-</body>
-</html>
+function doLogin(){
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value.trim();
+
+  const ok = DEMO_USERS.find(x => x.user === u && x.pass === p);
+  if(!ok){
+    alert('帳號或密碼錯誤（demo：admin / 1234）');
+    return;
+  }
+
+  currentAdmin = ok.name;
+  document.getElementById('loginPage').classList.add('hidden');
+  document.getElementById('adminPage').classList.remove('hidden');
+  document.getElementById('adminInfo').textContent = `Admin: ${currentAdmin}`;
+
+  seedData();
+  tickClock();
+  setInterval(tickClock, 1000);
+}
+
+function logout(){
+  currentAdmin = null;
+  document.getElementById('adminPage').classList.add('hidden');
+  document.getElementById('loginPage').classList.remove('hidden');
+}
+
+function tickClock(){
+  const d = new Date();
+  document.getElementById('nowTime').textContent = d.toLocaleString('zh-TW');
+}
+
+/* =========================
+   Mock Data (Orders / Items / Logs)
+========================= */
+let ORDERS = [];
+let ITEMS = [];
+let STOCK_LOGS = [];
+
+function seedData(){
+  ORDERS = [
+    {
+      task_id:'TASK-20260204-031',
+      name:'王小明', staff:'123456', dept:'急診醫學部',
+      created_at:'2026/02/04 10:12',
+      updated_at:'2026/02/04 10:12',
+      status:'PREPARING',
+      amount:1240,
+      items:[
+        { item_id:'I001', item_name:'環保提袋', unit_price:50, qty:20, subtotal:1000 },
+        { item_id:'I002', item_name:'三色筆', unit_price:8, qty:30, subtotal:240 }
+      ],
+      admin_note:''
+    },
+    {
+      task_id:'TASK-20260203-028',
+      name:'陳雅婷', staff:'234567', dept:'護理部',
+      created_at:'2026/02/03 14:05',
+      updated_at:'2026/02/03 14:05',
+      status:'SUBMITTED',
+      amount:980,
+      items:[
+        { item_id:'I003', item_name:'宣導資料夾', unit_price:19.6, qty:50, subtotal:980 }
+      ],
+      admin_note:''
+    },
+    {
+      task_id:'TASK-20260202-021',
+      name:'林志宏', staff:'345678', dept:'教學部',
+      created_at:'2026/02/02 09:30',
+      updated_at:'2026/02/02 11:00',
+      status:'EXCEPTION',
+      amount:560,
+      items:[
+        { item_id:'I004', item_name:'識別證套', unit_price:14, qty:40, subtotal:560 }
+      ],
+      admin_note:'品項臨時缺貨，已通知改期領取'
+    },
+    {
+      task_id:'TASK-20260131-018',
+      name:'黃怡君', staff:'456789', dept:'人資室',
+      created_at:'2026/01/31 16:20',
+      updated_at:'2026/02/05 13:40',
+      status:'READY',
+      amount:460,
+      items:[
+        { item_id:'I005', item_name:'北醫平安包', unit_price:460, qty:1, subtotal:460 }
+      ],
+      admin_note:'已通知領取'
+    }
+  ];
+
+  ITEMS = [
+    { item_id:'I001', name:'環保提袋', price:50, stock:200, is_active:true },
+    { item_id:'I002', name:'三色筆', price:8, stock:500, is_active:true },
+    { item_id:'I003', name:'宣導資料夾', price:19.6, stock:120, is_active:true },
+    { item_id:'I004', name:'識別證套', price:14, stock:80, is_active:true },
+    { item_id:'I005', name:'北醫平安包', price:460, stock:15, is_active:true }
+  ];
+
+  STOCK_LOGS = [
+    { at:'2026/02/01 09:10', by:'總務管理者-Admin', item:'環保提袋(I001)', before:180, after:200, note:'年度補貨 +20' },
+    { at:'2026/02/03 18:05', by:'總務管理者-Admin', item:'北醫平安包(I005)', before:18, after:15, note:'盤點校正 -3' }
+  ];
+
+  renderAll();
+}
+
+function statusText(s){
+  return ({
+    SUBMITTED:'申請提出',
+    PREPARING:'商品準備中',
+    READY:'已通知領取（結案）',
+    EXCEPTION:'異常通知'
+  })[s] || s;
+}
+function statusClass(s){
+  return ({
+    SUBMITTED:'s-submitted',
+    PREPARING:'s-preparing',
+    READY:'s-ready',
+    EXCEPTION:'s-exception'
+  })[s] || '';
+}
+
+/* =========================
+   Tab Switch
+========================= */
+function switchTab(tab){
+  document.getElementById('tabOrders').classList.toggle('active', tab==='orders');
+  document.getElementById('tabInventory').classList.toggle('active', tab==='inventory');
+  document.getElementById('tabLogs').classList.toggle('active', tab==='logs');
+
+  document.getElementById('viewOrders').classList.toggle('hidden', tab!=='orders');
+  document.getElementById('viewInventory').classList.toggle('hidden', tab!=='inventory');
+  document.getElementById('viewLogs').classList.toggle('hidden', tab!=='logs');
+}
+
+/* =========================
+   Render
+========================= */
+function renderAll(){
+  renderOrders();
+  renderItems();
+  renderLogs();
+}
+
+function renderOrders(){
+  const body = document.getElementById('ordersBody');
+  body.innerHTML = '';
+
+  const fStatus = document.getElementById('filterStatus').value;
+  const kw = document.getElementById('filterKeyword').value.trim().toLowerCase();
+
+  let rows = [...ORDERS];
+
+  if(fStatus) rows = rows.filter(o => o.status === fStatus);
+  if(kw){
+    rows = rows.filter(o =>
+      o.task_id.toLowe_
