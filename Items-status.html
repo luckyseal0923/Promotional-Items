@@ -11,38 +11,25 @@ body {
   background:#f6f7f9;
   padding:20px;
 }
+h1 { text-align:center; margin-bottom:20px; }
 
-h1 {
-  text-align:center;
-  margin-bottom:20px;
-}
-
-/* ===== 查詢區 ===== */
+/* ===== 查詢 ===== */
 .search-box {
   max-width:1200px;
   margin:0 auto 24px;
   display:flex;
   gap:10px;
 }
-
 .search-box input {
-  flex:1;
-  padding:10px;
-  border-radius:8px;
-  border:1px solid #ccc;
-  font-size:14px;
+  flex:1; padding:10px; border-radius:8px;
+  border:1px solid #ccc; font-size:14px;
 }
-
 .search-box button {
-  padding:10px 16px;
-  border:none;
-  border-radius:8px;
-  background:#0A84FF;
-  color:#fff;
-  cursor:pointer;
+  padding:10px 16px; border:none; border-radius:8px;
+  background:#0A84FF; color:#fff; cursor:pointer;
 }
 
-/* ===== 進行中卡片 ===== */
+/* ===== 卡片 ===== */
 .board {
   display:grid;
   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
@@ -50,140 +37,62 @@ h1 {
   max-width:1200px;
   margin:auto;
 }
-
 .card {
-  background:#fff;
-  border-radius:12px;
-  padding:16px;
+  background:#fff; border-radius:12px; padding:16px;
   box-shadow:0 2px 10px rgba(0,0,0,0.08);
 }
-
-.card .title {
-  font-size:18px;
-  font-weight:700;
-  margin-bottom:6px;
-}
-
-.card .sub {
-  font-size:14px;
-  margin-bottom:4px;
-}
-
-.card .money {
-  font-size:15px;
-  font-weight:600;
-  margin-top:6px;
-}
+.title { font-size:18px; font-weight:700; margin-bottom:6px; }
+.sub { font-size:14px; margin-bottom:4px; }
+.money { font-size:15px; font-weight:600; margin-top:6px; }
 
 /* ===== 狀態列 ===== */
-.timeline {
-  display:flex;
-  align-items:center;
-  margin:14px 0;
-}
-
+.timeline { display:flex; align-items:center; margin:14px 0; }
 .step {
-  flex:1;
-  text-align:center;
-  font-size:12px;
-  position:relative;
-  color:#999;
+  flex:1; text-align:center; font-size:12px;
+  position:relative; color:#999;
 }
-
 .step::before {
-  content:'';
-  display:block;
-  width:14px;
-  height:14px;
-  margin:0 auto 6px;
-  border-radius:50%;
-  background:#ccc;
+  content:''; display:block; width:14px; height:14px;
+  margin:0 auto 6px; border-radius:50%; background:#ccc;
 }
-
 .step::after {
-  content:'';
-  position:absolute;
-  top:7px;
-  left:50%;
-  width:100%;
-  height:2px;
-  background:#ccc;
-  z-index:-1;
+  content:''; position:absolute; top:7px; left:50%;
+  width:100%; height:2px; background:#ccc; z-index:-1;
 }
-
 .step:last-child::after { display:none; }
-
 .step.done { color:#0A84FF; }
-.step.done::before,
-.step.done::after { background:#0A84FF; }
-
+.step.done::before, .step.done::after { background:#0A84FF; }
 .step.current { color:#28a745; font-weight:bold; }
 .step.current::before { background:#28a745; }
-
 .step.exception { color:#dc3545; font-weight:bold; }
 .step.exception::before { background:#dc3545; }
 
 /* ===== 明細 ===== */
 .details {
-  display:none;
-  margin-top:10px;
-  font-size:13px;
-  color:#555;
-  border-top:1px dashed #ddd;
-  padding-top:10px;
+  display:none; margin-top:10px; font-size:13px;
+  color:#555; border-top:1px dashed #ddd; padding-top:10px;
 }
-
 .toggle-btn {
-  margin-top:8px;
-  background:none;
-  border:none;
-  color:#0A84FF;
-  cursor:pointer;
-  font-size:14px;
+  margin-top:8px; background:none; border:none;
+  color:#0A84FF; cursor:pointer; font-size:14px;
 }
 
 /* ===== 結案清單 ===== */
-.archive {
-  max-width:1200px;
-  margin:40px auto 0;
-}
-
-.archive h3 {
-  cursor:pointer;
-  font-size:16px;
-}
-
+.archive { max-width:1200px; margin:40px auto 0; }
+.archive h3 { cursor:pointer; font-size:16px; }
 .archive table {
-  width:100%;
-  border-collapse:collapse;
-  background:#fff;
-  margin-top:10px;
-  display:none;
+  width:100%; border-collapse:collapse;
+  background:#fff; margin-top:10px; display:none;
 }
-
 .archive th, .archive td {
   border-bottom:1px solid #eee;
-  padding:8px;
-  font-size:14px;
-  text-align:left;
-  vertical-align:top;
+  padding:8px; font-size:14px; text-align:left;
 }
-
 .archive th {
-  background:#f0f2f5;
-  cursor:pointer;
-  user-select:none;
+  background:#f0f2f5; cursor:pointer; user-select:none;
 }
-
-.sort-icon {
-  margin-left:6px;
-  font-size:11px;
-  color:#888;
-}
-.sort-active {
-  color:#0A84FF;
-  font-weight:bold;
-}
+.sort-icon { margin-left:6px; font-size:11px; color:#888; }
+.sort-active { color:#0A84FF; font-weight:bold; }
 </style>
 </head>
 
@@ -191,27 +100,24 @@ h1 {
 
 <h1>📦 公關品申請狀態看板</h1>
 
-<!-- 查詢 -->
 <div class="search-box">
-  <input id="staffInput" placeholder="輸入員編（6碼）查詢所有紀錄" />
-  <button onclick="render()">查詢</button>
+  <input id="staffInput" placeholder="輸入員編（6碼）查詢" />
+  <button onclick="loadData()">查詢</button>
 </div>
 
-<!-- 進行中訂單 -->
 <div class="board" id="activeBoard"></div>
 
-<!-- 結案清單 -->
 <div class="archive">
-  <h3 onclick="toggleArchive()">▸ 結案清單（點擊展開｜近半年）</h3>
+  <h3 onclick="toggleArchive()">▸ 結案清單（近半年）</h3>
   <table id="archiveTable">
     <thead>
       <tr>
-        <th onclick="sortArchive('task_id')">訂單編號<span id="icon-task_id" class="sort-icon"></span></th>
-        <th onclick="sortArchive('name')">申請人<span id="icon-name" class="sort-icon"></span></th>
-        <th onclick="sortArchive('dept')">部門<span id="icon-dept" class="sort-icon"></span></th>
+        <th>訂單編號</th>
+        <th>申請人</th>
+        <th>部門</th>
         <th>購買內容</th>
-        <th onclick="sortArchive('amount')">總金額<span id="icon-amount" class="sort-icon"></span></th>
-        <th onclick="sortArchive('close')">結案日期<span id="icon-close" class="sort-icon sort-active">▼</span></th>
+        <th>總金額</th>
+        <th>結案日期</th>
       </tr>
     </thead>
     <tbody id="archiveBody"></tbody>
@@ -219,56 +125,30 @@ h1 {
 </div>
 
 <script>
-/* ===== 排序狀態 ===== */
-let archiveSort = { key:'close', asc:false };
+const API_URL = 'https://chihwei-n8n.zeabur.app/webhook/items-status';
 
-/* ===== 虛擬資料（6 碼員編） ===== */
-const orders = [
-  { task_id:'TASK-20260204-031', name:'王小明', staff:'123456', dept:'急診醫學部', date:'2026/02/04', close:'', amount:1240, status:'PREPARING', items:['環保提袋 × 20','三色筆 × 30'] },
-  { task_id:'TASK-20260203-028', name:'陳雅婷', staff:'234567', dept:'護理部', date:'2026/02/03', close:'', amount:980, status:'SUBMITTED', items:['宣導資料夾 × 50'] },
-  { task_id:'TASK-20260202-021', name:'林志宏', staff:'345678', dept:'教學部', date:'2026/02/02', close:'', amount:560, status:'EXCEPTION', items:['識別證套 × 40'] },
-  { task_id:'TASK-20260131-018', name:'黃怡君', staff:'456789', dept:'人資室', date:'2026/01/31', close:'2026/02/05', amount:460, status:'READY', items:['北醫平安包 × 1'] },
-  { task_id:'TASK-20260128-011', name:'張志維', staff:'567890', dept:'醫學教育中心', date:'2026/01/28', close:'2026/02/01', amount:3200, status:'READY', items:['研討會背袋 × 100'] },
-  { task_id:'TASK-20260120-006', name:'李佩珊', staff:'678901', dept:'社服室', date:'2026/01/20', close:'2026/01/29', amount:1500, status:'READY', items:['宣導毛巾 × 50','環保杯 × 10'] }
-];
-
-function sortArchive(key){
-  if(archiveSort.key === key){
-    archiveSort.asc = !archiveSort.asc;
-  }else{
-    archiveSort.key = key;
-    archiveSort.asc = true;
-  }
-  render();
-}
-
-function updateSortIcons(){
-  document.querySelectorAll('.sort-icon').forEach(i=>{
-    i.textContent = '';
-    i.classList.remove('sort-active');
-  });
-  const icon = document.getElementById('icon-'+archiveSort.key);
-  icon.textContent = archiveSort.asc ? '▲' : '▼';
-  icon.classList.add('sort-active');
-}
-
-function render(){
+async function loadData(){
   const staff = document.getElementById('staffInput').value.trim();
-  const active = document.getElementById('activeBoard');
-  const archive = document.getElementById('archiveBody');
-  active.innerHTML='';
-  archive.innerHTML='';
+  const url = staff ? `${API_URL}?staff_id=${staff}` : API_URL;
 
-  const filtered = orders.filter(o=>!staff || o.staff===staff);
+  const res = await fetch(url);
+  const data = await res.json();
 
-  // ===== 進行中 =====
-  filtered.filter(o=>o.status!=='READY').forEach(o=>{
-    active.innerHTML += `
+  renderActive(data.active || []);
+  renderArchive(data.archived || []);
+}
+
+function renderActive(list){
+  const box = document.getElementById('activeBoard');
+  box.innerHTML = '';
+
+  list.forEach(o=>{
+    box.innerHTML += `
     <div class="card">
-      <div class="title">${o.name}（${o.staff}）｜${o.dept}</div>
+      <div class="title">${o.applicant_name}（${o.staff_id}）｜${o.department}</div>
       <div class="sub">訂單編號：${o.task_id}</div>
-      <div class="sub">申請日期：${o.date}</div>
-      <div class="money">總金額：NT$ ${o.amount}</div>
+      <div class="sub">申請日期：${o.apply_date}</div>
+      <div class="money">總金額：NT$ ${o.total_amount}</div>
 
       <div class="timeline">
         <div class="step done">申請提出</div>
@@ -278,49 +158,44 @@ function render(){
       </div>
 
       <button class="toggle-btn" onclick="toggleDetails(this)">查看案件明細</button>
-      <div class="details">${o.items.join('<br>')}</div>
+      <div class="details">
+        ${o.items.map(i=>`${i.name} × ${i.qty}`).join('<br>')}
+      </div>
     </div>`;
   });
+}
 
-  // ===== 結案 =====
-  const archived = filtered.filter(o=>o.status==='READY');
-  archived.sort((a,b)=>{
-    let va=a[archiveSort.key], vb=b[archiveSort.key];
-    if(archiveSort.key==='amount'){ va=+va; vb=+vb; }
-    if(archiveSort.key==='close'){ va=new Date(va); vb=new Date(vb); }
-    if(va>vb) return archiveSort.asc?1:-1;
-    if(va<vb) return archiveSort.asc?-1:1;
-    return 0;
-  });
+function renderArchive(list){
+  const body = document.getElementById('archiveBody');
+  body.innerHTML = '';
 
-  archived.forEach(o=>{
-    archive.innerHTML += `
+  list.forEach(o=>{
+    body.innerHTML += `
     <tr>
       <td>${o.task_id}</td>
-      <td>${o.name}（${o.staff}）</td>
-      <td>${o.dept}</td>
-      <td>${o.items.join('<br>')}</td>
-      <td>NT$ ${o.amount}</td>
-      <td>${o.close}</td>
+      <td>${o.applicant_name}（${o.staff_id}）</td>
+      <td>${o.department}</td>
+      <td>${o.items.map(i=>`${i.name} × ${i.qty}`).join('<br>')}</td>
+      <td>NT$ ${o.total_amount}</td>
+      <td>${o.close_date || ''}</td>
     </tr>`;
   });
-
-  updateSortIcons();
 }
 
 function toggleDetails(btn){
-  const d=btn.nextElementSibling;
-  const open=d.style.display==='block';
-  d.style.display=open?'none':'block';
-  btn.textContent=open?'查看案件明細':'收合案件明細';
+  const d = btn.nextElementSibling;
+  const open = d.style.display === 'block';
+  d.style.display = open ? 'none' : 'block';
+  btn.textContent = open ? '查看案件明細' : '收合案件明細';
 }
 
 function toggleArchive(){
-  const t=document.getElementById('archiveTable');
-  t.style.display=t.style.display==='table'?'none':'table';
+  const t = document.getElementById('archiveTable');
+  t.style.display = t.style.display === 'table' ? 'none' : 'table';
 }
 
-render();
+// 初始載入（可視需求拿掉）
+loadData();
 </script>
 
 </body>
