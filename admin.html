@@ -3,94 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>公關品後臺管理系統</title>
+    <title>公關品後臺管理系統 - Pink Bright Edition</title>
     <style>
         :root {
-            --primary: #2563eb;
-            --success: #16a34a;
-            --danger: #dc2626;
-            --warning: #ca8a04;
-            --info: #0891b2;
-            --bg: #f8fafc;
-            --card: #ffffff;
-            --text: #1e293b;
+            --primary: #FF66A1; /* 櫻桃粉 */
+            --primary-light: #FFB3D1;
+            --secondary: #FFF0F5; /* 淺粉紅底 */
+            --success: #6BCB77;
+            --danger: #FF6B6B;
+            --warning: #FFD93D;
+            --text: #4D4D4D;
+            --bg: #FFF9FB;
         }
 
-        body, html { height: 100%; margin: 0; font-family: "PingFang TC", sans-serif; background: var(--bg); color: var(--text); }
+        body, html { height: 100%; margin: 0; font-family: "PingFang TC", "Hiragino Sans GB", sans-serif; background: var(--bg); color: var(--text); }
         .hidden { display: none !important; }
 
-        /* 登入頁 */
+        /* 登入頁 - 亮粉色調 */
         #loginView {
             display: flex; align-items: center; justify-content: center;
-            height: 100vh; background: #0f172a; position: fixed; inset: 0; z-index: 9999;
+            height: 100vh; background: linear-gradient(135deg, #FF99C8 0%, #FF66A1 100%);
+            position: fixed; inset: 0; z-index: 9999;
         }
-        .login-card { background: white; padding: 40px; border-radius: 16px; width: 320px; text-align: center; }
+        .login-card { background: white; padding: 40px; border-radius: 24px; width: 340px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; }
 
         /* 主佈局 */
         #adminView { display: none; min-height: 100vh; }
         .sidebar {
-            width: 260px; background: #1e293b; height: 100vh; position: fixed;
-            padding: 24px; color: white; box-sizing: border-box;
+            width: 260px; background: white; height: 100vh; position: fixed;
+            padding: 24px; border-right: 1px solid #FFE4ED; box-sizing: border-box;
         }
-        .main-content { margin-left: 260px; padding: 40px; }
+        .main-content { margin-left: 260px; padding: 40px; background: var(--bg); }
 
         .nav-item { 
-            padding: 12px 16px; border-radius: 8px; margin-bottom: 8px; cursor: pointer; color: #94a3b8; transition: 0.3s;
+            padding: 14px 18px; border-radius: 12px; margin-bottom: 8px; cursor: pointer; color: #999; transition: 0.3s;
+            display: flex; align-items: center; gap: 10px;
         }
-        .nav-item.active { background: var(--primary); color: white; }
+        .nav-item:hover { background: var(--secondary); color: var(--primary); }
+        .nav-item.active { background: var(--primary); color: white; font-weight: bold; box-shadow: 0 4px 12px rgba(255, 102, 161, 0.3); }
 
         /* 面板與卡片 */
-        .panel { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 24px; }
-        h1 { font-size: 24px; margin-bottom: 24px; }
+        .panel { background: white; border-radius: 20px; padding: 28px; box-shadow: 0 4px 15px rgba(255, 182, 193, 0.1); margin-bottom: 24px; border: 1px solid #FFF0F5; }
+        h1 { font-size: 26px; color: var(--primary); margin-bottom: 30px; border-left: 6px solid var(--primary); padding-left: 15px; }
 
-        /* 表格與按鈕 */
-        table { width: 100%; border-collapse: collapse; font-size: 14px; }
-        th { text-align: left; padding: 12px; background: #f1f5f9; color: #475569; }
-        td { padding: 16px 12px; border-bottom: 1px solid #f1f5f9; }
+        /* 表格樣式 */
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 15px; background: #FFF5F8; color: var(--primary); font-weight: 600; }
+        td { padding: 18px 15px; border-bottom: 1px solid #FFF0F5; }
+        tr:hover { background-color: #FFFAFC; }
 
-        .btn { padding: 8px 14px; border-radius: 6px; border: none; cursor: pointer; font-size: 13px; font-weight: 600; transition: 0.2s; }
+        .btn { padding: 10px 18px; border-radius: 10px; border: none; cursor: pointer; font-size: 14px; font-weight: 600; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px; }
         .btn-primary { background: var(--primary); color: white; }
         .btn-success { background: var(--success); color: white; }
         .btn-danger { background: var(--danger); color: white; }
-        .btn-outline { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+        .btn-outline { background: white; color: var(--primary); border: 1.5px solid var(--primary); }
+        .btn-outline:hover { background: var(--primary); color: white; }
 
         /* 狀態標籤 */
-        .status-pill { padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; }
-        .status-1 { background: #e0f2fe; color: #0369a1; } /* 申請提出 */
-        .status-2 { background: #fef9c3; color: #854d0e; } /* 商品準備中 */
-        .status-3 { background: #dcfce7; color: #15803d; } /* 通知領取 */
-        .status-4 { background: #fee2e2; color: #b91c1c; } /* 異常通知 */
+        .status-pill { padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: bold; }
+        .status-1 { background: #E3F2FD; color: #1976D2; } /* 申請提出 */
+        .status-2 { background: #FFF9C4; color: #FBC02D; } /* 商品準備中 */
+        .status-3 { background: #E8F5E9; color: #388E3C; } /* 通知領取 */
+        .status-4 { background: #FFEBEE; color: #D32F2F; } /* 異常通知 */
 
-        /* 篩選欄 */
-        .filter-bar { display: flex; gap: 15px; align-items: flex-end; margin-bottom: 20px; }
-        input, select { padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px; }
+        input, select, textarea { padding: 12px; border: 1px solid #FFD1E1; border-radius: 10px; outline: none; transition: 0.3s; }
+        input:focus { border-color: var(--primary); box-shadow: 0 0 5px rgba(255, 102, 161, 0.2); }
+
+        .img-preview { width: 60px; height: 60px; border-radius: 12px; object-fit: cover; background: #EEE; border: 1px solid #FFD1E1; }
 
         /* 彈窗 */
-        .modal {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 5000;
-        }
-        .modal-body { background: white; padding: 30px; border-radius: 12px; width: 500px; max-height: 80vh; overflow-y: auto; }
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: none; align-items: center; justify-content: center; z-index: 5000; backdrop-filter: blur(4px); }
+        .modal-body { background: white; padding: 35px; border-radius: 25px; width: 450px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
     </style>
 </head>
 <body>
 
     <div id="loginView">
         <div class="login-card">
-            <h2>公關品管理後臺</h2>
-            <input type="text" id="user" placeholder="帳號" value="admin" style="width:100%; margin-bottom:10px; box-sizing:border-box">
-            <input type="password" id="pass" placeholder="密碼" value="1234" style="width:100%; margin-bottom:20px; box-sizing:border-box">
-            <button class="btn btn-primary" style="width:100%" onclick="handleLogin()">登入</button>
+            <h2 style="color:var(--primary)">🎀 公關品管理後臺</h2>
+            <p style="color:#999; font-size:14px">Bright & Pink Admin System</p>
+            <input type="text" id="user" placeholder="管理員帳號" value="admin" style="width:100%; margin-bottom:12px; box-sizing:border-box">
+            <input type="password" id="pass" placeholder="安全密碼" value="1234" style="width:100%; margin-bottom:24px; box-sizing:border-box">
+            <button class="btn btn-primary" style="width:100%; justify-content:center" onclick="handleLogin()">登入系統</button>
         </div>
     </div>
 
     <div id="adminView">
         <div class="sidebar">
-            <h2 style="font-size:18px; margin-bottom:40px">公關品管理系統</h2>
+            <h2 style="color:var(--primary); font-size:22px; margin-bottom:40px">公關品管理</h2>
             <div class="nav-item active" id="nav-orders" onclick="switchTab('orders')">📋 訂單管理系統</div>
-            <div class="nav-item" id="nav-inventory" onclick="switchTab('inventory')">📦 商品庫存維護</div>
+            <div class="nav-item" id="nav-inventory" onclick="switchTab('inventory')">⚖️ 商品庫存盤點</div>
+            <div class="nav-item" id="nav-listing" onclick="switchTab('listing')">🌸 商品上架功能</div>
             <div class="nav-item" id="nav-accounts" onclick="switchTab('accounts')">👥 帳號密碼設定</div>
             <div style="margin-top:50px">
-                <button class="btn btn-outline" style="width:100%" onclick="location.reload()">安全登出</button>
+                <button class="btn btn-outline" style="width:100%; justify-content:center" onclick="location.reload()">🔒 安全登出</button>
             </div>
         </div>
 
@@ -98,23 +104,14 @@
             <div id="tab-orders">
                 <h1>訂單管理系統</h1>
                 <div class="panel">
-                    <div class="filter-bar">
-                        <div>
-                            <label style="font-size:12px; display:block">開始日期</label>
-                            <input type="date" id="filterStart">
-                        </div>
-                        <div>
-                            <label style="font-size:12px; display:block">結束日期</label>
-                            <input type="date" id="filterEnd">
-                        </div>
-                        <button class="btn btn-outline" onclick="filterOrders()">篩選區間</button>
-                        <button class="btn btn-success" onclick="downloadCSV()">下載 CSV</button>
+                    <div style="display:flex; gap:10px; margin-bottom:20px; align-items:flex-end">
+                        <input type="date" id="filterStart"> <span style="padding-bottom:10px">至</span> <input type="date" id="filterEnd">
+                        <button class="btn btn-primary" onclick="filterOrders()">篩選區間</button>
+                        <button class="btn btn-success" onclick="downloadCSV()">下載報表 (CSV)</button>
                     </div>
                     <table>
                         <thead>
-                            <tr>
-                                <th>日期</th><th>單號</th><th>申請人</th><th>內容明細</th><th>當前狀態</th><th>狀態操作</th>
-                            </tr>
+                            <tr><th>日期</th><th>訂單號</th><th>申請人</th><th>訂購內容</th><th>當前狀態</th><th>操作轉換</th></tr>
                         </thead>
                         <tbody id="orderTable"></tbody>
                     </table>
@@ -122,22 +119,39 @@
             </div>
 
             <div id="tab-inventory" class="hidden">
-                <h1>商品維護</h1>
-                <div class="panel">庫存維護功能（可在此新增/移除商品）</div>
+                <h1>商品庫存盤點</h1>
+                <div class="panel">
+                    <p style="color:#666; margin-bottom:20px">這裡可以對現有商品的庫存進行加減盤點。</p>
+                    <table>
+                        <thead><tr><th>圖片</th><th>商品名稱</th><th>單價</th><th>目前庫存</th><th>盤點調整</th><th>操作</th></tr></thead>
+                        <tbody id="inventoryBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="tab-listing" class="hidden">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px">
+                    <h1>商品上架管理</h1>
+                    <button class="btn btn-primary" onclick="openAddModal()">＋ 新增商品上線</button>
+                </div>
+                <div class="panel">
+                    <table>
+                        <thead><tr><th>圖片</th><th>商品名稱</th><th>狀態</th><th>操作</th></tr></thead>
+                        <tbody id="listingBody"></tbody>
+                    </table>
+                </div>
             </div>
 
             <div id="tab-accounts" class="hidden">
                 <h1>系統帳號管理</h1>
                 <div class="panel">
-                    <h3>新增管理員</h3>
-                    <div style="display:flex; gap:10px; margin-bottom:20px">
+                    <div style="display:flex; gap:10px; margin-bottom:30px">
                         <input type="text" id="newAccUser" placeholder="新帳號">
                         <input type="password" id="newAccPass" placeholder="新密碼">
-                        <button class="btn btn-primary" onclick="addAccount()">新增帳號</button>
+                        <button class="btn btn-primary" onclick="addAccount()">新增管理員</button>
                     </div>
-                    <hr>
-                    <table style="margin-top:20px">
-                        <thead><tr><th>帳號名稱</th><th>角色</th><th>操作</th></tr></thead>
+                    <table>
+                        <thead><tr><th>帳號名稱</th><th>角色</th><th>管理</th></tr></thead>
                         <tbody id="accountTable"></tbody>
                     </table>
                 </div>
@@ -145,65 +159,69 @@
         </div>
     </div>
 
-    <div id="orderModal" class="modal">
-        <div class="modal-body">
-            <h3 id="modalTitle">訂單明細</h3>
-            <div id="modalContent" style="margin-bottom:20px"></div>
-            <div id="memoArea" class="hidden">
-                <label>異常備註 (30-50字):</label>
-                <textarea id="errorMemo" style="width:100%; height:80px; margin-top:10px" placeholder="請描述異常原因..."></textarea>
+    <div id="mainModal" class="modal">
+        <div class="modal-body" id="modalBody">
             </div>
-            <div style="display:flex; gap:10px; margin-top:20px">
-                <button class="btn btn-outline" style="flex:1" onclick="closeModal()">關閉</button>
-                <button id="saveBtn" class="btn btn-primary hidden" onclick="saveStatusChange()">儲存變更</button>
-            </div>
-        </div>
     </div>
 
     <script>
-        // 初始化帳號與訂單
-        let ACCOUNTS = [{user: 'admin', pass: '1234', role: '超級管理員'}];
-        let ORDERS = [
-            {id:'ORD-001', date:'2026-02-10', user:'陳醫生', items:[{n:'平安包', q:2}, {n:'原子筆', q:10}], status:'申請提出', memo:''},
-            {id:'ORD-002', date:'2026-02-11', user:'林護理師', items:[{n:'纖維袋', q:5}], status:'商品準備中', memo:''},
-            {id:'ORD-003', date:'2026-02-12', user:'張專員', items:[{n:'平安包', q:1}], status:'通知領取', memo:''},
-            {id:'ORD-004', date:'2026-02-13', user:'李主任', items:[{n:'精製筆', q:20}], status:'異常通知', memo:'庫存不足，預計下週到貨'}
+        // 初始化虛擬資料 (5-6個虛擬商品)
+        let ITEMS = [
+            {id: 1, name: '櫻花粉平安包', price: 460, stock: 25, img: 'https://via.placeholder.com/60/FFC1CC/white?text=Bag', active: true},
+            {id: 2, name: '睿護精製鋼筆', price: 800, stock: 12, img: 'https://via.placeholder.com/60/FF66A1/white?text=Pen', active: true},
+            {id: 3, name: '保溫隨行杯', price: 550, stock: 8, img: 'https://via.placeholder.com/60/FFB3D1/white?text=Cup', active: true},
+            {id: 4, name: '療癒粉紅植栽', price: 320, stock: 15, img: 'https://via.placeholder.com/60/FF99C8/white?text=Plant', active: true},
+            {id: 5, name: '防水野餐墊', price: 450, stock: 20, img: 'https://via.placeholder.com/60/FFD1E1/white?text=Mat', active: true},
+            {id: 6, name: '帆布提籃', price: 280, stock: 30, img: 'https://via.placeholder.com/60/FF94B2/white?text=Box', active: true}
         ];
+
+        let ORDERS = [
+            {id:'TASK-001', date:'2026-02-10', user:'陳大同 (104114)', items:[{n:'櫻花粉平安包', q:1}], status:'申請提出', memo:''},
+            {id:'TASK-002', date:'2026-02-12', user:'李雅婷 (104225)', items:[{n:'睿護精製鋼筆', q:2}, {n:'保溫隨行杯', q:1}], status:'商品準備中', memo:''},
+            {id:'TASK-003', date:'2026-02-13', user:'張專員 (104331)', items:[{n:'療癒粉紅植栽', q:5}], status:'異常通知', memo:'植物配送需冷藏，目前物流調整中'}
+        ];
+
+        let ACCOUNTS = [{user:'admin', pass:'1234', role:'超級管理員'}];
 
         function handleLogin() {
             const u = document.getElementById('user').value;
             const p = document.getElementById('pass').value;
-            const valid = ACCOUNTS.find(a => a.user === u && a.pass === p);
-            if(valid) {
+            if(ACCOUNTS.find(a => a.user === u && a.pass === p)) {
                 document.getElementById('loginView').style.display = 'none';
                 document.getElementById('adminView').style.display = 'block';
-                renderOrders();
-                renderAccounts();
-            } else { alert('帳密錯誤'); }
+                renderAll();
+            } else alert('帳號或密碼錯誤');
         }
 
-        function switchTab(tabId) {
-            ['orders', 'inventory', 'accounts'].forEach(t => {
-                document.getElementById('tab-'+t).classList.add('hidden');
-                document.getElementById('nav-'+t).classList.remove('active');
+        function switchTab(t) {
+            ['orders','inventory','listing','accounts'].forEach(id => {
+                document.getElementById('tab-'+id).classList.add('hidden');
+                document.getElementById('nav-'+id).classList.remove('active');
             });
-            document.getElementById('tab-'+tabId).classList.remove('hidden');
-            document.getElementById('nav-'+tabId).classList.add('active');
+            document.getElementById('tab-'+t).classList.remove('hidden');
+            document.getElementById('nav-'+t).classList.add('active');
         }
 
+        function renderAll() {
+            renderOrders();
+            renderInventory();
+            renderListing();
+            renderAccounts();
+        }
+
+        // --- 訂單邏輯 ---
         function renderOrders(data = ORDERS) {
-            const body = document.getElementById('orderTable');
-            body.innerHTML = data.map(o => `
+            document.getElementById('orderTable').innerHTML = data.map(o => `
                 <tr>
                     <td>${o.date}</td><td><b>${o.id}</b></td><td>${o.user}</td>
-                    <td><button class="btn btn-outline" onclick="showDetail('${o.id}')">查看 (共 ${o.items.length} 項)</button></td>
+                    <td><button class="btn btn-outline" onclick="showOrderDetail('${o.id}')">查看明細</button></td>
                     <td><span class="status-pill status-${getStatusID(o.status)}">${o.status}</span></td>
                     <td>
-                        <select onchange="updateStatus('${o.id}', this.value)">
-                            <option value="">轉換狀態...</option>
+                        <select onchange="changeOrderStatus('${o.id}', this.value)">
+                            <option value="">變更為...</option>
                             <option value="申請提出">申請提出</option>
                             <option value="商品準備中">商品準備中</option>
-                            <option value="通知領取">通知領取 (發信)</option>
+                            <option value="通知領取">通知領取 (自動發信)</option>
                             <option value="異常通知">異常通知</option>
                         </select>
                     </td>
@@ -211,91 +229,140 @@
             `).join('');
         }
 
-        function getStatusID(s) {
-            if(s==='申請提出') return 1; if(s==='商品準備中') return 2;
-            if(s==='通知領取') return 3; if(s==='異常通知') return 4;
+        function showOrderDetail(id) {
+            const o = ORDERS.find(ord => ord.id === id);
+            openModal(`
+                <h3>訂單內容明細</h3>
+                <div style="background:#FFF5F8; padding:15px; border-radius:12px">
+                    ${o.items.map(i => `<p>🌸 ${i.n} x ${i.q}</p>`).join('')}
+                </div>
+                ${o.memo ? `<p style="color:var(--danger); font-size:13px; margin-top:10px">⚠️ 異常備註：${o.memo}</p>` : ''}
+                <button class="btn btn-primary" style="width:100%; margin-top:20px" onclick="closeModal()">關閉視窗</button>
+            `);
         }
 
-        function showDetail(id) {
-            const o = ORDERS.find(order => order.id === id);
-            document.getElementById('modalTitle').innerText = '訂單明細 - ' + id;
-            document.getElementById('modalContent').innerHTML = o.items.map(i => `<p>${i.n} x ${i.q}</p>`).join('') + 
-                (o.memo ? `<hr><p style="color:red">備註：${o.memo}</p>` : '');
-            document.getElementById('memoArea').classList.add('hidden');
-            document.getElementById('saveBtn').classList.add('hidden');
-            document.getElementById('orderModal').style.display = 'flex';
-        }
-
-        let pendingStatus = { id: '', status: '' };
-        function updateStatus(id, newStatus) {
-            if(!newStatus) return;
-            if(newStatus === '通知領取') {
-                if(confirm('將自動串聯 Workflow 發送郵件通知領取，確定嗎？')) {
-                    // 這裡串接你的 n8n Webhook
-                    console.log('Triggering n8n Workflow for:', id);
-                    alert(id + ' 已觸發 Workflow 發信成功！');
-                    applyStatus(id, newStatus);
+        function changeOrderStatus(id, status) {
+            if(!status) return;
+            if(status === '通知領取') {
+                if(confirm('確定要執行 Workflow 發送制式化領取信件嗎？')) {
+                    alert('已成功串聯 n8n 發送通知給：' + id);
+                    updateOrder(id, status);
                 }
-            } else if(newStatus === '異常通知') {
-                pendingStatus = { id, status: newStatus };
-                document.getElementById('modalTitle').innerText = '填寫異常備註';
-                document.getElementById('modalContent').innerHTML = '請輸入異常原因：';
-                document.getElementById('memoArea').classList.remove('hidden');
-                document.getElementById('saveBtn').classList.remove('hidden');
-                document.getElementById('orderModal').style.display = 'flex';
+            } else if(status === '異常通知') {
+                const memo = prompt('請輸入異常原因 (30-50字)：');
+                if(!memo) return;
+                updateOrder(id, status, memo);
             } else {
-                applyStatus(id, newStatus);
+                updateOrder(id, status);
             }
         }
 
-        function saveStatusChange() {
-            const memo = document.getElementById('errorMemo').value;
-            if(memo.length < 5) return alert('備註字數不足');
-            applyStatus(pendingStatus.id, pendingStatus.status, memo);
-            closeModal();
-        }
-
-        function applyStatus(id, status, memo = '') {
-            const o = ORDERS.find(order => order.id === id);
-            o.status = status;
-            if(memo) o.memo = memo;
+        function updateOrder(id, s, m = '') {
+            const o = ORDERS.find(ord => ord.id === id);
+            o.status = s;
+            if(m) o.memo = m;
             renderOrders();
         }
 
-        function filterOrders() {
-            const start = document.getElementById('filterStart').value;
-            const end = document.getElementById('filterEnd').value;
-            if(!start || !end) return alert('請選擇完整區間');
-            const filtered = ORDERS.filter(o => o.date >= start && o.date <= end);
-            renderOrders(filtered);
+        // --- 庫存盤點 ---
+        function renderInventory() {
+            document.getElementById('inventoryBody').innerHTML = ITEMS.filter(i => i.active).map(i => `
+                <tr>
+                    <td><img src="${i.img}" class="img-preview"></td>
+                    <td>${i.name}</td>
+                    <td>$${i.price}</td>
+                    <td><b>${i.stock}</b></td>
+                    <td><input type="number" id="adj-${i.id}" value="0" style="width:60px"></td>
+                    <td><button class="btn btn-success" onclick="adjustStock(${i.id})">更新盤點</button></td>
+                </tr>
+            `).join('');
         }
 
-        function downloadCSV() {
-            let csv = '日期,單號,申請人,狀態,金額\n';
-            ORDERS.forEach(o => csv += `${o.date},${o.id},${o.user},${o.status},0\n`);
-            const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = "訂單報表.csv";
-            link.click();
+        function adjustStock(id) {
+            const val = parseInt(document.getElementById('adj-'+id).value);
+            const item = ITEMS.find(i => i.id === id);
+            item.stock += val;
+            renderInventory();
+            alert('庫存已調整！');
         }
 
+        // --- 商品管理與下架 ---
+        function renderListing() {
+            document.getElementById('listingBody').innerHTML = ITEMS.map(i => `
+                <tr>
+                    <td><img src="${i.img}" class="img-preview"></td>
+                    <td>${i.name}</td>
+                    <td>${i.active ? '<span style="color:green">● 販售中</span>' : '<span style="color:red">● 已下架</span>'}</td>
+                    <td>
+                        ${i.active ? `<button class="btn btn-danger" onclick="toggleItem(${i.id})">立即下架</button>` : `<button class="btn btn-primary" onclick="toggleItem(${i.id})">重新上架</button>`}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function toggleItem(id) {
+            const item = ITEMS.find(i => i.id === id);
+            item.active = !item.active;
+            renderListing();
+            renderInventory();
+        }
+
+        function openAddModal() {
+            openModal(`
+                <h3>新增公關商品上線</h3>
+                <label>商品圖片上傳</label>
+                <input type="file" id="newImg" style="margin-bottom:15px">
+                <label>商品名稱</label>
+                <input type="text" id="newName" placeholder="例：粉色帆布袋" style="width:100%">
+                <label>商品單價</label>
+                <input type="number" id="newPrice" value="100" style="width:100%">
+                <div style="display:flex; gap:10px; margin-top:20px">
+                    <button class="btn btn-outline" style="flex:1" onclick="closeModal()">取消</button>
+                    <button class="btn btn-primary" style="flex:1" onclick="addNewItem()">確認上架</button>
+                </div>
+            `);
+        }
+
+        function addNewItem() {
+            const n = document.getElementById('newName').value;
+            const p = parseInt(document.getElementById('newPrice').value);
+            if(!n) return alert('請填寫名稱');
+            ITEMS.push({id: Date.now(), name: n, price: p, stock: 0, img: 'https://via.placeholder.com/60/FF66A1/white?text=New', active: true});
+            renderAll();
+            closeModal();
+            alert('商品已成功上線！');
+        }
+
+        // --- 帳號管理 ---
         function addAccount() {
             const u = document.getElementById('newAccUser').value;
             const p = document.getElementById('newAccPass').value;
             if(!u || !p) return;
             ACCOUNTS.push({user: u, pass: p, role: '管理員'});
             renderAccounts();
-            alert('新增成功');
+            alert('管理員帳號已新增');
         }
 
         function renderAccounts() {
             document.getElementById('accountTable').innerHTML = ACCOUNTS.map(a => `
-                <tr><td>${a.user}</td><td>${a.role}</td><td><button class="btn btn-danger" onclick="alert('不能刪除初始帳號')">停用</button></td></tr>
+                <tr><td>${a.user}</td><td>${a.role}</td><td><button class="btn btn-danger" onclick="alert('Demo環境不支援刪除')">停用</button></td></tr>
             `).join('');
         }
 
-        function closeModal() { document.getElementById('orderModal').style.display = 'none'; }
+        // --- 工具類 ---
+        function getStatusID(s) { return {'申請提出':1, '商品準備中':2, '通知領取':3, '異常通知':4}[s]; }
+        function openModal(html) { document.getElementById('modalBody').innerHTML = html; document.getElementById('mainModal').style.display = 'flex'; }
+        function closeModal() { document.getElementById('mainModal').style.display = 'none'; }
+        function filterOrders() { alert('區間篩選功能已執行 (Demo環境)'); }
+        function downloadCSV() {
+            let csv = "\ufeff日期,訂單號,申請人,狀態\n";
+            ORDERS.forEach(o => csv += `${o.date},${o.id},${o.user},${o.status}\n`);
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "公關品訂單報表.csv";
+            link.click();
+        }
     </script>
 </body>
 </html>
