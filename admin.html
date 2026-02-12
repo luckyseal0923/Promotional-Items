@@ -3,413 +3,235 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Phase 3｜公關品申請系統－後臺管理</title>
-
+<title>Phase 3｜公關品後臺管理系統</title>
 <style>
-  body{
-    font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC",Arial,sans-serif;
-    background:#f6f7f9;
-    margin:0;
-    padding:20px;
-  }
-  h1{ text-align:center; margin:0 0 18px; }
-  .container{ max-width:1200px; margin:0 auto; }
-
-  /* ===== 卡片 ===== */
-  .panel{
-    background:#fff;
-    border-radius:12px;
-    padding:16px;
-    box-shadow:0 2px 10px rgba(0,0,0,0.08);
-    margin-bottom:18px;
+  /* 全域樣式 */
+  body, html {
+    height: 100%;
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Noto Sans TC", Arial, sans-serif;
+    background: #f0f2f5;
+    color: #333;
   }
 
-  /* ===== 上方列 ===== */
-  .topbar{
-    display:flex;
-    gap:10px;
-    align-items:center;
-    justify-content:space-between;
-    flex-wrap:wrap;
-    margin-bottom:12px;
-  }
-  .badge{
-    display:inline-block;
-    padding:4px 10px;
-    border-radius:999px;
-    font-size:12px;
-    background:#eef2ff;
-    color:#1e40af;
-  }
-  .btn{
-    border:none;
-    padding:10px 14px;
-    border-radius:10px;
-    cursor:pointer;
-    font-size:14px;
-  }
-  .btn-primary{ background:#0A84FF; color:#fff; }
-  .btn-ghost{ background:#f1f5f9; color:#111; }
-  .btn-danger{ background:#dc3545; color:#fff; }
-
-  /* ===== Tabs ===== */
-  .tabs{
-    display:flex;
-    gap:8px;
-    margin:10px 0 0;
-    flex-wrap:wrap;
-  }
-  .tab{
-    padding:10px 14px;
-    border-radius:999px;
-    cursor:pointer;
-    background:#f1f5f9;
-    font-size:14px;
-  }
-  .tab.active{
-    background:#0A84FF;
-    color:#fff;
+  /* 登入頁面樣式：佔滿全螢幕並置中 */
+  #loginView {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    width: 100%;
+    background: linear-gradient(135deg, #0A84FF 0%, #0056b3 100%);
   }
 
-  /* ===== 表格 ===== */
-  table{
-    width:100%;
-    border-collapse:collapse;
-    background:#fff;
-    overflow:hidden;
-    border-radius:12px;
-  }
-  th, td{
-    padding:12px 10px;
-    border-bottom:1px solid #eee;
-    text-align:left;
-    vertical-align:top;
-    font-size:14px;
-  }
-  th{ background:#f0f2f5; user-select:none; }
-  tr:hover td{ background:#fafafa; }
-
-  .muted{ color:#666; font-size:13px; }
-  .small{ font-size:12px; color:#666; }
-
-  /* ===== 狀態 ===== */
-  .status-pill{
-    display:inline-block;
-    padding:4px 10px;
-    border-radius:999px;
-    font-size:12px;
-    background:#eef2f7;
-    color:#111;
-    white-space:nowrap;
-  }
-  .s-submitted{ background:#e0f2fe; color:#075985; }
-  .s-preparing{ background:#fff7ed; color:#9a3412; }
-  .s-ready{ background:#ecfdf5; color:#065f46; }
-  .s-exception{ background:#fee2e2; color:#991b1b; }
-
-  /* ===== Form ===== */
-  .grid{
-    display:grid;
-    grid-template-columns: 1fr 1fr;
-    gap:12px;
-  }
-  @media (max-width: 860px){
-    .grid{ grid-template-columns:1fr; }
-  }
-  label{ font-size:13px; color:#333; display:block; margin-bottom:6px; }
-  input, select, textarea{
-    width:100%;
-    padding:10px;
-    border:1px solid #ccc;
-    border-radius:10px;
-    font-size:14px;
-    box-sizing:border-box;
-    background:#fff;
-  }
-  textarea{ min-height:88px; resize:vertical; }
-
-  .row{
-    display:flex;
-    gap:10px;
-    align-items:center;
-    flex-wrap:wrap;
+  .login-card {
+    background: #fff;
+    padding: 32px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    width: 100%;
+    max-width: 360px;
   }
 
-  /* ===== Modal ===== */
-  .modal-backdrop{
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,0.35);
-    display:none;
-    align-items:center;
-    justify-content:center;
-    padding:16px;
-    z-index:50;
-  }
-  .modal{
-    width: min(900px, 100%);
-    background:#fff;
-    border-radius:14px;
-    box-shadow:0 10px 40px rgba(0,0,0,0.25);
-    overflow:hidden;
-  }
-  .modal-header{
-    padding:14px 16px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    background:#0A84FF;
-    color:#fff;
-  }
-  .modal-body{ padding:16px; max-height:70vh; overflow-y:auto; }
-  .modal-footer{
-    padding:14px 16px;
-    background:#f8fafc;
-    display:flex;
-    gap:10px;
-    justify-content:flex-end;
-    flex-wrap:wrap;
+  /* 管理頁面樣式：預設隱藏 */
+  #adminView {
+    display: none; /* 登入前隱藏 */
+    padding: 20px;
+    min-height: 100vh;
+    box-sizing: border-box;
   }
 
-  .hidden{ display:none; }
+  /* 共用組件 */
+  .panel {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    margin-bottom: 20px;
+  }
 
-  /* ===== Login ===== */
-  .login-wrap{
-    min-height: calc(100vh - 40px);
-    display:flex;
-    align-items:center;
-    justify-content:center;
+  h1 { margin-top: 0; font-size: 24px; color: #1a1a1a; }
+  label { display: block; margin-bottom: 6px; font-size: 14px; font-weight: 500; }
+  input, select {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-sizing: border-box;
   }
-  .login-card{
-    width:min(400px, 100%);
-    background:#fff;
-    border-radius:14px;
-    padding:24px;
-    box-shadow:0 4px 20px rgba(0,0,0,0.1);
+
+  .btn {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.2s;
   }
+  .btn-primary { background: #0A84FF; color: white; width: 100%; }
+  .btn-primary:hover { background: #0070e0; }
+  .btn-danger { background: #ff3b30; color: white; }
+
+  /* 頁籤 Tab 樣式 */
+  .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+  .tab {
+    padding: 10px 20px;
+    background: #e4e6eb;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  .tab.active { background: #0A84FF; color: white; }
+
+  /* 表格樣式 */
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+  th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; font-size: 14px; }
+  th { background: #f8f9fa; color: #666; }
+
+  .status-pill {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+  }
+  .s-preparing { background: #fff7ed; color: #9a3412; }
+  .s-submitted { background: #e0f2fe; color: #075985; }
+
+  .hidden { display: none; }
 </style>
 </head>
-
 <body>
 
-<div id="loginPage" class="login-wrap">
-  <div class="login-card">
-    <h2 style="margin:0 0 8px;">🔐 後臺管理系統</h2>
-    <div class="muted" style="margin-bottom:20px;">請輸入管理員帳號與密碼</div>
-
-    <div style="margin-bottom:15px;">
+  <div id="loginView">
+    <div class="login-card">
+      <h2 style="text-align: center; margin-bottom: 24px;">管理員登入</h2>
       <label>帳號</label>
-      <input id="loginUser" placeholder="admin" value="admin" />
-    </div>
-
-    <div style="margin-bottom:20px;">
+      <input type="text" id="user" value="admin">
       <label>密碼</label>
-      <input id="loginPass" type="password" placeholder="1234" value="1234" />
-    </div>
-
-    <button class="btn btn-primary" style="width:100%;" onclick="doLogin()">立即登入</button>
-    <div style="text-align:center; margin-top:12px;">
-      <span class="small">預設測試：admin / 1234</span>
+      <input type="password" id="pass" value="1234">
+      <button class="btn btn-primary" onclick="handleLogin()">登入系統</button>
+      <p style="font-size: 12px; color: #666; text-align: center; margin-top: 15px;">預設：admin / 1234</p>
     </div>
   </div>
-</div>
 
-<div id="adminPage" class="container hidden">
-  <h1>🛠️ 公關品申請系統－後臺管理</h1>
-
-  <div class="panel">
-    <div class="topbar">
+  <div id="adminView">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <h1>🛠️ 公關品管理後臺</h1>
       <div>
-        <span class="badge" id="adminInfo">Admin: -</span>
-        <span class="badge" id="nowTime">-</span>
-      </div>
-      <div class="row">
-        <button class="btn btn-ghost" onclick="seedData()">重置虛擬資料</button>
-        <button class="btn btn-danger" onclick="logout()">登出</button>
+        <span id="adminName" style="margin-right: 15px; font-weight: bold;"></span>
+        <button class="btn btn-danger" onclick="handleLogout()">登出</button>
       </div>
     </div>
 
     <div class="tabs">
-      <div class="tab active" id="tabOrders" onclick="switchTab('orders')">A. 訂單管理</div>
-      <div class="tab" id="tabInventory" onclick="switchTab('inventory')">B. 商品與庫存盤點</div>
-      <div class="tab" id="tabLogs" onclick="switchTab('logs')">C. 盤點紀錄</div>
+      <div class="tab active" onclick="switchPage('orders', this)">訂單管理</div>
+      <div class="tab" onclick="switchPage('inventory', this)">庫存盤點</div>
     </div>
-  </div>
 
-  <div id="viewOrders" class="panel">
-    <div class="topbar">
-      <b>訂單列表</b>
-      <div class="row">
-        <select id="filterStatus" onchange="renderOrders()">
-          <option value="">全部狀態</option>
-          <option value="SUBMITTED">申請提出</option>
-          <option value="PREPARING">商品準備中</option>
-          <option value="READY">已通知領取（結案）</option>
-          <option value="EXCEPTION">異常通知</option>
-        </select>
-        <input id="filterKeyword" placeholder="搜尋：編號 / 姓名 / 部門" oninput="renderOrders()" />
+    <div id="page-orders" class="admin-page">
+      <div class="panel">
+        <h3>即時訂單列表</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>訂單編號</th>
+              <th>申請人</th>
+              <th>部門</th>
+              <th>狀態</th>
+              <th>金額</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="ordersBody">
+            </tbody>
+        </table>
       </div>
     </div>
-    <table>
-      <thead>
-        <tr>
-          <th>訂單編號</th>
-          <th>申請人</th>
-          <th>部門</th>
-          <th>申請日期</th>
-          <th>金額</th>
-          <th>狀態</th>
-          <th>操作</th>
-        </tr>
-      </thead>
-      <tbody id="ordersBody"></tbody>
-    </table>
+
+    <div id="page-inventory" class="admin-page hidden">
+      <div class="panel">
+        <h3>商品庫存狀況</h3>
+        <p class="muted">此處可與 Sheet 2 的庫存資料進行同步。</p>
+        <table>
+          <thead>
+            <tr>
+              <th>商品名稱</th>
+              <th>單價</th>
+              <th>現有數量</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>北醫平安包</td>
+              <td>460</td>
+              <td>15</td>
+              <td><button onclick="alert('開啟調整彈窗')">調整</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 
-  <div id="viewInventory" class="panel hidden">
-    <b>商品與庫存盤點</b>
-    <table style="margin-top:12px;">
-      <thead>
+  <script>
+    // 虛擬資料
+    const MOCK_ORDERS = [
+      { id: 'TASK-103', name: '張智維', dept: 'ER', status: 'PREPARING', amount: 1660 },
+      { id: 'TASK-104', name: '李小姐', dept: 'ICU', status: 'SUBMITTED', amount: 460 }
+    ];
+
+    // 登入邏輯
+    function handleLogin() {
+      const u = document.getElementById('user').value;
+      const p = document.getElementById('pass').value;
+
+      if (u === 'admin' && p === '1234') {
+        // [關鍵點]：隱藏登入頁，顯示管理頁
+        document.getElementById('loginView').style.display = 'none';
+        document.getElementById('adminView').style.display = 'block';
+        document.getElementById('adminName').innerText = "管理者：" + u;
+        
+        renderOrders(); // 載入資料
+      } else {
+        alert('帳號或密碼錯誤');
+      }
+    }
+
+    // 登出邏輯
+    function handleLogout() {
+      if(confirm('確定要登出嗎？')) {
+        location.reload(); // 最簡單的登出方式：重新整理頁面
+      }
+    }
+
+    // 分頁切換邏輯
+    function switchPage(pageId, el) {
+      // 隱藏所有分頁
+      document.querySelectorAll('.admin-page').forEach(p => p.classList.add('hidden'));
+      // 顯示目標分頁
+      document.getElementById('page-' + pageId).classList.remove('hidden');
+      
+      // 更新 Tab 樣式
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+    }
+
+    // 渲染訂單
+    function renderOrders() {
+      const body = document.getElementById('ordersBody');
+      body.innerHTML = MOCK_ORDERS.map(o => `
         <tr>
-          <th>商品</th>
-          <th>單價</th>
-          <th>現有庫存</th>
-          <th>盤點備註</th>
-          <th>操作</th>
+          <td>${o.id}</td>
+          <td>${o.name}</td>
+          <td>${o.dept}</td>
+          <td><span class="status-pill s-${o.status.toLowerCase()}">${o.status}</span></td>
+          <td>NT$ ${o.amount}</td>
+          <td><button onclick="alert('載入 ${o.id} 明細')">查看</button></td>
         </tr>
-      </thead>
-      <tbody id="itemsBody"></tbody>
-    </table>
-  </div>
-
-  <div id="viewLogs" class="panel hidden">
-    <b>盤點紀錄（Stock Log）</b>
-    <table style="margin-top:12px;">
-      <thead>
-        <tr>
-          <th>時間</th>
-          <th>管理者</th>
-          <th>商品</th>
-          <th>變動</th>
-          <th>備註</th>
-        </tr>
-      </thead>
-      <tbody id="logsBody"></tbody>
-    </table>
-  </div>
-</div>
-
-<script>
-let currentAdmin = null;
-const DEMO_USERS = [{ user:'admin', pass:'1234', name:'總務管理者-Admin' }];
-
-let ORDERS = [];
-let ITEMS = [];
-let STOCK_LOGS = [];
-
-// Login Logic
-function doLogin(){
-  const u = document.getElementById('loginUser').value.trim();
-  const p = document.getElementById('loginPass').value.trim();
-  const ok = DEMO_USERS.find(x => x.user === u && x.pass === p);
-  
-  if(!ok){
-    alert('帳密錯誤');
-    return;
-  }
-
-  currentAdmin = ok.name;
-  document.getElementById('loginPage').classList.add('hidden');
-  document.getElementById('adminPage').classList.remove('hidden');
-  document.getElementById('adminInfo').textContent = `Admin: ${currentAdmin}`;
-
-  seedData();
-  tickClock();
-  setInterval(tickClock, 1000);
-}
-
-function logout(){
-  location.reload();
-}
-
-function tickClock(){
-  document.getElementById('nowTime').textContent = new Date().toLocaleString('zh-TW');
-}
-
-// Data Management
-function seedData(){
-  ORDERS = [
-    { task_id:'TASK-103', name:'張智維', staff:'104114', dept:'ER', created_at:'2026/02/04 10:12', status:'PREPARING', amount:1660, items:[{name:'北醫平安包',qty:1}] },
-    { task_id:'TASK-104', name:'李小姐', staff:'104222', dept:'ER', created_at:'2026/02/03 14:05', status:'SUBMITTED', amount:460, items:[{name:'北醫平安包',qty:1}] }
-  ];
-  ITEMS = [
-    { id:'I001', name:'北醫平安包', price:460, stock:15 },
-    { id:'I002', name:'環保提袋', price:50, stock:120 }
-  ];
-  STOCK_LOGS = [
-    { at:'2026/02/01 09:10', by:'Admin', item:'北醫平安包', change:'+10', note:'進貨' }
-  ];
-  renderAll();
-}
-
-function switchTab(tab){
-  ['Orders','Inventory','Logs'].forEach(t => {
-    document.getElementById('tab'+t).classList.toggle('active', t.toLowerCase()===tab);
-    document.getElementById('view'+t).classList.toggle('hidden', t.toLowerCase()!==tab);
-  });
-}
-
-function renderAll(){
-  renderOrders();
-  renderItems();
-  renderLogs();
-}
-
-function renderOrders(){
-  const body = document.getElementById('ordersBody');
-  const fStatus = document.getElementById('filterStatus').value;
-  const kw = document.getElementById('filterKeyword').value.toLowerCase();
-  
-  body.innerHTML = ORDERS.filter(o => 
-    (!fStatus || o.status === fStatus) && 
-    (o.name.toLowerCase().includes(kw) || o.task_id.toLowerCase().includes(kw))
-  ).map(o => `
-    <tr>
-      <td>${o.task_id}</td>
-      <td>${o.name} (${o.staff})</td>
-      <td>${o.dept}</td>
-      <td>${o.created_at}</td>
-      <td>NT$ ${o.amount}</td>
-      <td><span class="status-pill s-${o.status.toLowerCase()}">${o.status}</span></td>
-      <td><button class="btn btn-ghost" onclick="alert('查看訂單：'+'${o.task_id}')">查看</button></td>
-    </tr>
-  `).join('');
-}
-
-function renderItems(){
-  document.getElementById('itemsBody').innerHTML = ITEMS.map(i => `
-    <tr>
-      <td>${i.name}</td>
-      <td>${i.price}</td>
-      <td><b>${i.stock}</b></td>
-      <td><input style="width:120px" placeholder="盤點備註" id="note-${i.id}"></td>
-      <td><button class="btn btn-primary" onclick="alert('模擬更新：'+'${i.name}')">盤點</button></td>
-    </tr>
-  `).join('');
-}
-
-function renderLogs(){
-  document.getElementById('logsBody').innerHTML = STOCK_LOGS.map(l => `
-    <tr>
-      <td class="small">${l.at}</td>
-      <td>${l.by}</td>
-      <td>${l.item}</td>
-      <td>${l.change}</td>
-      <td class="muted">${l.note}</td>
-    </tr>
-  `).join('');
-}
-</script>
-
+      `).join('');
+    }
+  </script>
 </body>
 </html>
