@@ -1,313 +1,301 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>睿護學院｜公關品後臺管理系統</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>公關品後臺管理系統</title>
     <style>
         :root {
-            --primary: #0066FF;
-            --success: #34C759;
-            --danger: #FF3B30;
-            --warning: #FF9500;
-            --bg: #F5F7FA;
-            --card-bg: #FFFFFF;
-            --text-main: #1D1D1F;
-            --text-muted: #86868B;
+            --primary: #2563eb;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --warning: #ca8a04;
+            --info: #0891b2;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #1e293b;
         }
 
-        body, html {
-            height: 100%; margin: 0;
-            font-family: "PingFang TC", "Microsoft JhengHei", sans-serif;
-            background: var(--bg); color: var(--text-main);
-            overflow-x: hidden;
-        }
-
-        /* 強制隱藏工具 */
+        body, html { height: 100%; margin: 0; font-family: "PingFang TC", sans-serif; background: var(--bg); color: var(--text); }
         .hidden { display: none !important; }
 
-        /* ===== 登入視窗 ===== */
+        /* 登入頁 */
         #loginView {
             display: flex; align-items: center; justify-content: center;
-            height: 100vh; width: 100vw;
-            background: linear-gradient(135deg, #0044AA 0%, #0066FF 100%);
-            position: fixed; top: 0; left: 0; z-index: 1000;
+            height: 100vh; background: #0f172a; position: fixed; inset: 0; z-index: 9999;
         }
-        .login-card {
-            background: var(--card-bg); padding: 40px; border-radius: 24px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3); width: 100%; max-width: 360px;
-            text-align: center;
-        }
+        .login-card { background: white; padding: 40px; border-radius: 16px; width: 320px; text-align: center; }
 
-        /* ===== 管理後臺佈局 ===== */
+        /* 主佈局 */
         #adminView { display: none; min-height: 100vh; }
         .sidebar {
-            width: 260px; background: #fff; height: 100vh; position: fixed;
-            border-right: 1px solid #E5E5E5; padding: 24px; box-sizing: border-box;
+            width: 260px; background: #1e293b; height: 100vh; position: fixed;
+            padding: 24px; color: white; box-sizing: border-box;
         }
-        .main-content { margin-left: 260px; padding: 40px; max-width: 1200px; }
+        .main-content { margin-left: 260px; padding: 40px; }
 
-        /* 儀表板卡片 */
-        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 32px; }
-        .stat-card { 
-            background: #fff; padding: 24px; border-radius: 20px; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-            border-bottom: 4px solid var(--primary);
-        }
-
-        /* 元件樣式 */
-        .panel { background: #fff; border-radius: 20px; padding: 28px; box-shadow: 0 4px 20px rgba(0,0,0,0.02); }
-        .btn {
-            padding: 12px 20px; border-radius: 12px; border: none; font-weight: 600;
-            cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; font-size: 14px;
-        }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-danger { background: #FFF0F0; color: var(--danger); }
-        .btn-outline { background: transparent; border: 1px solid #DDD; }
-
-        input, select, textarea {
-            width: 100%; padding: 14px; margin: 8px 0 16px;
-            border: 1px solid #E5E5E5; border-radius: 12px; background: #F9F9F9; font-size: 14px; box-sizing: border-box;
-        }
-
-        /* 表格優化 */
-        table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; padding: 16px; color: var(--text-muted); font-weight: 500; border-bottom: 1px solid #EEE; }
-        td { padding: 18px 16px; border-bottom: 1px solid #F5F5F5; }
-        .img-preview-sm { width: 48px; height: 48px; border-radius: 10px; object-fit: cover; background: #f0f0f0; }
-
-        /* 導覽項目 */
         .nav-item { 
-            padding: 14px 18px; border-radius: 12px; margin-bottom: 8px; 
-            cursor: pointer; color: var(--text-muted); transition: 0.3s;
+            padding: 12px 16px; border-radius: 8px; margin-bottom: 8px; cursor: pointer; color: #94a3b8; transition: 0.3s;
         }
-        .nav-item.active { background: #F0F6FF; color: var(--primary); font-weight: 700; }
+        .nav-item.active { background: var(--primary); color: white; }
 
-        /* Modal 彈窗樣式 */
-        .modal-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.6);
-            display: none; align-items: center; justify-content: center; z-index: 2000;
-            backdrop-filter: blur(4px);
+        /* 面板與卡片 */
+        .panel { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 24px; }
+        h1 { font-size: 24px; margin-bottom: 24px; }
+
+        /* 表格與按鈕 */
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        th { text-align: left; padding: 12px; background: #f1f5f9; color: #475569; }
+        td { padding: 16px 12px; border-bottom: 1px solid #f1f5f9; }
+
+        .btn { padding: 8px 14px; border-radius: 6px; border: none; cursor: pointer; font-size: 13px; font-weight: 600; transition: 0.2s; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-outline { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+
+        /* 狀態標籤 */
+        .status-pill { padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+        .status-1 { background: #e0f2fe; color: #0369a1; } /* 申請提出 */
+        .status-2 { background: #fef9c3; color: #854d0e; } /* 商品準備中 */
+        .status-3 { background: #dcfce7; color: #15803d; } /* 通知領取 */
+        .status-4 { background: #fee2e2; color: #b91c1c; } /* 異常通知 */
+
+        /* 篩選欄 */
+        .filter-bar { display: flex; gap: 15px; align-items: flex-end; margin-bottom: 20px; }
+        input, select { padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px; }
+
+        /* 彈窗 */
+        .modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 5000;
         }
-        .modal-content { background: #fff; padding: 32px; border-radius: 24px; width: 420px; box-shadow: 0 30px 60px rgba(0,0,0,0.4); }
+        .modal-body { background: white; padding: 30px; border-radius: 12px; width: 500px; max-height: 80vh; overflow-y: auto; }
     </style>
 </head>
 <body>
 
     <div id="loginView">
         <div class="login-card">
-            <h2 style="margin-bottom:8px">睿護管理系統</h2>
-            <p style="color:var(--text-muted); margin-bottom:32px">請輸入管理員憑證</p>
-            
-            <div style="text-align:left">
-                <label>管理員帳號</label>
-                <input type="text" id="user" value="admin">
-                <label>安全密碼</label>
-                <input type="password" id="pass" value="1234">
-            </div>
-            
-            <button class="btn btn-primary" style="width:100%; justify-content:center; margin-top:10px" onclick="handleLogin()">登入後臺</button>
-            <p style="font-size:12px; color:#AAA; margin-top:20px">Demo Access: admin / 1234</p>
+            <h2>公關品管理後臺</h2>
+            <input type="text" id="user" placeholder="帳號" value="admin" style="width:100%; margin-bottom:10px; box-sizing:border-box">
+            <input type="password" id="pass" placeholder="密碼" value="1234" style="width:100%; margin-bottom:20px; box-sizing:border-box">
+            <button class="btn btn-primary" style="width:100%" onclick="handleLogin()">登入</button>
         </div>
     </div>
 
     <div id="adminView">
         <div class="sidebar">
-            <h2 style="color:var(--primary); margin-bottom:40px">睿護學院</h2>
-            <div class="nav-item active" id="nav-dashboard" onclick="switchSection('dashboard')">📊 儀表板總覽</div>
-            <div class="nav-item" id="nav-orders" onclick="switchSection('orders')">📦 訂單管理系統</div>
-            <div class="nav-item" id="nav-inventory" onclick="switchSection('inventory')">🍎 商品維護與上架</div>
-            <div style="position:absolute; bottom:30px; width:212px">
-                <hr style="border:0; border-top:1px solid #EEE; margin-bottom:20px">
-                <div class="nav-item" onclick="location.reload()" style="color:var(--danger)">🚪 安全登出</div>
+            <h2 style="font-size:18px; margin-bottom:40px">公關品管理系統</h2>
+            <div class="nav-item active" id="nav-orders" onclick="switchTab('orders')">📋 訂單管理系統</div>
+            <div class="nav-item" id="nav-inventory" onclick="switchTab('inventory')">📦 商品庫存維護</div>
+            <div class="nav-item" id="nav-accounts" onclick="switchTab('accounts')">👥 帳號密碼設定</div>
+            <div style="margin-top:50px">
+                <button class="btn btn-outline" style="width:100%" onclick="location.reload()">安全登出</button>
             </div>
         </div>
 
         <div class="main-content">
-            <div id="section-dashboard" class="content-section">
-                <h1>儀表板總覽</h1>
-                <div class="stat-grid">
-                    <div class="stat-card">
-                        <div style="color:var(--text-muted); font-size:14px">待處理訂單</div>
-                        <div style="font-size:32px; font-weight:bold; margin-top:8px">12 <span style="font-size:14px">筆</span></div>
-                    </div>
-                    <div class="stat-card" style="border-left: 4px solid var(--success)">
-                        <div style="color:var(--text-muted); font-size:14px">本月累計結案</div>
-                        <div style="font-size:32px; font-weight:bold; margin-top:8px">158 <span style="font-size:14px">筆</span></div>
-                    </div>
-                    <div class="stat-card" style="border-left: 4px solid var(--warning)">
-                        <div style="color:var(--text-muted); font-size:14px">庫存不足警示</div>
-                        <div style="font-size:32px; font-weight:bold; margin-top:8px">3 <span style="font-size:14px">項</span></div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="section-orders" class="content-section hidden">
+            <div id="tab-orders">
                 <h1>訂單管理系統</h1>
                 <div class="panel">
+                    <div class="filter-bar">
+                        <div>
+                            <label style="font-size:12px; display:block">開始日期</label>
+                            <input type="date" id="filterStart">
+                        </div>
+                        <div>
+                            <label style="font-size:12px; display:block">結束日期</label>
+                            <input type="date" id="filterEnd">
+                        </div>
+                        <button class="btn btn-outline" onclick="filterOrders()">篩選區間</button>
+                        <button class="btn btn-success" onclick="downloadCSV()">下載 CSV</button>
+                    </div>
                     <table>
                         <thead>
                             <tr>
-                                <th>編號</th><th>申請人</th><th>部門</th><th>狀態</th><th>金額</th><th>管理</th>
+                                <th>日期</th><th>單號</th><th>申請人</th><th>內容明細</th><th>當前狀態</th><th>狀態操作</th>
                             </tr>
                         </thead>
-                        <tbody id="ordersBody"></tbody>
+                        <tbody id="orderTable"></tbody>
                     </table>
                 </div>
             </div>
 
-            <div id="section-inventory" class="content-section hidden">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px">
-                    <h1>商品維護與上架</h1>
-                    <button class="btn btn-primary" onclick="openModal()">＋ 新增公關品</button>
-                </div>
+            <div id="tab-inventory" class="hidden">
+                <h1>商品維護</h1>
+                <div class="panel">庫存維護功能（可在此新增/移除商品）</div>
+            </div>
+
+            <div id="tab-accounts" class="hidden">
+                <h1>系統帳號管理</h1>
                 <div class="panel">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>縮圖</th><th>商品名稱</th><th>單價</th><th>庫存量</th><th>管理</th>
-                            </tr>
-                        </thead>
-                        <tbody id="inventoryBody"></tbody>
+                    <h3>新增管理員</h3>
+                    <div style="display:flex; gap:10px; margin-bottom:20px">
+                        <input type="text" id="newAccUser" placeholder="新帳號">
+                        <input type="password" id="newAccPass" placeholder="新密碼">
+                        <button class="btn btn-primary" onclick="addAccount()">新增帳號</button>
+                    </div>
+                    <hr>
+                    <table style="margin-top:20px">
+                        <thead><tr><th>帳號名稱</th><th>角色</th><th>操作</th></tr></thead>
+                        <tbody id="accountTable"></tbody>
                     </table>
-                </div>
-            </div>
-        </div>
-
-        <div id="addModal" class="modal-overlay">
-            <div class="modal-content">
-                <h3 style="margin-top:0">新增商品資訊</h3>
-                <label>商品照片</label>
-                <input type="file" id="itemPic" accept="image/*" onchange="previewImage(this)">
-                <div id="previewBox" style="margin-bottom:15px; display:none">
-                    <img id="uploadPreview" style="width:100%; height:150px; object-fit:contain; border-radius:12px; background:#f9f9f9">
-                </div>
-                
-                <label>商品名稱</label>
-                <input type="text" id="itemName" placeholder="例如：北醫平安包">
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px">
-                    <div>
-                        <label>單價 (NT$)</label>
-                        <input type="number" id="itemPrice" value="460">
-                    </div>
-                    <div>
-                        <label>初始庫存</label>
-                        <input type="number" id="itemStock" value="50">
-                    </div>
-                </div>
-                
-                <div style="display:flex; gap:12px; margin-top:20px">
-                    <button class="btn btn-outline" style="flex:1; justify-content:center" onclick="closeModal()">取消</button>
-                    <button class="btn btn-primary" style="flex:1; justify-content:center" onclick="confirmAddItem()">儲存上架</button>
                 </div>
             </div>
         </div>
     </div>
 
+    <div id="orderModal" class="modal">
+        <div class="modal-body">
+            <h3 id="modalTitle">訂單明細</h3>
+            <div id="modalContent" style="margin-bottom:20px"></div>
+            <div id="memoArea" class="hidden">
+                <label>異常備註 (30-50字):</label>
+                <textarea id="errorMemo" style="width:100%; height:80px; margin-top:10px" placeholder="請描述異常原因..."></textarea>
+            </div>
+            <div style="display:flex; gap:10px; margin-top:20px">
+                <button class="btn btn-outline" style="flex:1" onclick="closeModal()">關閉</button>
+                <button id="saveBtn" class="btn btn-primary hidden" onclick="saveStatusChange()">儲存變更</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // 初始化虛擬資料
-        let MOCK_ORDERS = [
-            { id: 'TASK-103', name: '張智維', dept: '急診室', status: 'PREPARING', amount: 1660 },
-            { id: 'TASK-104', name: '李雅婷', dept: '護理部', status: 'SUBMITTED', amount: 460 },
-            { id: 'TASK-105', name: '王大同', dept: '家醫科', status: 'READY', amount: 920 }
+        // 初始化帳號與訂單
+        let ACCOUNTS = [{user: 'admin', pass: '1234', role: '超級管理員'}];
+        let ORDERS = [
+            {id:'ORD-001', date:'2026-02-10', user:'陳醫生', items:[{n:'平安包', q:2}, {n:'原子筆', q:10}], status:'申請提出', memo:''},
+            {id:'ORD-002', date:'2026-02-11', user:'林護理師', items:[{n:'纖維袋', q:5}], status:'商品準備中', memo:''},
+            {id:'ORD-003', date:'2026-02-12', user:'張專員', items:[{n:'平安包', q:1}], status:'通知領取', memo:''},
+            {id:'ORD-004', date:'2026-02-13', user:'李主任', items:[{n:'精製筆', q:20}], status:'異常通知', memo:'庫存不足，預計下週到貨'}
         ];
 
-        let MOCK_ITEMS = [
-            { id: 1, name: '北醫平安包', price: 460, stock: 15, img: 'https://via.placeholder.com/150?text=Bag' },
-            { id: 2, name: '環保纖維袋', price: 50, stock: 120, img: 'https://via.placeholder.com/150?text=Tote' }
-        ];
-
-        // 登入功能
         function handleLogin() {
             const u = document.getElementById('user').value;
             const p = document.getElementById('pass').value;
-
-            if (u === 'admin' && p === '1234') {
+            const valid = ACCOUNTS.find(a => a.user === u && a.pass === p);
+            if(valid) {
                 document.getElementById('loginView').style.display = 'none';
                 document.getElementById('adminView').style.display = 'block';
-                renderUI();
-            } else {
-                alert('登入失敗：帳號或密碼錯誤');
-            }
+                renderOrders();
+                renderAccounts();
+            } else { alert('帳密錯誤'); }
         }
 
-        // 切換側邊欄
-        function switchSection(secId) {
-            document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
-            document.getElementById('section-' + secId).classList.remove('hidden');
-            
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById('nav-' + secId).classList.add('active');
+        function switchTab(tabId) {
+            ['orders', 'inventory', 'accounts'].forEach(t => {
+                document.getElementById('tab-'+t).classList.add('hidden');
+                document.getElementById('nav-'+t).classList.remove('active');
+            });
+            document.getElementById('tab-'+tabId).classList.remove('hidden');
+            document.getElementById('nav-'+tabId).classList.add('active');
         }
 
-        // 渲染畫面
-        function renderUI() {
-            // 訂單渲染
-            document.getElementById('ordersBody').innerHTML = MOCK_ORDERS.map(o => `
+        function renderOrders(data = ORDERS) {
+            const body = document.getElementById('orderTable');
+            body.innerHTML = data.map(o => `
                 <tr>
-                    <td><b>${o.id}</b></td><td>${o.name}</td><td>${o.dept}</td>
-                    <td><span style="color:${o.status==='READY'?'#34C759':'#FF9500'}">● ${o.status}</span></td>
-                    <td>$${o.amount}</td>
-                    <td><button class="btn btn-outline" style="padding:6px 12px">查看</button></td>
-                </tr>
-            `).join('');
-
-            // 商品渲染
-            document.getElementById('inventoryBody').innerHTML = MOCK_ITEMS.map(i => `
-                <tr>
-                    <td><img src="${i.img}" class="img-preview-sm"></td>
-                    <td><b>${i.name}</b></td>
-                    <td>$${i.price}</td>
-                    <td style="${i.stock < 20 ? 'color:red; font-weight:bold' : ''}">${i.stock} 件</td>
-                    <td><button class="btn btn-danger" style="padding:6px 12px" onclick="deleteItem(${i.id})">移除</button></td>
+                    <td>${o.date}</td><td><b>${o.id}</b></td><td>${o.user}</td>
+                    <td><button class="btn btn-outline" onclick="showDetail('${o.id}')">查看 (共 ${o.items.length} 項)</button></td>
+                    <td><span class="status-pill status-${getStatusID(o.status)}">${o.status}</span></td>
+                    <td>
+                        <select onchange="updateStatus('${o.id}', this.value)">
+                            <option value="">轉換狀態...</option>
+                            <option value="申請提出">申請提出</option>
+                            <option value="商品準備中">商品準備中</option>
+                            <option value="通知領取">通知領取 (發信)</option>
+                            <option value="異常通知">異常通知</option>
+                        </select>
+                    </td>
                 </tr>
             `).join('');
         }
 
-        // 彈窗控制
-        function openModal() {
-            document.getElementById('addModal').style.display = 'flex';
-        }
-        function closeModal() {
-            document.getElementById('addModal').style.display = 'none';
+        function getStatusID(s) {
+            if(s==='申請提出') return 1; if(s==='商品準備中') return 2;
+            if(s==='通知領取') return 3; if(s==='異常通知') return 4;
         }
 
-        // 圖片預覽
-        function previewImage(input) {
-            const file = input.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('uploadPreview').src = e.target.result;
-                    document.getElementById('previewBox').style.display = 'block';
+        function showDetail(id) {
+            const o = ORDERS.find(order => order.id === id);
+            document.getElementById('modalTitle').innerText = '訂單明細 - ' + id;
+            document.getElementById('modalContent').innerHTML = o.items.map(i => `<p>${i.n} x ${i.q}</p>`).join('') + 
+                (o.memo ? `<hr><p style="color:red">備註：${o.memo}</p>` : '');
+            document.getElementById('memoArea').classList.add('hidden');
+            document.getElementById('saveBtn').classList.add('hidden');
+            document.getElementById('orderModal').style.display = 'flex';
+        }
+
+        let pendingStatus = { id: '', status: '' };
+        function updateStatus(id, newStatus) {
+            if(!newStatus) return;
+            if(newStatus === '通知領取') {
+                if(confirm('將自動串聯 Workflow 發送郵件通知領取，確定嗎？')) {
+                    // 這裡串接你的 n8n Webhook
+                    console.log('Triggering n8n Workflow for:', id);
+                    alert(id + ' 已觸發 Workflow 發信成功！');
+                    applyStatus(id, newStatus);
                 }
-                reader.readAsDataURL(file);
+            } else if(newStatus === '異常通知') {
+                pendingStatus = { id, status: newStatus };
+                document.getElementById('modalTitle').innerText = '填寫異常備註';
+                document.getElementById('modalContent').innerHTML = '請輸入異常原因：';
+                document.getElementById('memoArea').classList.remove('hidden');
+                document.getElementById('saveBtn').classList.remove('hidden');
+                document.getElementById('orderModal').style.display = 'flex';
+            } else {
+                applyStatus(id, newStatus);
             }
         }
 
-        // 新增商品
-        function confirmAddItem() {
-            const name = document.getElementById('itemName').value;
-            const price = document.getElementById('itemPrice').value;
-            const stock = document.getElementById('itemStock').value;
-            const img = document.getElementById('uploadPreview').src;
-
-            if (!name) return alert('請輸入商品名稱');
-
-            MOCK_ITEMS.unshift({ id: Date.now(), name, price, stock, img });
-            renderUI();
+        function saveStatusChange() {
+            const memo = document.getElementById('errorMemo').value;
+            if(memo.length < 5) return alert('備註字數不足');
+            applyStatus(pendingStatus.id, pendingStatus.status, memo);
             closeModal();
-            // 重置
-            document.getElementById('itemName').value = '';
-            document.getElementById('previewBox').style.display = 'none';
         }
 
-        function deleteItem(id) {
-            if(confirm('確定要移除此商品？')) {
-                MOCK_ITEMS = MOCK_ITEMS.filter(i => i.id !== id);
-                renderUI();
-            }
+        function applyStatus(id, status, memo = '') {
+            const o = ORDERS.find(order => order.id === id);
+            o.status = status;
+            if(memo) o.memo = memo;
+            renderOrders();
         }
+
+        function filterOrders() {
+            const start = document.getElementById('filterStart').value;
+            const end = document.getElementById('filterEnd').value;
+            if(!start || !end) return alert('請選擇完整區間');
+            const filtered = ORDERS.filter(o => o.date >= start && o.date <= end);
+            renderOrders(filtered);
+        }
+
+        function downloadCSV() {
+            let csv = '日期,單號,申請人,狀態,金額\n';
+            ORDERS.forEach(o => csv += `${o.date},${o.id},${o.user},${o.status},0\n`);
+            const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "訂單報表.csv";
+            link.click();
+        }
+
+        function addAccount() {
+            const u = document.getElementById('newAccUser').value;
+            const p = document.getElementById('newAccPass').value;
+            if(!u || !p) return;
+            ACCOUNTS.push({user: u, pass: p, role: '管理員'});
+            renderAccounts();
+            alert('新增成功');
+        }
+
+        function renderAccounts() {
+            document.getElementById('accountTable').innerHTML = ACCOUNTS.map(a => `
+                <tr><td>${a.user}</td><td>${a.role}</td><td><button class="btn btn-danger" onclick="alert('不能刪除初始帳號')">停用</button></td></tr>
+            `).join('');
+        }
+
+        function closeModal() { document.getElementById('orderModal').style.display = 'none'; }
     </script>
 </body>
 </html>
