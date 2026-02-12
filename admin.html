@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>公關品後臺管理系統 - 提案優化版</title>
+    <title>公關品後臺管理系統 - Mobile Optimized</title>
     <style>
         :root {
             --primary: #10B981;
@@ -18,62 +18,67 @@
         body, html { height: 100%; margin: 0; font-family: "PingFang TC", sans-serif; background: var(--bg); color: var(--text); }
         .hidden { display: none !important; }
 
-        /* Sidebar & Layout */
+        /* Sidebar 響應式優化 */
         .sidebar {
             width: 260px; background: white; height: 100vh; position: fixed;
             padding: 24px; border-right: 1px solid var(--border); box-sizing: border-box; z-index: 1000;
             transition: transform 0.3s ease;
         }
-        .main-content { margin-left: 260px; padding: 30px; transition: 0.3s; }
 
-        /* 手機版適配 (RWD) */
-        @media (max-width: 900px) {
-            .sidebar { transform: translateX(-100%); width: 240px; }
+        .main-content { margin-left: 260px; padding: 30px; transition: margin-left 0.3s ease; }
+
+        /* ===== 手機版關鍵樣式修正 ===== */
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); width: 240px; } /* 預設隱藏側邊欄 */
             .sidebar.active { transform: translateX(0); }
             .main-content { margin-left: 0; padding: 15px; }
-            .mobile-header { display: flex !important; align-items: center; padding: 12px; background: white; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 900; }
             
-            /* 卡片式佈局：取代表格 */
-            .resp-table thead { display: none; }
-            .resp-table tbody tr {
-                display: block; background: white; border: 1px solid var(--border);
-                border-radius: 12px; margin-bottom: 15px; padding: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            /* 將表格轉換為卡片式佈局 */
+            .responsive-table thead { display: none; } /* 隱藏表頭 */
+            .responsive-table tbody tr {
+                display: block;
+                background: white;
+                border: 1px solid var(--border);
+                border-radius: 12px;
+                margin-bottom: 15px;
+                padding: 15px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             }
-            .resp-table td {
-                display: flex; justify-content: space-between; align-items: center;
-                padding: 10px 0; border-bottom: 1px dashed #f0f0f0; text-align: right;
+            .responsive-table td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 8px 0;
+                border-bottom: 1px dashed #f0f0f0;
+                text-align: right;
             }
-            .resp-table td::before { content: attr(data-label); font-weight: bold; color: #64748B; text-align: left; }
-            .resp-table td:last-child { border-bottom: none; flex-direction: column; align-items: stretch; gap: 10px; padding-top: 15px; }
+            .responsive-table td::before {
+                content: attr(data-label);
+                font-weight: bold;
+                color: #64748B;
+                text-align: left;
+            }
+            .responsive-table td:last-child { border-bottom: none; flex-direction: column; align-items: stretch; gap: 10px; }
         }
 
+        /* UI 元件 */
         .nav-item { padding: 14px; border-radius: 10px; margin-bottom: 8px; cursor: pointer; display: flex; align-items: center; gap: 12px; color: #64748B; }
         .nav-item.active { background: var(--primary); color: white; font-weight: bold; }
-
-        .panel { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 24px; border: 1px solid var(--border); }
-        h1 { font-size: 22px; margin-bottom: 24px; color: #0F172A; border-left: 5px solid var(--primary); padding-left: 15px; }
-
+        .panel { background: white; border-radius: 12px; padding: 20px; border: 1px solid var(--border); }
         .btn { padding: 10px 16px; border-radius: 8px; border: none; cursor: pointer; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
         .btn-primary { background: var(--primary); color: white; }
-        .btn-success { background: #10B981; color: white; }
-        .btn-outline { background: white; border: 1px solid var(--border); color: var(--text); }
+        .btn-outline { background: white; border: 1px solid var(--border); }
+        .status-pill { padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: bold; background: #DBEAFE; color: #1E40AF; }
 
-        .status-pill { padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: bold; }
-        .status-1 { background: #DBEAFE; color: #1E40AF; } /* 申請提出 */
-        .status-4 { background: #FEE2E2; color: #991B1B; } /* 異常通知 */
-
-        input, select, textarea { padding: 12px; border: 1px solid var(--border); border-radius: 8px; box-sizing: border-box; }
-        .img-thumb { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; background: #eee; }
-
-        /* Modal */
-        .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.5); display: none; align-items: center; justify-content: center; z-index: 5000; padding: 15px; }
-        .modal-body { background: white; padding: 30px; border-radius: 16px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
+        /* 彈窗優化 */
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 5000; padding: 15px; }
+        .modal-body { background: white; padding: 25px; border-radius: 16px; width: 100%; max-width: 480px; max-height: 85vh; overflow-y: auto; }
         .info-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #F1F5F9; font-size: 14px; }
     </style>
 </head>
 <body>
 
-    <div class="mobile-header" style="display:none;">
+    <div style="padding: 10px; background: white; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 10px;" class="mobile-only">
         <button class="btn btn-outline" onclick="document.querySelector('.sidebar').classList.toggle('active')">☰ 選單</button>
         <b style="color:var(--primary)">公關品管理系統</b>
     </div>
@@ -81,63 +86,49 @@
     <div id="adminView">
         <div class="sidebar">
             <h2 style="color:var(--primary-dark); margin-bottom:30px">後臺管理</h2>
-            <div class="nav-item active" id="nav-orders" onclick="switchTab('orders')">📋 <span class="nav-text">訂單管理系統</span></div>
-            <div class="nav-item" id="nav-inventory" onclick="switchTab('inventory')">⚖️ <span class="nav-text">庫存盤點 (+/-)</span></div>
-            <div class="nav-item" id="nav-listing" onclick="switchTab('listing')">🚀 <span class="nav-text">商品上架/下架</span></div>
-            <div class="nav-item" id="nav-accounts" onclick="switchTab('accounts')">👥 <span class="nav-text">帳號設定</span></div>
-            <div style="margin-top:40px"><button class="btn btn-outline" style="width:100%" onclick="location.reload()">🔒 安全登出</button></div>
+            <div class="nav-item active" onclick="switchTab('orders')">📋 <span class="nav-text">訂單管理</span></div>
+            <div class="nav-item" onclick="switchTab('inventory')">⚖️ <span class="nav-text">庫存盤點</span></div>
+            <div class="nav-item" onclick="switchTab('listing')">🚀 <span class="nav-text">商品上架</span></div>
+            <div class="nav-item" onclick="switchTab('accounts')">👥 <span class="nav-text">帳號設定</span></div>
+            <button class="btn btn-outline" style="width:100%; margin-top:30px" onclick="location.reload()">安全登出</button>
         </div>
 
         <div class="main-content">
             <div id="tab-orders">
-                <h1>訂單管理系統 (演示版資料)</h1>
+                <h1>訂單管理系統</h1>
                 <div class="panel">
-                    <div style="display:flex; gap:12px; margin-bottom:24px; flex-wrap:wrap;">
-                        <input type="date" value="2026-02-01"> <span style="align-self:center">至</span> <input type="date" value="2026-02-28">
-                        <button class="btn btn-primary" onclick="alert('篩選成功')">篩選區間</button>
-                        <button class="btn btn-success" onclick="downloadCSV()">下載報表 (CSV)</button>
+                    <div style="display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap;">
+                        <input type="date" style="flex:1; min-width:140px;">
+                        <input type="date" style="flex:1; min-width:140px;">
+                        <button class="btn btn-primary" style="flex:1;">篩選</button>
                     </div>
-                    <table class="resp-table">
-                        <thead><tr><th>日期</th><th>單號</th><th>申請人</th><th>明細</th><th>狀態</th><th>操作</th></tr></thead>
+                    
+                    <table class="responsive-table">
+                        <thead>
+                            <tr><th>日期</th><th>單號</th><th>申請人</th><th>內容</th><th>狀態</th><th>操作</th></tr>
+                        </thead>
                         <tbody id="orderTable"></tbody>
                     </table>
                 </div>
             </div>
 
             <div id="tab-inventory" class="hidden">
-                <h1>庫存盤點管理 (使用 + / - 調整量)</h1>
-                <div class="panel">
-                    <table class="resp-table">
-                        <thead><tr><th>縮圖</th><th>商品名稱</th><th>單價</th><th>庫存</th><th>盤點量</th><th>操作</th></tr></thead>
-                        <tbody id="inventoryBody"></tbody>
-                    </table>
-                </div>
+                 <h1>庫存盤點</h1>
+                 <div class="panel">
+                     <table class="responsive-table">
+                         <tbody id="inventoryBody"></tbody>
+                     </table>
+                 </div>
             </div>
 
             <div id="tab-listing" class="hidden">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px">
-                    <h1>商品上架與維護清單</h1>
-                    <button class="btn btn-primary" onclick="openAddModal()">＋ 新增商品上線</button>
+                    <h1>商品上架</h1>
+                    <button class="btn btn-primary" onclick="openAddModal()">＋ 新增</button>
                 </div>
                 <div class="panel">
-                    <table class="resp-table">
-                        <thead><tr><th>圖片</th><th>商品名稱</th><th>單價</th><th>狀態</th><th>管理</th></tr></thead>
+                    <table class="responsive-table">
                         <tbody id="listingBody"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div id="tab-accounts" class="hidden">
-                <h1>帳號與權限設定</h1>
-                <div class="panel">
-                    <div style="display:flex; gap:12px; margin-bottom:24px; flex-wrap:wrap">
-                        <input type="text" id="newAccUser" placeholder="管理員帳號">
-                        <input type="password" id="newAccPass" placeholder="初始密碼">
-                        <button class="btn btn-primary" onclick="addAccount()">新增帳號</button>
-                    </div>
-                    <table class="resp-table">
-                        <thead><tr><th>帳號名稱</th><th>角色權限</th><th>目前狀態</th><th>操作</th></tr></thead>
-                        <tbody id="accountTable"></tbody>
                     </table>
                 </div>
             </div>
@@ -147,168 +138,101 @@
     <div id="mainModal" class="modal"><div class="modal-body" id="modalBody"></div></div>
 
     <script>
-        // 初始化虛擬資料 (6項商品)
-        let ITEMS = [
-            {id: 1, name: '北醫平安包', price: 460, stock: 25, img: 'https://via.placeholder.com/50/10B981/FFF?text=Bag', active: true},
-            {id: 2, name: '睿護精製鋼筆', price: 800, stock: 12, img: 'https://via.placeholder.com/50/3B82F6/FFF?text=Pen', active: true},
-            {id: 3, name: '保溫隨行杯', price: 550, stock: 8, img: 'https://via.placeholder.com/50/F59E0B/FFF?text=Cup', active: true},
-            {id: 4, name: '療癒小植栽', price: 320, stock: 15, img: 'https://via.placeholder.com/50/10B981/FFF?text=Plant', active: true},
-            {id: 5, name: '防水野餐墊', price: 450, stock: 20, img: 'https://via.placeholder.com/50/3B82F6/FFF?text=Mat', active: true},
-            {id: 6, name: '帆布提籃', price: 280, stock: 30, img: 'https://via.placeholder.com/50/F59E0B/FFF?text=Box', active: true}
-        ];
-
-        // 20筆虛擬訂單
-        let ORDERS = Array.from({length: 20}, (_, i) => ({
-            id: `TASK-2026-${100+i}`, date: `2026-02-${String(1+(i%28)).padStart(2,'0')}`,
-            user: i % 2 === 0 ? `張智維 (10411${i})` : `李雅婷 (10422${i})`,
-            phone: '0912-345-678', email: 'service@example.com', dept: '急診醫學部', 
-            cost_center: 'CC-9900', reason: '公務研討會贈品',
-            items: [{n: ITEMS[i % 6].name, q: 1}], status: i % 4 === 0 ? '異常通知' : '申請提出', memo: i % 4 === 0 ? '物流配送異常' : ''
+        // 大量虛擬訂單
+        const ORDERS = Array.from({length: 12}, (_, i) => ({
+            id: `TASK-10${i}`,
+            date: `2026-02-${10+i}`,
+            user: `張智維 (10411${i})`,
+            phone: '0988-123-456',
+            email: 'test@example.com',
+            dept: '急診室',
+            cost_center: 'CC-5566',
+            reason: '參訪贈品',
+            status: '申請提出',
+            items: [{n: '北醫平安包', q: 1}]
         }));
 
-        let ACCOUNTS = [{user: 'admin', pass: '1234', role: '超級管理員', active: true}];
-
-        function handleLogin() {
-            document.getElementById('adminView').style.display = 'block';
-            renderAll();
-        }
-
-        function switchTab(t) {
-            ['orders','inventory','listing','accounts'].forEach(id => {
-                document.getElementById('tab-'+id)?.classList.add('hidden');
-                document.getElementById('nav-'+id)?.classList.remove('active');
-            });
-            document.getElementById('tab-'+t).classList.remove('hidden');
-            document.getElementById('nav-'+t).classList.add('active');
-            document.querySelector('.sidebar').classList.remove('active');
-        }
-
-        function renderAll() {
-            renderOrders();
-            renderInventory();
-            renderListing();
-            renderAccounts();
-        }
+        const ITEMS = [
+            {id: 1, name: '北醫平安包', price: 460, stock: 25, img: 'https://via.placeholder.com/50'},
+            {id: 2, name: '睿護精製鋼筆', price: 800, stock: 12, img: 'https://via.placeholder.com/50'}
+        ];
 
         function renderOrders() {
             document.getElementById('orderTable').innerHTML = ORDERS.map(o => `
                 <tr>
-                    <td data-label="日期">${o.date}</td><td data-label="單號"><b>${o.id}</b></td><td data-label="申請人">${o.user}</td>
-                    <td data-label="明細"><button class="btn btn-outline" onclick="showDetail('${o.id}')">查看完整明細</button></td>
-                    <td data-label="狀態"><span class="status-pill status-1">${o.status}</span></td>
+                    <td data-label="日期">${o.date}</td>
+                    <td data-label="單號"><b>${o.id}</b></td>
+                    <td data-label="申請人">${o.user}</td>
+                    <td data-label="內容"><button class="btn btn-outline" onclick="showDetail('${o.id}')">查看明細</button></td>
+                    <td data-label="狀態"><span class="status-pill">${o.status}</span></td>
                     <td data-label="操作">
-                        <select onchange="updateStatus('${o.id}', this.value)" style="width:100%"><option value="">轉換狀態...</option><option value="通知領取">通知領取 (發信)</option><option value="異常通知">異常通知</option></select>
+                        <select onchange="updateStatus('${o.id}', this.value)" style="width:100%">
+                            <option value="">轉至...</option>
+                            <option value="通知領取">通知領取</option>
+                            <option value="異常通知">異常通知</option>
+                        </select>
                     </td>
-                </tr>`).join('');
+                </tr>
+            `).join('');
         }
 
         function showDetail(id) {
             const o = ORDERS.find(ord => ord.id === id);
             openModal(`
-                <h3 style="margin-top:0">📋 訂單詳細內容</h3>
-                <div class="panel" style="background:#F1F5F9; border:none; padding:15px">
-                    <div class="info-row"><span style="font-weight:bold">申請人</span><span>${o.user}</span></div>
-                    <div class="info-row"><span style="font-weight:bold">電話</span><span>${o.phone}</span></div>
-                    <div class="info-row"><span style="font-weight:bold">信箱</span><span>${o.email}</span></div>
-                    <div class="info-row"><span style="font-weight:bold">單位</span><span>${o.dept}</span></div>
-                    <div class="info-row"><span style="font-weight:bold">成本中心</span><span>${o.cost_center}</span></div>
-                    <div class="info-row"><span style="font-weight:bold">事由</span><span>${o.reason}</span></div>
-                </div>
-                <h4>📦 購買品項</h4>
+                <h3>📋 訂單完整資訊</h3>
+                <div class="info-row"><span>申請人</span><span>${o.user}</span></div>
+                <div class="info-row"><span>電話</span><span>${o.phone}</span></div>
+                <div class="info-row"><span>信箱</span><span>${o.email}</span></div>
+                <div class="info-row"><span>單位</span><span>${o.dept}</span></div>
+                <div class="info-row"><span>成本中心</span><span>${o.cost_center}</span></div>
+                <div class="info-row"><span>理由</span><span>${o.reason}</span></div>
+                <h4 style="margin: 15px 0 10px;">📦 商品項目</h4>
                 ${o.items.map(i => `<p>● ${i.n} x ${i.q}</p>`).join('')}
-                ${o.memo ? `<p style="color:var(--danger)">⚠️ 異常備註：${o.memo}</p>` : ''}
-                <button class="btn btn-primary" style="width:100%; margin-top:20px" onclick="closeModal()">關閉明細</button>
+                <button class="btn btn-primary" style="width:100%; margin-top:20px" onclick="closeModal()">關閉</button>
             `);
         }
 
         function renderInventory() {
-            document.getElementById('inventoryBody').innerHTML = ITEMS.filter(i=>i.active).map(i => `
+            document.getElementById('inventoryBody').innerHTML = ITEMS.map(i => `
                 <tr>
-                    <td data-label="縮圖"><img src="${i.img}" class="img-thumb"></td>
-                    <td data-label="商品">${i.name}</td><td data-label="單價">$${i.price}</td><td data-label="庫存"><b>${i.stock}</b></td>
-                    <td data-label="盤點量">
-                        <div style="display:flex; gap:5px; justify-content:flex-end">
+                    <td data-label="圖片"><img src="${i.img}" class="img-thumb"></td>
+                    <td data-label="商品">${i.name}</td>
+                    <td data-label="目前庫存"><b>${i.stock}</b></td>
+                    <td data-label="盤點調整">
+                        <div style="display:flex; gap:5px; width:100%; justify-content:flex-end">
                             <select id="s-${i.id}"><option>+</option><option>-</option></select>
-                            <input type="number" id="v-${i.id}" value="0" style="width:70px">
+                            <input type="number" id="v-${i.id}" value="0" style="width:60px">
                         </div>
                     </td>
-                    <td data-label="操作"><button class="btn btn-success" onclick="adjustStock(${i.id})">更新盤點</button></td>
-                </tr>`).join('');
-        }
-
-        function adjustStock(id) {
-            const sign = document.getElementById('s-'+id).value;
-            const val = parseInt(document.getElementById('v-'+id).value);
-            const item = ITEMS.find(i => i.id === id);
-            if(sign === '+') item.stock += val; else item.stock -= val;
-            renderInventory(); alert('庫存更新成功！');
-        }
-
-        function renderListing() {
-            document.getElementById('listingBody').innerHTML = ITEMS.map(i => `
-                <tr>
-                    <td data-label="圖片"><img src="${i.img}" class="img-thumb"></td><td data-label="商品">${i.name}</td><td data-label="單價">$${i.price}</td>
-                    <td data-label="狀態">${i.active ? '上架中' : '已下架'}</td>
-                    <td data-label="管理"><button class="btn ${i.active?'btn-danger':'btn-primary'}" style="width:100%" onclick="toggleItem(${i.id})">${i.active?'下架':'重新上架'}</button></td>
-                </tr>`).join('');
-        }
-
-        function toggleItem(id) {
-            const i = ITEMS.find(x => x.id === id);
-            i.active = !i.active; renderAll();
+                    <td data-label="操作"><button class="btn btn-success" onclick="alert('盤點成功')">更新</button></td>
+                </tr>
+            `).join('');
         }
 
         function openAddModal() {
             openModal(`
                 <h3>新增商品上線</h3>
-                <div style="margin-bottom:15px">
-                    <label style="display:block; margin-bottom:8px"><b>1. 商品照片上傳</b></label>
-                    <input type="file" id="itemPic" onchange="previewImg(this)">
+                <label><b>圖片上傳</b></label><br><input type="file" style="margin:10px 0"><br>
+                <label><b>商品名稱</b></label><input type="text" style="width:100%; margin-bottom:15px">
+                <div style="display:flex; gap:10px">
+                    <div style="flex:1"><label><b>單價</b></label><input type="number" style="width:100%"></div>
+                    <div style="flex:1"><label><b>進貨量</b></label><input type="number" style="width:100%"></div>
                 </div>
-                <div id="pBox" style="display:none; margin-bottom:15px"><img id="pImg" style="width:100px; height:100px; border-radius:10px; border:1px solid #ddd"></div>
-                
-                <div style="margin-bottom:15px">
-                    <label style="display:block; margin-bottom:8px"><b>2. 商品名稱</b></label>
-                    <input type="text" id="newName" placeholder="例如：北醫限定平安包" style="width:100%">
-                </div>
-                
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom:20px">
-                    <div><label style="display:block; margin-bottom:8px"><b>單價</b></label><input type="number" id="newPrice" value="500" style="width:100%"></div>
-                    <div><label style="display:block; margin-bottom:8px"><b>進貨量</b></label><input type="number" id="newStock" value="100" style="width:100%"></div>
-                </div>
-                <button class="btn btn-primary" style="width:100%" onclick="alert('上架成功'); closeModal();">確認發布上線</button>
+                <button class="btn btn-primary" style="width:100%; margin-top:20px" onclick="closeModal()">確認上架</button>
             `);
         }
 
-        function previewImg(input) {
-            const reader = new FileReader();
-            reader.onload = e => { document.getElementById('pImg').src = e.target.result; document.getElementById('pBox').style.display='block'; };
-            reader.readAsDataURL(input.files[0]);
+        // 基本邏輯
+        function switchTab(t) {
+            ['orders','inventory','listing','accounts'].forEach(id => {
+                document.getElementById('tab-'+id)?.classList.add('hidden');
+            });
+            document.getElementById('tab-'+t).classList.remove('hidden');
+            document.querySelector('.sidebar').classList.remove('active'); // 手機點擊後收合
         }
-
-        function renderAccounts() {
-            document.getElementById('accountTable').innerHTML = ACCOUNTS.map(a => `
-                <tr>
-                    <td data-label="帳號">${a.user}</td><td data-label="權限">${a.role}</td><td data-label="狀態">${a.active?'使用中':'停權'}</td>
-                    <td data-label="管理"><button class="btn btn-outline" style="width:100%" onclick="alert('Demo環境禁止操作初始管理員')">權限設定</button></td>
-                </tr>`).join('');
-        }
-
-        function updateStatus(id, s) {
-            if(s === '異常通知') {
-                const m = prompt('請輸入異常原因 (30-50字)：');
-                if(m) { ORDERS.find(o => o.id === id).memo = m; renderAll(); }
-            } else if(s === '通知領取') {
-                if(confirm('將自動執行 Workflow 並寄出領取郵件，確定嗎？')) { alert(id + ' 發信成功！'); }
-            }
-        }
-
         function openModal(h) { document.getElementById('modalBody').innerHTML = h; document.getElementById('mainModal').style.display = 'flex'; }
         function closeModal() { document.getElementById('mainModal').style.display = 'none'; }
-        function downloadCSV() { alert('報表已匯出 CSV'); }
-
-        // 自動執行登入 (Demo)
-        window.onload = handleLogin;
+        window.onload = () => { renderOrders(); renderInventory(); };
     </script>
 </body>
 </html>
