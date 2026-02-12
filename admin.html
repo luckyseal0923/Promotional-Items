@@ -380,13 +380,22 @@
 </div>
 
 <script>
+  console.log('SCRIPT START');
+
 /* =========================
    Demo Session / Login
 ========================= */
 let currentAdmin = null;
 const DEMO_USERS = [{ user:'admin', pass:'1234', name:'總務管理者-Admin' }];
 
+console.log('before doLogin');
+
 function doLogin(){
+  console.log('doLogin called');
+  ...
+}
+
+console.log('after doLogin');
   const u = document.getElementById('loginUser').value.trim();
   const p = document.getElementById('loginPass').value.trim();
 
