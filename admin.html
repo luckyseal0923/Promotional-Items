@@ -542,6 +542,11 @@ function renderOrders(){
   let rows = [...ORDERS];
 
   if(fStatus) rows = rows.filter(o => o.status === fStatus);
-  if(kw){
-    rows = rows.filter(o =>
-      o.task_id.toLowe_
+if (kw) {
+  rows = rows.filter(o =>
+    o.task_id.toLowerCase().includes(kw) ||
+    o.name.toLowerCase().includes(kw) ||
+    o.staff.toLowerCase().includes(kw) ||
+    o.dept.toLowerCase().includes(kw)
+  );
+}
