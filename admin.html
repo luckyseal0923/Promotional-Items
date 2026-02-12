@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>公關品後臺管理系統 - Dual UI Edition</title>
+    <title>公關品後臺管理系統 - 專業演示版</title>
     <style>
         :root {
             --primary: #10B981;
@@ -12,63 +12,53 @@
             --text: #334155;
             --border: #E2E8F0;
             --danger: #EF4444;
-            --card: #FFFFFF;
         }
 
         body, html { height: 100%; margin: 0; font-family: "PingFang TC", sans-serif; background: var(--bg); color: var(--text); }
         .hidden { display: none !important; }
 
-        /* ===== 側邊欄與佈局 ===== */
+        /* ===== 佈局樣式 ===== */
         .sidebar {
             width: 260px; background: white; height: 100vh; position: fixed;
             padding: 24px; border-right: 1px solid var(--border); box-sizing: border-box; z-index: 1000;
         }
         .main-content { margin-left: 260px; padding: 40px; transition: 0.3s; }
-        .nav-item { 
-            padding: 14px 18px; border-radius: 10px; margin-bottom: 8px; cursor: pointer; color: #64748B;
-            display: flex; align-items: center; gap: 12px;
-        }
+        .nav-item { padding: 14px 18px; border-radius: 10px; margin-bottom: 8px; cursor: pointer; display: flex; align-items: center; gap: 12px; color: #64748B; }
         .nav-item.active { background: var(--primary); color: white; font-weight: bold; }
 
-        /* ===== UI 元件 ===== */
         .panel { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 24px; border: 1px solid var(--border); }
-        h1 { font-size: 22px; margin: 0 0 24px; color: #0F172A; border-left: 5px solid var(--primary); padding-left: 15px; }
+        h1 { font-size: 22px; margin-bottom: 24px; color: #0F172A; border-left: 5px solid var(--primary); padding-left: 15px; }
+
+        /* ===== 按鈕與輸入框 ===== */
         .btn { padding: 10px 16px; border-radius: 8px; border: none; cursor: pointer; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; }
         .btn-primary { background: var(--primary); color: white; }
-        .btn-outline { background: white; border: 1px solid var(--border); }
-        input, select { padding: 10px; border: 1px solid var(--border); border-radius: 8px; }
+        .btn-outline { background: white; border: 1px solid var(--border); color: var(--text); }
+        input, select, textarea { padding: 10px; border: 1px solid var(--border); border-radius: 8px; box-sizing: border-box; }
 
-        /* ===== 電腦版表格樣式 (Desktop Only) ===== */
-        .desktop-table { width: 100%; border-collapse: collapse; display: table; }
-        .desktop-table th { text-align: left; padding: 12px; background: #F8FAFC; border-bottom: 2px solid var(--border); font-size: 13px; }
-        .desktop-table td { padding: 16px 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
+        /* ===== 電腦版表格 (Desktop) ===== */
+        .desktop-view { width: 100%; border-collapse: collapse; display: table; }
+        .desktop-view th { text-align: left; padding: 12px; background: #F8FAFC; border-bottom: 2px solid var(--border); color: #64748B; }
+        .desktop-view td { padding: 16px 12px; border-bottom: 1px solid var(--border); }
 
-        /* ===== 手機版卡片樣式 (Mobile Only) ===== */
-        .mobile-card-list { display: none; }
-        .order-card {
-            background: white; border: 1px solid var(--border); border-radius: 16px;
-            padding: 20px; margin-bottom: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-        }
+        /* ===== 手機版卡片 (Mobile) ===== */
+        .mobile-view { display: none; }
+        .order-card { background: white; border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin-bottom: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
         .card-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #F1F5F9; font-size: 14px; }
         .card-label { font-weight: bold; color: #64748B; }
 
-        /* ===== 響應式切換核心邏輯 ===== */
+        /* ===== RWD 切換 ===== */
         @media (max-width: 900px) {
             .sidebar { transform: translateX(-100%); transition: 0.3s; }
             .sidebar.active { transform: translateX(0); }
             .main-content { margin-left: 0; padding: 20px; }
-            
-            /* 隱藏表格，顯示卡片 */
-            .desktop-table { display: none; }
-            .mobile-card-list { display: block; }
-            
-            .mobile-header { display: flex !important; align-items: center; gap: 10px; padding: 15px; background: white; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 900; }
+            .desktop-view { display: none; }
+            .mobile-view { display: block; }
+            .mobile-header { display: flex !important; align-items: center; padding: 15px; background: white; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 900; }
         }
 
-        /* 彈窗樣式 */
+        /* 彈窗 */
         .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.5); display: none; align-items: center; justify-content: center; z-index: 5000; padding: 15px; }
         .modal-body { background: white; padding: 30px; border-radius: 20px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
-        .img-thumb { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; }
     </style>
 </head>
 <body>
@@ -85,34 +75,50 @@
             <div class="nav-item" onclick="switchTab('inventory')">⚖️ <span class="nav-text">庫存盤點</span></div>
             <div class="nav-item" onclick="switchTab('listing')">🚀 <span class="nav-text">商品上架</span></div>
             <div class="nav-item" onclick="switchTab('accounts')">👥 <span class="nav-text">帳號設定</span></div>
-            <button class="btn btn-outline" style="width:100%; margin-top:40px" onclick="location.reload()">安全登出</button>
+            <button class="btn btn-outline" style="width:100%; margin-top:40px" onclick="location.reload()">登出系統</button>
         </div>
 
         <div class="main-content">
             <div id="tab-orders">
-                <h1>訂單管理系統 (提案演示版)</h1>
+                <h1>訂單管理系統 (演示版)</h1>
                 <div class="panel">
-                    <div style="display:flex; gap:12px; margin-bottom:24px; flex-wrap:wrap;">
+                    <div style="display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap;">
                         <input type="date" value="2026-02-01"> <span>至</span> <input type="date" value="2026-02-28">
                         <button class="btn btn-primary">篩選區間</button>
                     </div>
 
-                    <table class="desktop-table">
+                    <table class="desktop-view">
                         <thead><tr><th>日期</th><th>單號</th><th>申請人</th><th>明細</th><th>狀態</th><th>操作</th></tr></thead>
                         <tbody id="orderTableDesktop"></tbody>
                     </table>
 
-                    <div id="orderListMobile" class="mobile-card-list"></div>
+                    <div id="orderListMobile" class="mobile-view"></div>
                 </div>
             </div>
 
-            <div id="tab-inventory" class="hidden"><h1>庫存盤點</h1><div class="panel" id="invContent"></div></div>
+            <div id="tab-inventory" class="hidden">
+                <h1>庫存盤點 (使用 + / - 調整)</h1>
+                <div class="panel">
+                    <table class="desktop-view">
+                        <thead><tr><th>縮圖</th><th>商品名稱</th><th>單價</th><th>庫存</th><th>調整</th><th>操作</th></tr></thead>
+                        <tbody id="inventoryTableDesktop"></tbody>
+                    </table>
+                    <div id="inventoryListMobile" class="mobile-view"></div>
+                </div>
+            </div>
+
             <div id="tab-listing" class="hidden">
                 <div style="display:flex; justify-content:space-between; margin-bottom:20px">
                     <h1>商品上架管理</h1>
                     <button class="btn btn-primary" onclick="openAddModal()">＋ 新增商品</button>
                 </div>
-                <div class="panel" id="listContent"></div>
+                <div class="panel">
+                    <table class="desktop-view">
+                        <thead><tr><th>圖片</th><th>名稱</th><th>單價</th><th>狀態</th><th>操作</th></tr></thead>
+                        <tbody id="listingTableDesktop"></tbody>
+                    </table>
+                    <div id="listingListMobile" class="mobile-view"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -120,7 +126,7 @@
     <div id="mainModal" class="modal"><div class="modal-body" id="modalBody"></div></div>
 
     <script>
-        // 生成 15 筆詳細虛擬資料
+        // 共用虛擬資料 (15 筆)
         const ORDERS = Array.from({length: 15}, (_, i) => ({
             id: `TASK-10${i}`,
             date: `2026-02-${10+i}`,
@@ -130,33 +136,38 @@
             dept: '急診醫學部',
             cost_center: 'CC-9900',
             reason: '國際會議贈品',
-            status: i % 3 === 0 ? '通知領取' : '申請提出',
-            items: [{n: '北醫平安包', q: 1}, {n: '精製鋼筆', q: 1}]
+            status: i % 4 === 0 ? '異常通知' : '申請提出',
+            items: [{n: '北醫平安包', q: 1}],
+            memo: i % 4 === 0 ? '物流配送異常，預計延遲兩日' : ''
         }));
 
-        function renderOrders() {
-            // 渲染電腦版表格
-            document.getElementById('orderTableDesktop').innerHTML = ORDERS.map(o => `
-                <tr>
-                    <td>${o.date}</td><td><b>${o.id}</b></td><td>${o.user}</td>
-                    <td><button class="btn btn-outline" onclick="showDetail('${o.id}')">查看明細</button></td>
-                    <td><span style="color:var(--primary); font-weight:bold">${o.status}</span></td>
-                    <td><select><option>切換狀態...</option><option>通知領取</option></select></td>
-                </tr>
-            `).join('');
+        const ITEMS = [
+            {id: 1, name: '北醫平安包', price: 460, stock: 25, img: 'https://via.placeholder.com/50', active: true},
+            {id: 2, name: '睿護精製鋼筆', price: 800, stock: 12, img: 'https://via.placeholder.com/50', active: true}
+        ];
 
-            // 渲染手機版卡片
-            document.getElementById('orderListMobile').innerHTML = ORDERS.map(o => `
-                <div class="order-card">
-                    <div class="card-row"><span class="card-label">單號</span><b>${o.id}</b></div>
-                    <div class="card-row"><span class="card-label">申請人</span><span>${o.user}</span></div>
-                    <div class="card-row"><span class="card-label">狀態</span><b style="color:var(--primary)">${o.status}</b></div>
-                    <div style="margin-top:15px; display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                        <button class="btn btn-outline" onclick="showDetail('${o.id}')">查看明細</button>
-                        <select style="width:100%"><option>操作...</option></select>
-                    </div>
-                </div>
-            `).join('');
+        function renderAll() {
+            // 同步渲染訂單
+            const dBody = document.getElementById('orderTableDesktop');
+            const mList = document.getElementById('orderListMobile');
+            dBody.innerHTML = ''; mList.innerHTML = '';
+
+            ORDERS.forEach(o => {
+                const row = `<tr><td>${o.date}</td><td><b>${o.id}</b></td><td>${o.user}</td><td><button class="btn btn-outline" onclick="showDetail('${o.id}')">明細</button></td><td><span style="color:var(--primary)">${o.status}</span></td><td><select onchange="updateStatus('${o.id}', this.value)"><option value="">轉換...</option><option value="通知領取">通知領取</option></select></td></tr>`;
+                dBody.innerHTML += row;
+
+                const card = `<div class="order-card"><div class="card-row"><span class="card-label">單號</span><b>${o.id}</b></div><div class="card-row"><span class="card-label">申請人</span><span>${o.user}</span></div><div class="card-row"><span class="card-label">狀態</span><b style="color:var(--primary)">${o.status}</b></div><div style="margin-top:15px; display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><button class="btn btn-outline" onclick="showDetail('${o.id}')">明細</button><select><option>操作...</option></select></div></div>`;
+                mList.innerHTML += card;
+            });
+
+            // 同步渲染盤點
+            const invDesktop = document.getElementById('inventoryTableDesktop');
+            const invMobile = document.getElementById('inventoryListMobile');
+            invDesktop.innerHTML = ''; invMobile.innerHTML = '';
+            ITEMS.forEach(i => {
+                invDesktop.innerHTML += `<tr><td><img src="${i.img}" class="img-thumb"></td><td>${i.name}</td><td>$${i.price}</td><td><b>${i.stock}</b></td><td><div style="display:flex;gap:5px"><select><option>+</option><option>-</option></select><input type="number" value="0" style="width:60px"></div></td><td><button class="btn btn-success">更新</button></td></tr>`;
+                invMobile.innerHTML += `<div class="order-card"><div class="card-row"><span class="card-label">商品</span><b>${i.name}</b></div><div class="card-row"><span class="card-label">目前庫存</span><span>${i.stock}</span></div><div style="margin-top:15px; display:flex; gap:10px;"><select><option>+</option><option>-</option></select><input type="number" value="0" style="flex:1"><button class="btn btn-success">更新</button></div></div>`;
+            });
         }
 
         function showDetail(id) {
@@ -173,6 +184,7 @@
                 </div>
                 <h4>📦 商品項目</h4>
                 ${o.items.map(i => `<p>● ${i.n} x ${i.q}</p>`).join('')}
+                ${o.memo ? `<p style="color:var(--danger)"><b>⚠️ 異常備註：</b>${o.memo}</p>` : ''}
                 <button class="btn btn-primary" style="width:100%; margin-top:20px" onclick="closeModal()">關閉明細</button>
             `);
         }
@@ -180,19 +192,13 @@
         function openAddModal() {
             openModal(`
                 <h3>新增商品上線</h3>
-                <div style="margin-bottom:15px">
-                    <label><b>商品圖片</b></label><br>
-                    <input type="file" style="margin-top:8px">
-                </div>
-                <div style="margin-bottom:15px">
-                    <label><b>商品名稱</b></label>
-                    <input type="text" placeholder="請輸入名稱" style="width:100%; margin-top:8px">
-                </div>
-                <div style="display:flex; gap:10px; margin-bottom:20px">
+                <label><b>商品照片上傳</b></label><br><input type="file" style="margin:10px 0"><br>
+                <label><b>商品名稱</b></label><input type="text" placeholder="輸入名稱" style="width:100%; margin:8px 0 15px">
+                <div style="display:flex; gap:10px">
                     <div style="flex:1"><label><b>單價</b></label><input type="number" style="width:100%"></div>
                     <div style="flex:1"><label><b>進貨量</b></label><input type="number" style="width:100%"></div>
                 </div>
-                <button class="btn btn-primary" style="width:100%" onclick="closeModal()">確認上架</button>
+                <button class="btn btn-primary" style="width:100%; margin-top:20px" onclick="closeModal()">確認上架</button>
             `);
         }
 
@@ -206,7 +212,7 @@
 
         function openModal(h) { document.getElementById('modalBody').innerHTML = h; document.getElementById('mainModal').style.display = 'flex'; }
         function closeModal() { document.getElementById('mainModal').style.display = 'none'; }
-        window.onload = () => { renderOrders(); };
+        window.onload = renderAll;
     </script>
 </body>
 </html>
