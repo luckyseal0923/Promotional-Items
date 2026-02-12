@@ -80,7 +80,7 @@
     border-radius:12px;
   }
   th, td{
-    padding:10px;
+    padding:12px 10px;
     border-bottom:1px solid #eee;
     text-align:left;
     vertical-align:top;
@@ -161,7 +161,7 @@
     background:#0A84FF;
     color:#fff;
   }
-  .modal-body{ padding:16px; }
+  .modal-body{ padding:16px; max-height:70vh; overflow-y:auto; }
   .modal-footer{
     padding:14px 16px;
     background:#f8fafc;
@@ -181,13 +181,12 @@
     justify-content:center;
   }
   .login-card{
-    width:min(520px, 100%);
+    width:min(400px, 100%);
     background:#fff;
     border-radius:14px;
-    padding:18px;
-    box-shadow:0 2px 16px rgba(0,0,0,0.10);
+    padding:24px;
+    box-shadow:0 4px 20px rgba(0,0,0,0.1);
   }
-  .login-card h2{ margin:0 0 12px; }
 </style>
 </head>
 
@@ -195,32 +194,29 @@
 
 <div id="loginPage" class="login-wrap">
   <div class="login-card">
-    <h2>🔐 後臺登入（Phase 3 Admin Demo）</h2>
-    <div class="muted" style="margin-bottom:12px;">
-      這是展示版（虛擬帳號）。之後可接 n8n 做真正的白名單驗證。
-    </div>
+    <h2 style="margin:0 0 8px;">🔐 後臺管理系統</h2>
+    <div class="muted" style="margin-bottom:20px;">請輸入管理員帳號與密碼</div>
 
-    <div style="margin-bottom:12px;">
+    <div style="margin-bottom:15px;">
       <label>帳號</label>
-      <input id="loginUser" placeholder="例：admin" />
+      <input id="loginUser" placeholder="admin" value="admin" />
     </div>
 
-    <div style="margin-bottom:12px;">
+    <div style="margin-bottom:20px;">
       <label>密碼</label>
-      <input id="loginPass" type="password" placeholder="例：1234" />
+      <input id="loginPass" type="password" placeholder="1234" value="1234" />
     </div>
 
-    <div class="row">
-      <button class="btn btn-primary" onclick="doLogin()">登入</button>
-      <span class="small">測試帳密：admin / 1234</span>
+    <button class="btn btn-primary" style="width:100%;" onclick="doLogin()">立即登入</button>
+    <div style="text-align:center; margin-top:12px;">
+      <span class="small">預設測試：admin / 1234</span>
     </div>
   </div>
 </div>
 
 <div id="adminPage" class="container hidden">
-  <h1>🛠️ 公關品申請系統－後臺管理（Phase 3）</h1>
+  <h1>🛠️ 公關品申請系統－後臺管理</h1>
 
-  <!-- Top Panel -->
   <div class="panel">
     <div class="topbar">
       <div>
@@ -240,14 +236,9 @@
     </div>
   </div>
 
-  <!-- A. Orders -->
   <div id="viewOrders" class="panel">
     <div class="topbar">
-      <div>
-        <b>訂單列表</b>
-        <div class="muted">可篩選、查看明細、更新狀態（含防呆）。</div>
-      </div>
-
+      <b>訂單列表</b>
       <div class="row">
         <select id="filterStatus" onchange="renderOrders()">
           <option value="">全部狀態</option>
@@ -256,10 +247,9 @@
           <option value="READY">已通知領取（結案）</option>
           <option value="EXCEPTION">異常通知</option>
         </select>
-        <input id="filterKeyword" placeholder="搜尋：task_id / 姓名 / 員編 / 部門" oninput="renderOrders()" />
+        <input id="filterKeyword" placeholder="搜尋：編號 / 姓名 / 部門" oninput="renderOrders()" />
       </div>
     </div>
-
     <table>
       <thead>
         <tr>
@@ -267,7 +257,7 @@
           <th>申請人</th>
           <th>部門</th>
           <th>申請日期</th>
-          <th>總金額</th>
+          <th>金額</th>
           <th>狀態</th>
           <th>操作</th>
         </tr>
@@ -276,23 +266,15 @@
     </table>
   </div>
 
-  <!-- B. Inventory -->
   <div id="viewInventory" class="panel hidden">
-    <div class="topbar">
-      <div>
-        <b>商品與庫存盤點</b>
-        <div class="muted">輸入「調整量」後更新，並自動寫入盤點紀錄（Stock Log）。</div>
-      </div>
-    </div>
-
-    <table>
+    <b>商品與庫存盤點</b>
+    <table style="margin-top:12px;">
       <thead>
         <tr>
           <th>商品</th>
           <th>單價</th>
           <th>現有庫存</th>
-          <th>盤點調整（+/-）</th>
-          <th>備註</th>
+          <th>盤點備註</th>
           <th>操作</th>
         </tr>
       </thead>
@@ -300,26 +282,15 @@
     </table>
   </div>
 
-  <!-- C. Logs -->
   <div id="viewLogs" class="panel hidden">
-    <div class="topbar">
-      <div>
-        <b>盤點紀錄（Stock Log）</b>
-        <div class="muted">追蹤每次庫存異動：誰改、何時改、改了多少、原因。</div>
-      </div>
-      <div class="row">
-        <button class="btn btn-ghost" onclick="clearLogs()">清空紀錄（demo）</button>
-      </div>
-    </div>
-
-    <table>
+    <b>盤點紀錄（Stock Log）</b>
+    <table style="margin-top:12px;">
       <thead>
         <tr>
           <th>時間</th>
           <th>管理者</th>
           <th>商品</th>
-          <th>原庫存</th>
-          <th>新庫存</th>
+          <th>變動</th>
           <th>備註</th>
         </tr>
       </thead>
@@ -328,80 +299,22 @@
   </div>
 </div>
 
-<!-- ===== 訂單明細 Modal ===== -->
-<div id="orderModalBackdrop" class="modal-backdrop">
-  <div class="modal">
-    <div class="modal-header">
-      <div><b id="modalTitle">訂單明細</b></div>
-      <button class="btn btn-ghost" onclick="closeOrderModal()">關閉</button>
-    </div>
-
-    <div class="modal-body">
-      <div class="grid">
-        <div class="panel" style="margin:0;">
-          <b>基本資訊</b>
-          <div class="muted" id="modalBaseInfo" style="margin-top:8px;"></div>
-        </div>
-
-        <div class="panel" style="margin:0;">
-          <b>狀態更新（Admin）</b>
-          <div style="margin-top:10px;">
-            <label>更新狀態</label>
-            <select id="modalStatus">
-              <option value="SUBMITTED">申請提出</option>
-              <option value="PREPARING">商品準備中</option>
-              <option value="READY">已通知領取（結案）</option>
-              <option value="EXCEPTION">異常通知</option>
-            </select>
-          </div>
-
-          <div style="margin-top:10px;">
-            <label>處理備註（EXCEPTION 必填）</label>
-            <textarea id="modalNote" placeholder="例：品項缺貨，已通知改期 / 改單"></textarea>
-          </div>
-
-          <div class="muted" style="margin-top:8px;">
-            防呆：結案後不可再改；狀態不可倒退；異常需備註。
-          </div>
-        </div>
-      </div>
-
-      <div class="panel" style="margin-top:12px;">
-        <b>申請品項</b>
-        <div id="modalItems" style="margin-top:10px;" class="muted"></div>
-      </div>
-    </div>
-
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeOrderModal()">取消</button>
-      <button class="btn btn-primary" onclick="saveOrderStatus()">儲存狀態</button>
-    </div>
-  </div>
-</div>
-
 <script>
-  console.log('SCRIPT START');
-
-/* =========================
-   Demo Session / Login
-========================= */
 let currentAdmin = null;
 const DEMO_USERS = [{ user:'admin', pass:'1234', name:'總務管理者-Admin' }];
 
-console.log('before doLogin');
+let ORDERS = [];
+let ITEMS = [];
+let STOCK_LOGS = [];
 
+// Login Logic
 function doLogin(){
-  console.log('doLogin called');
-  ...
-}
-
-console.log('after doLogin');
   const u = document.getElementById('loginUser').value.trim();
   const p = document.getElementById('loginPass').value.trim();
-
   const ok = DEMO_USERS.find(x => x.user === u && x.pass === p);
+  
   if(!ok){
-    alert('帳號或密碼錯誤（demo：admin / 1234）');
+    alert('帳密錯誤');
     return;
   }
 
@@ -416,125 +329,36 @@ console.log('after doLogin');
 }
 
 function logout(){
-  currentAdmin = null;
-  document.getElementById('adminPage').classList.add('hidden');
-  document.getElementById('loginPage').classList.remove('hidden');
+  location.reload();
 }
 
 function tickClock(){
-  const d = new Date();
-  document.getElementById('nowTime').textContent = d.toLocaleString('zh-TW');
+  document.getElementById('nowTime').textContent = new Date().toLocaleString('zh-TW');
 }
 
-/* =========================
-   Mock Data (Orders / Items / Logs)
-========================= */
-let ORDERS = [];
-let ITEMS = [];
-let STOCK_LOGS = [];
-
+// Data Management
 function seedData(){
   ORDERS = [
-    {
-      task_id:'TASK-20260204-031',
-      name:'王小明', staff:'123456', dept:'急診醫學部',
-      created_at:'2026/02/04 10:12',
-      updated_at:'2026/02/04 10:12',
-      status:'PREPARING',
-      amount:1240,
-      items:[
-        { item_id:'I001', item_name:'環保提袋', unit_price:50, qty:20, subtotal:1000 },
-        { item_id:'I002', item_name:'三色筆', unit_price:8, qty:30, subtotal:240 }
-      ],
-      admin_note:''
-    },
-    {
-      task_id:'TASK-20260203-028',
-      name:'陳雅婷', staff:'234567', dept:'護理部',
-      created_at:'2026/02/03 14:05',
-      updated_at:'2026/02/03 14:05',
-      status:'SUBMITTED',
-      amount:980,
-      items:[
-        { item_id:'I003', item_name:'宣導資料夾', unit_price:19.6, qty:50, subtotal:980 }
-      ],
-      admin_note:''
-    },
-    {
-      task_id:'TASK-20260202-021',
-      name:'林志宏', staff:'345678', dept:'教學部',
-      created_at:'2026/02/02 09:30',
-      updated_at:'2026/02/02 11:00',
-      status:'EXCEPTION',
-      amount:560,
-      items:[
-        { item_id:'I004', item_name:'識別證套', unit_price:14, qty:40, subtotal:560 }
-      ],
-      admin_note:'品項臨時缺貨，已通知改期領取'
-    },
-    {
-      task_id:'TASK-20260131-018',
-      name:'黃怡君', staff:'456789', dept:'人資室',
-      created_at:'2026/01/31 16:20',
-      updated_at:'2026/02/05 13:40',
-      status:'READY',
-      amount:460,
-      items:[
-        { item_id:'I005', item_name:'北醫平安包', unit_price:460, qty:1, subtotal:460 }
-      ],
-      admin_note:'已通知領取'
-    }
+    { task_id:'TASK-103', name:'張智維', staff:'104114', dept:'ER', created_at:'2026/02/04 10:12', status:'PREPARING', amount:1660, items:[{name:'北醫平安包',qty:1}] },
+    { task_id:'TASK-104', name:'李小姐', staff:'104222', dept:'ER', created_at:'2026/02/03 14:05', status:'SUBMITTED', amount:460, items:[{name:'北醫平安包',qty:1}] }
   ];
-
   ITEMS = [
-    { item_id:'I001', name:'環保提袋', price:50, stock:200, is_active:true },
-    { item_id:'I002', name:'三色筆', price:8, stock:500, is_active:true },
-    { item_id:'I003', name:'宣導資料夾', price:19.6, stock:120, is_active:true },
-    { item_id:'I004', name:'識別證套', price:14, stock:80, is_active:true },
-    { item_id:'I005', name:'北醫平安包', price:460, stock:15, is_active:true }
+    { id:'I001', name:'北醫平安包', price:460, stock:15 },
+    { id:'I002', name:'環保提袋', price:50, stock:120 }
   ];
-
   STOCK_LOGS = [
-    { at:'2026/02/01 09:10', by:'總務管理者-Admin', item:'環保提袋(I001)', before:180, after:200, note:'年度補貨 +20' },
-    { at:'2026/02/03 18:05', by:'總務管理者-Admin', item:'北醫平安包(I005)', before:18, after:15, note:'盤點校正 -3' }
+    { at:'2026/02/01 09:10', by:'Admin', item:'北醫平安包', change:'+10', note:'進貨' }
   ];
-
   renderAll();
 }
 
-function statusText(s){
-  return ({
-    SUBMITTED:'申請提出',
-    PREPARING:'商品準備中',
-    READY:'已通知領取（結案）',
-    EXCEPTION:'異常通知'
-  })[s] || s;
-}
-function statusClass(s){
-  return ({
-    SUBMITTED:'s-submitted',
-    PREPARING:'s-preparing',
-    READY:'s-ready',
-    EXCEPTION:'s-exception'
-  })[s] || '';
-}
-
-/* =========================
-   Tab Switch
-========================= */
 function switchTab(tab){
-  document.getElementById('tabOrders').classList.toggle('active', tab==='orders');
-  document.getElementById('tabInventory').classList.toggle('active', tab==='inventory');
-  document.getElementById('tabLogs').classList.toggle('active', tab==='logs');
-
-  document.getElementById('viewOrders').classList.toggle('hidden', tab!=='orders');
-  document.getElementById('viewInventory').classList.toggle('hidden', tab!=='inventory');
-  document.getElementById('viewLogs').classList.toggle('hidden', tab!=='logs');
+  ['Orders','Inventory','Logs'].forEach(t => {
+    document.getElementById('tab'+t).classList.toggle('active', t.toLowerCase()===tab);
+    document.getElementById('view'+t).classList.toggle('hidden', t.toLowerCase()!==tab);
+  });
 }
 
-/* =========================
-   Render
-========================= */
 function renderAll(){
   renderOrders();
   renderItems();
@@ -543,19 +367,49 @@ function renderAll(){
 
 function renderOrders(){
   const body = document.getElementById('ordersBody');
-  body.innerHTML = '';
-
   const fStatus = document.getElementById('filterStatus').value;
-  const kw = document.getElementById('filterKeyword').value.trim().toLowerCase();
-
-  let rows = [...ORDERS];
-
-  if(fStatus) rows = rows.filter(o => o.status === fStatus);
-if (kw) {
-  rows = rows.filter(o =>
-    o.task_id.toLowerCase().includes(kw) ||
-    o.name.toLowerCase().includes(kw) ||
-    o.staff.toLowerCase().includes(kw) ||
-    o.dept.toLowerCase().includes(kw)
-  );
+  const kw = document.getElementById('filterKeyword').value.toLowerCase();
+  
+  body.innerHTML = ORDERS.filter(o => 
+    (!fStatus || o.status === fStatus) && 
+    (o.name.toLowerCase().includes(kw) || o.task_id.toLowerCase().includes(kw))
+  ).map(o => `
+    <tr>
+      <td>${o.task_id}</td>
+      <td>${o.name} (${o.staff})</td>
+      <td>${o.dept}</td>
+      <td>${o.created_at}</td>
+      <td>NT$ ${o.amount}</td>
+      <td><span class="status-pill s-${o.status.toLowerCase()}">${o.status}</span></td>
+      <td><button class="btn btn-ghost" onclick="alert('查看訂單：'+'${o.task_id}')">查看</button></td>
+    </tr>
+  `).join('');
 }
+
+function renderItems(){
+  document.getElementById('itemsBody').innerHTML = ITEMS.map(i => `
+    <tr>
+      <td>${i.name}</td>
+      <td>${i.price}</td>
+      <td><b>${i.stock}</b></td>
+      <td><input style="width:120px" placeholder="盤點備註" id="note-${i.id}"></td>
+      <td><button class="btn btn-primary" onclick="alert('模擬更新：'+'${i.name}')">盤點</button></td>
+    </tr>
+  `).join('');
+}
+
+function renderLogs(){
+  document.getElementById('logsBody').innerHTML = STOCK_LOGS.map(l => `
+    <tr>
+      <td class="small">${l.at}</td>
+      <td>${l.by}</td>
+      <td>${l.item}</td>
+      <td>${l.change}</td>
+      <td class="muted">${l.note}</td>
+    </tr>
+  `).join('');
+}
+</script>
+
+</body>
+</html>
