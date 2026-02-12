@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>公關品後臺管理系統 - Pro Detail Edition</title>
+    <title>公關品後臺管理系統 - 提案演示版</title>
     <style>
         :root {
             --primary: #10B981;
             --primary-dark: #059669;
             --bg: #F8FAFC;
-            --sidebar-bg: #FFFFFF;
             --text: #334155;
             --border: #E2E8F0;
             --danger: #EF4444;
@@ -19,20 +18,12 @@
         body, html { height: 100%; margin: 0; font-family: "PingFang TC", sans-serif; background: var(--bg); color: var(--text); }
         .hidden { display: none !important; }
 
-        /* Login */
-        #loginView {
-            display: flex; align-items: center; justify-content: center;
-            height: 100vh; background: #0F172A; position: fixed; inset: 0; z-index: 9999;
-        }
-        .login-card { background: white; padding: 40px; border-radius: 16px; width: 90%; max-width: 360px; text-align: center; }
-
-        /* Layout */
-        #adminView { display: none; min-height: 100vh; }
+        /* 側邊欄 RWD */
         .sidebar {
-            width: 260px; background: var(--sidebar-bg); height: 100vh; position: fixed;
+            width: 260px; background: white; height: 100vh; position: fixed;
             padding: 24px; border-right: 1px solid var(--border); box-sizing: border-box; z-index: 100;
         }
-        .main-content { margin-left: 260px; padding: 30px; transition: 0.3s; }
+        .main-content { margin-left: 260px; padding: 30px; }
 
         @media (max-width: 900px) {
             .sidebar { width: 70px; padding: 15px 5px; text-align: center; }
@@ -44,18 +35,17 @@
             padding: 14px 18px; border-radius: 10px; margin-bottom: 8px; cursor: pointer; color: #64748B;
             display: flex; align-items: center; gap: 12px; transition: 0.2s;
         }
-        .nav-item:hover { background: #F1F5F9; color: var(--primary); }
         .nav-item.active { background: var(--primary); color: white; font-weight: bold; }
 
+        /* 面板與表格 */
         .panel { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 24px; border: 1px solid var(--border); }
         h1 { font-size: 22px; margin-bottom: 24px; color: #0F172A; border-left: 5px solid var(--primary); padding-left: 15px; }
-
-        /* Table */
-        .table-container { width: 100%; overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 700px; }
-        th { text-align: left; padding: 12px; background: #F8FAFC; color: #64748B; font-size: 13px; border-bottom: 2px solid var(--border); }
+        
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        th { text-align: left; padding: 12px; background: #F8FAFC; border-bottom: 2px solid var(--border); font-size: 13px; }
         td { padding: 16px 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
 
+        /* 按鈕與標籤 */
         .btn { padding: 10px 16px; border-radius: 8px; border: none; cursor: pointer; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; }
         .btn-primary { background: var(--primary); color: white; }
         .btn-success { background: #10B981; color: white; }
@@ -66,51 +56,39 @@
         .status-1 { background: #DBEAFE; color: #1E40AF; }
         .status-4 { background: #FEE2E2; color: #991B1B; }
 
-        input, select, textarea { padding: 10px; border: 1px solid var(--border); border-radius: 8px; outline: none; }
-        .img-thumb { width: 45px; height: 45px; border-radius: 8px; object-fit: cover; background: #EEE; }
+        input, select, textarea { padding: 12px; border: 1px solid var(--border); border-radius: 8px; outline: none; box-sizing: border-box; }
+        .img-thumb { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; background: #EEE; }
 
-        /* Modal */
+        /* 彈窗 */
         .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.5); display: none; align-items: center; justify-content: center; z-index: 5000; padding: 15px; }
         .modal-body { background: white; padding: 30px; border-radius: 16px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
-        
-        /* 資訊列樣式 */
-        .info-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #EEE; font-size: 14px; }
-        .info-label { color: #64748B; font-weight: bold; }
+        .info-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #EEE; }
     </style>
 </head>
 <body>
 
-    <div id="loginView">
-        <div class="login-card">
-            <h2 style="color:var(--primary-dark)">公關品管理後臺</h2>
-            <input type="text" id="user" placeholder="帳號" value="admin" style="width:100%; margin-bottom:12px">
-            <input type="password" id="pass" placeholder="密碼" value="1234" style="width:100%; margin-bottom:24px">
-            <button class="btn btn-primary" style="width:100%; justify-content:center" onclick="handleLogin()">登入系統</button>
-        </div>
-    </div>
-
     <div id="adminView">
         <div class="sidebar">
-            <h2 style="color:var(--primary-dark); font-size:20px; margin-bottom:30px">後臺管理</h2>
+            <h2 style="color:var(--primary-dark); margin-bottom:30px">公關品後臺</h2>
             <div class="nav-item active" id="nav-orders" onclick="switchTab('orders')">📋 <span class="nav-text">訂單管理系統</span></div>
-            <div class="nav-item" id="nav-inventory" onclick="switchTab('inventory')">⚖️ <span class="nav-text">庫存盤點 (+) / (-)</span></div>
+            <div class="nav-item" id="nav-inventory" onclick="switchTab('inventory')">⚖️ <span class="nav-text">庫存盤點 (+/-)</span></div>
             <div class="nav-item" id="nav-listing" onclick="switchTab('listing')">🚀 <span class="nav-text">商品上架/下架</span></div>
             <div class="nav-item" id="nav-accounts" onclick="switchTab('accounts')">👥 <span class="nav-text">帳號權限設定</span></div>
-            <div style="margin-top:50px"><button class="btn btn-outline" style="width:100%" onclick="location.reload()">🔒 安全登出</button></div>
+            <div style="margin-top:50px"><button class="btn btn-outline" style="width:100%" onclick="alert('Demo 登出')">安全登出</button></div>
         </div>
 
         <div class="main-content">
             <div id="tab-orders">
-                <h1>訂單管理系統</h1>
+                <h1>訂單管理系統 (演示版資料)</h1>
                 <div class="panel">
                     <div style="display:flex; gap:12px; margin-bottom:20px">
-                        <input type="date" id="filterStart"> <input type="date" id="filterEnd">
-                        <button class="btn btn-primary" onclick="alert('篩選成功')">篩選區間</button>
-                        <button class="btn btn-success" onclick="downloadCSV()">下載報表 (CSV)</button>
+                        <input type="date" value="2026-02-01"> <span>至</span> <input type="date" value="2026-02-28">
+                        <button class="btn btn-primary">篩選區間</button>
+                        <button class="btn btn-success" onclick="downloadCSV()">下載報表</button>
                     </div>
-                    <div class="table-container">
+                    <div style="overflow-x:auto">
                         <table>
-                            <thead><tr><th>日期</th><th>單號</th><th>申請人</th><th>內容明細</th><th>狀態</th><th>操作</th></tr></thead>
+                            <thead><tr><th>日期</th><th>單號</th><th>申請人</th><th>明細</th><th>狀態</th><th>操作</th></tr></thead>
                             <tbody id="orderTable"></tbody>
                         </table>
                     </div>
@@ -118,14 +96,12 @@
             </div>
 
             <div id="tab-inventory" class="hidden">
-                <h1>商品庫存盤點 (使用 + / - 調整庫存量)</h1>
+                <h1>庫存盤點管理</h1>
                 <div class="panel">
-                    <div class="table-container">
-                        <table>
-                            <thead><tr><th>縮圖</th><th>商品名稱</th><th>單價</th><th>目前庫存</th><th>盤點量 (使用箭頭)</th><th>操作</th></tr></thead>
-                            <tbody id="inventoryBody"></tbody>
-                        </table>
-                    </div>
+                    <table>
+                        <thead><tr><th>縮圖</th><th>商品名稱</th><th>單價</th><th>目前庫存</th><th>調整量</th><th>操作</th></tr></thead>
+                        <tbody id="inventoryBody"></tbody>
+                    </table>
                 </div>
             </div>
 
@@ -135,24 +111,27 @@
                     <button class="btn btn-primary" onclick="openAddModal()">＋ 新增商品上線</button>
                 </div>
                 <div class="panel">
-                    <div class="table-container">
-                        <table>
-                            <thead><tr><th>圖片</th><th>商品名稱</th><th>單價</th><th>狀態</th><th>操作</th></tr></thead>
-                            <tbody id="listingBody"></tbody>
-                        </table>
-                    </div>
+                    <table>
+                        <thead><tr><th>圖片</th><th>商品名稱</th><th>單價</th><th>狀態</th><th>操作</th></tr></thead>
+                        <tbody id="listingBody"></tbody>
+                    </table>
                 </div>
             </div>
 
             <div id="tab-accounts" class="hidden">
-                <h1>帳號權限設定</h1>
+                <h1>系統帳號管理</h1>
                 <div class="panel">
-                    <div style="display:flex; gap:12px; margin-bottom:24px">
-                        <input type="text" id="newAccUser" placeholder="新帳號">
-                        <input type="password" id="newAccPass" placeholder="密碼">
-                        <button class="btn btn-primary" onclick="addAccount()">新增</button>
+                    <div style="display:flex; gap:12px; margin-bottom:20px">
+                        <input type="text" placeholder="新帳號"> <input type="password" placeholder="密碼">
+                        <button class="btn btn-primary">新增管理員</button>
                     </div>
-                    <table id="accountTable"></table>
+                    <table>
+                        <thead><tr><th>帳號</th><th>權限</th><th>狀態</th></tr></thead>
+                        <tbody>
+                            <tr><td>admin</td><td>超級管理員</td><td>● 正常</td></tr>
+                            <tr><td>staff_01</td><td>一般管理員</td><td>● 正常</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -161,29 +140,95 @@
     <div id="mainModal" class="modal"><div class="modal-body" id="modalBody"></div></div>
 
     <script>
-        let ITEMS = [
-            {id: 1, name: '北醫平安包', price: 460, stock: 25, img: 'https://via.placeholder.com/50', active: true},
-            {id: 2, name: '睿護精製鋼筆', price: 800, stock: 12, img: 'https://via.placeholder.com/50', active: true}
+        // 初始化大量虛擬資料
+        const ITEMS = [
+            {id: 1, name: '北醫平安包', price: 460, stock: 25, img: 'https://via.placeholder.com/50/10B981/FFFFFF?text=Bag', active: true},
+            {id: 2, name: '睿護精製鋼筆', price: 800, stock: 12, img: 'https://via.placeholder.com/50/3B82F6/FFFFFF?text=Pen', active: true},
+            {id: 3, name: '保溫隨行杯', price: 550, stock: 8, img: 'https://via.placeholder.com/50/F59E0B/FFFFFF?text=Cup', active: true}
         ];
 
-        let ORDERS = [
-            {
-                id:'TASK-101', date:'2026-02-12', 
-                user:'張智維 (104114)', 
-                phone:'0912-345-678', 
-                email:'chihwei@example.com',
-                dept:'急診醫學部', 
-                cost_center:'ER-999', 
-                reason:'公務研討會贈品',
-                items:[{n:'平安包', q:1}], 
-                status:'申請提出', memo:''
-            }
-        ];
+        const ORDERS = Array.from({length: 20}, (_, i) => ({
+            id: `TASK-202602-${100 + i}`,
+            date: `2026-02-${String(i + 1).padStart(2, '0')}`,
+            user: i % 2 === 0 ? `張智維 (10411${i})` : `李雅婷 (10422${i})`,
+            phone: '0912-345-678', email: 'service@example.com', dept: '教學部', cost_center: 'CC-7788', reason: '公務研討',
+            status: i % 4 === 0 ? '異常通知' : i % 3 === 0 ? '通知領取' : '商品準備中',
+            items: [{n: '平安包', q: 1}], memo: i % 4 === 0 ? '物流配送異常' : ''
+        }));
 
-        function handleLogin() {
-            document.getElementById('loginView').style.display = 'none';
-            document.getElementById('adminView').style.display = 'block';
-            renderAll();
+        function renderOrders() {
+            document.getElementById('orderTable').innerHTML = ORDERS.map(o => `
+                <tr>
+                    <td>${o.date}</td><td><b>${o.id}</b></td><td>${o.user}</td>
+                    <td><button class="btn btn-outline" onclick="showOrderDetail('${o.id}')">查看明細</button></td>
+                    <td><span class="status-pill status-1">${o.status}</span></td>
+                    <td><select onchange="updateStatus('${o.id}', this.value)"><option value="">切換...</option><option value="通知領取">通知領取</option><option value="異常通知">異常通知</option></select></td>
+                </tr>
+            `).join('');
+        }
+
+        function showOrderDetail(id) {
+            const o = ORDERS.find(ord => ord.id === id);
+            openModal(`
+                <h3 style="margin-top:0">📋 訂單詳細資訊</h3>
+                <div class="panel" style="background:#F8FAFC">
+                    <div class="info-row"><b>申請人</b><span>${o.user}</span></div>
+                    <div class="info-row"><b>電話</b><span>${o.phone}</span></div>
+                    <div class="info-row"><b>信箱</b><span>${o.email}</span></div>
+                    <div class="info-row"><b>單位</b><span>${o.dept}</span></div>
+                    <div class="info-row"><b>成本中心</b><span>${o.cost_center}</span></div>
+                    <div class="info-row"><b>事由</b><span>${o.reason}</span></div>
+                </div>
+                <h4>📦 商品內容</h4>
+                ${o.items.map(i => `<p>● ${i.n} x ${i.q}</p>`).join('')}
+                ${o.memo ? `<p style="color:red"><b>⚠️ 異常備註：</b>${o.memo}</p>` : ''}
+                <button class="btn btn-primary" style="width:100%; margin-top:15px" onclick="closeModal()">關閉</button>
+            `);
+        }
+
+        function renderInventory() {
+            document.getElementById('inventoryBody').innerHTML = ITEMS.map(i => `
+                <tr>
+                    <td><img src="${i.img}" class="img-thumb"></td>
+                    <td>${i.name}</td><td>$${i.price}</td><td><b>${i.stock}</b></td>
+                    <td><div style="display:flex; gap:5px"><select id="s-${i.id}"><option>+</option><option>-</option></select><input type="number" id="v-${i.id}" value="0" style="width:60px"></div></td>
+                    <td><button class="btn btn-success" onclick="alert('盤點成功')">更新</button></td>
+                </tr>
+            `).join('');
+        }
+
+        function renderListing() {
+            document.getElementById('listingBody').innerHTML = ITEMS.map(i => `
+                <tr><td><img src="${i.img}" class="img-thumb"></td><td>${i.name}</td><td>$${i.price}</td><td>上架中</td><td><button class="btn btn-danger">下架</button></td></tr>
+            `).join('');
+        }
+
+        function openAddModal() {
+            openModal(`
+                <h3>新增商品上線</h3>
+                <div style="margin-bottom:15px">
+                    <label style="display:block; margin-bottom:8px"><b>商品圖片上傳</b></label>
+                    <input type="file" onchange="previewImg(this)">
+                </div>
+                <div id="pBox" style="display:none; margin-bottom:15px"><img id="pImg" style="width:100px; height:100px; border-radius:8px"></div>
+                
+                <div style="margin-bottom:15px">
+                    <label style="display:block; margin-bottom:8px"><b>商品名稱</b></label>
+                    <input type="text" placeholder="輸入商品完整名稱" style="width:100%">
+                </div>
+                
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:20px">
+                    <div><label style="display:block; margin-bottom:8px"><b>單價</b></label><input type="number" value="100" style="width:100%"></div>
+                    <div><label style="display:block; margin-bottom:8px"><b>進貨量</b></label><input type="number" value="50" style="width:100%"></div>
+                </div>
+                <button class="btn btn-primary" style="width:100%" onclick="alert('上架成功'); closeModal();">確認上架</button>
+            `);
+        }
+
+        function previewImg(input) {
+            const reader = new FileReader();
+            reader.onload = e => { document.getElementById('pImg').src = e.target.result; document.getElementById('pBox').style.display='block'; };
+            reader.readAsDataURL(input.files[0]);
         }
 
         function switchTab(t) {
@@ -195,122 +240,10 @@
             document.getElementById('nav-'+t).classList.add('active');
         }
 
-        function renderAll() { renderOrders(); renderInventory(); renderListing(); }
-
-        function renderOrders() {
-            document.getElementById('orderTable').innerHTML = ORDERS.map(o => `
-                <tr>
-                    <td>${o.date}</td><td><b>${o.id}</b></td><td>${o.user}</td>
-                    <td><button class="btn btn-outline" onclick="showOrderDetail('${o.id}')">查看完整明細</button></td>
-                    <td><span class="status-pill status-1">${o.status}</span></td>
-                    <td><select onchange="updateStatus('${o.id}', this.value)"><option value="">切換狀態...</option><option value="通知領取">通知領取</option><option value="異常通知">異常通知</option></select></td>
-                </tr>
-            `).join('');
-        }
-
-        function showOrderDetail(id) {
-            const o = ORDERS.find(ord => ord.id === id);
-            openModal(`
-                <h3 style="margin-top:0">📋 訂單完整資訊</h3>
-                <div class="panel" style="margin-bottom:15px; background:#F8FAFC">
-                    <div class="info-row"><span class="info-label">申請人</span><span>${o.user}</span></div>
-                    <div class="info-row"><span class="info-label">聯絡電話</span><span>${o.phone}</span></div>
-                    <div class="info-row"><span class="info-label">電子信箱</span><span>${o.email}</span></div>
-                    <div class="info-row"><span class="info-label">申請單位</span><span>${o.dept}</span></div>
-                    <div class="info-row"><span class="info-label">成本中心</span><span>${o.cost_center}</span></div>
-                    <div class="info-row"><span class="info-label">領取事由</span><span>${o.reason}</span></div>
-                </div>
-                <h4>📦 購買品項</h4>
-                <div style="padding:10px; border:1px solid #EEE; border-radius:8px">
-                    ${o.items.map(i => `<p>● ${i.n} x ${i.q}</p>`).join('')}
-                </div>
-                <button class="btn btn-primary" style="width:100%; margin-top:20px" onclick="closeModal()">關閉明細</button>
-            `);
-        }
-
-        function renderInventory() {
-            document.getElementById('inventoryBody').innerHTML = ITEMS.filter(i=>i.active).map(i => `
-                <tr>
-                    <td><img src="${i.img}" class="img-thumb"></td>
-                    <td>${i.name}</td><td>$${i.price}</td><td><b>${i.stock}</b></td>
-                    <td>
-                        <div style="display:flex; align-items:center; gap:5px">
-                            <select id="sign-${i.id}" style="width:50px"><option value="+">+</option><option value="-">-</option></select>
-                            <input type="number" id="adj-${i.id}" value="0" style="width:70px">
-                        </div>
-                    </td>
-                    <td><button class="btn btn-success" onclick="adjustStock(${i.id})">更新盤點</button></td>
-                </tr>
-            `).join('');
-        }
-
-        function adjustStock(id) {
-            const sign = document.getElementById('sign-'+id).value;
-            const val = parseInt(document.getElementById('adj-'+id).value);
-            const item = ITEMS.find(i => i.id === id);
-            if(sign === '+') item.stock += val; else item.stock -= val;
-            renderInventory();
-            alert('盤點更新成功！');
-        }
-
-        function renderListing() {
-            document.getElementById('listingBody').innerHTML = ITEMS.map(i => `
-                <tr>
-                    <td><img src="${i.img}" class="img-thumb"></td>
-                    <td>${i.name}</td><td>$${i.price}</td>
-                    <td>${i.active ? '上架中':'已下架'}</td>
-                    <td><button class="btn ${i.active?'btn-danger':'btn-primary'}" onclick="toggleItem(${i.id})">${i.active?'下架':'上架'}</button></td>
-                </tr>
-            `).join('');
-        }
-
-        function toggleItem(id) {
-            const item = ITEMS.find(i => i.id === id);
-            item.active = !item.active;
-            renderAll();
-        }
-
-        function openAddModal() {
-            openModal(`
-                <h3>新增商品上線</h3>
-                <label>商品縮圖上傳</label>
-                <input type="file" id="newItemFile" accept="image/*" style="margin-bottom:15px" onchange="previewImg(this)">
-                <div id="pBox" style="display:none; margin-bottom:10px"><img id="pImg" class="img-thumb" style="width:100px; height:100px"></div>
-                
-                <label>商品名稱</label><input type="text" id="newName" style="width:100%; margin-bottom:15px">
-                <label>單價</label><input type="number" id="newPrice" style="width:100%; margin-bottom:15px">
-                <label>初始進貨量</label><input type="number" id="newStock" value="50" style="width:100%; margin-bottom:20px">
-                <button class="btn btn-primary" style="width:100%" onclick="confirmAdd()">確認上架</button>
-            `);
-        }
-
-        function previewImg(input) {
-            const reader = new FileReader();
-            reader.onload = e => { 
-                document.getElementById('pImg').src = e.target.result; 
-                document.getElementById('pBox').style.display='block'; 
-            };
-            reader.readAsDataURL(input.files[0]);
-        }
-
-        function confirmAdd() {
-            const name = document.getElementById('newName').value;
-            ITEMS.push({id:Date.now(), name, price:parseInt(document.getElementById('newPrice').value), stock:parseInt(document.getElementById('newStock').value), img:document.getElementById('pImg').src || 'https://via.placeholder.com/50', active:true});
-            closeModal(); renderAll();
-        }
-
-        function updateStatus(id, s) {
-            if(s === '異常通知') {
-                const m = prompt('請輸入異常原因：');
-                const o = ORDERS.find(ord => ord.id === id);
-                o.status = s; o.memo = m;
-            } else { alert('已串聯 Workflow 發送領取通知！'); }
-            renderOrders();
-        }
-
-        function openModal(html) { document.getElementById('modalBody').innerHTML = html; document.getElementById('mainModal').style.display = 'flex'; }
+        function openModal(h) { document.getElementById('modalBody').innerHTML = h; document.getElementById('mainModal').style.display = 'flex'; }
         function closeModal() { document.getElementById('mainModal').style.display = 'none'; }
-        function downloadCSV() { alert('下載 CSV...'); }
+        
+        window.onload = () => { renderOrders(); renderInventory(); renderListing(); };
     </script>
 </body>
 </html>
