@@ -201,43 +201,84 @@ function resetFilter() {
   FILTERED_ORDERS = [...ALL_ORDERS];
   renderOrders();
 }
-function renderOrders(){
-  const tb=document.getElementById('orderTable');
-  if(FILTERED_ORDERS.length===0){
-    tb.innerHTML='<tr><td colspan="6" style="text-align:center;color:#666;padding:30px">尚無訂單資料</td></tr>';
+function renderOrders() {
+  const tb = document.getElementById('orderTable');
+  if (FILTERED_ORDERS.length === 0) {
+    tb.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#666;padding:30px">尚無訂單資料</td></tr>';
     return;
   }
-tb.innerHTML = FILTERED_ORDERS.map(o =>
-  '<tr>' +
-    '<td style="line-height:1.6">' +
-      '<div style="font-size:15px;font-weight:600;color:#0F172A">' + formatDate(o.date) + '</div>' +
-      '<div style="font-size:12px;color:#64748B">' + (o.task_id || '-') + '</div>' +
-    '</td>' +
-    '<td>' + (o.user || '-') + '</td>' +
-    '<td>' + (o.department || '-') + '</td>' +
-    '<td><span class="status-pill ' + getStatusClass(o.status) + '">' + getStatusText(o.status) + '</span></td>' +
-    '<td><button class="btn btn-outline" onclick="showOrderDetail(\'' + o.task_id + '\')">📋 訂單查詢</button></td>' +
-  '</tr>'
-).join('');
+  tb.innerHTML = FILTERED_ORDERS.map(o =>
+    '<tr>' +
+      '<td style="line-height:1.5;width:140px">' +
+        '<div style="font-size:14px;font-weight:600;color:#0F172A">' + formatDate(o.date) + '</div>' +
+        '<div style="font-size:11px;color:#94A3B8">' + (o.task_id || '-') + '</div>' +
+      '</td>' +
+      '<td>' + (o.user || '-') + '</td>' +
+      '<td>' + (o.department || '-') + '</td>' +
+      '<td><span class="status-pill ' + getStatusClass(o.status) + '">' + getStatusText(o.status) + '</span></td>' +
+      '<td style="white-space:nowrap">' +
+        '<button class="btn btn-outline" style="margin-right:4px" onclick="showOrderDetail(\'' + o.task_id + '\')">📋 查詢</button>' +
+        '<button class="btn btn-primary" onclick="showEditStatus(\'' + o.task_id + '\')">✏️ 狀態</button>' +
+      '</td>' +
+    '</tr>'
+  ).join('');
 }
-function showOrderDetail(tid){
-  const o=ALL_ORDERS.find(x=>x.task_id===tid);
-  if(!o){alert('找不到此訂單');return;}
-  let ih=o.items&&o.items.length>0?o.items.map(i=>'<div class="item-row"><span>'+(i.item_name||i.name||'未知商品')+'</span><span>x'+(i.quantity||i.qty||1)+' / $'+(i.subtotal||0)+'</span></div>').join(''):'<p style="color:#666">無商品明細</p>';
-  let dh='<div style="background:#F8FAFC;padding:16px;border-radius:10px;margin-bottom:16px">';
-  dh+='<div class="info-row"><span class="info-label">訂單編號</span><span class="info-value">'+(o.task_id||'-')+'</span></div>';
-  dh+='<div class="info-row"><span class="info-label">申請時間</span><span class="info-value">'+formatDateTime(o.date)+'</span></div>';
-  dh+='<div class="info-row"><span class="info-label">申請人</span><span class="info-value">'+(o.user||'-')+'</span></div>';
-  dh+='<div class="info-row"><span class="info-label">單位</span><span class="info-value">'+(o.department||'-')+'</span></div>';
-  dh+='<div class="info-row"><span class="info-label">訂單狀態</span><span class="info-value"><span class="status-pill '+getStatusClass(o.status)+'">'+getStatusText(o.status)+'</span></span></div>';
-  dh+='<div class="info-row"><span class="info-label">訂單金額</span><span class="info-value" style="color:var(--primary)">$'+(o.total||0)+'</span></div>';
-  dh+='</div><h4 style="margin:16px 0 8px 0;color:#0F172A">📦 商品明細</h4><div class="item-list">'+ih+'</div>';
-  document.getElementById('orderDetail').innerHTML=dh;
+function showOrderDetail(tid) {
+  const o = ALL_ORDERS.find(x => x.task_id === tid);
+  if (!o) { alert('找不到此訂單'); return; }
+  
+  let ih = o.items && o.items.length > 0 
+    ? o.items.map(i => '<div class="item-row"><span>' + (i.item_name || i.name || '未知商品') + '</span><span>x' + (i.quantity || i.qty || 1) + ' / $' + (i.subtotal || 0) + '</span></div>').join('') 
+    : '<p style="color:#666">無商品明細</p>';
+  
+  let dh = '<div style="background:#F8FAFC;padding:16px;border-radius:10px;margin-bottom:16px">';
+  dh += '<div class="info-row"><span class="info-label">訂單編號</span><span class="info-value">' + (o.task_id || '-') + '</span></div>';
+  dh += '<div class="info-row"><span class="info-label">申請時間</span><span class="info-value">' + formatDateTime(o.date) + '</span></div>';
+  dh += '<div class="info-row"><span class="info-label">申請人</span><span class="info-value">' + (o.user || '-') + '</span></div>';
+  dh += '<div class="info-row"><span class="info-label">院內員編</span><span class="info-value">' + (o.staff_id || '-') + '</span></div>';
+  dh += '<div class="info-row"><span class="info-label">申請者電話</span><span class="info-value">' + (o.phone || '-') + '</span></div>';
+  dh += '<div class="info-row"><span class="info-label">電子信箱</span><span class="info-value">' + (o.email || '-') + '</span></div>';
+  dh += '<div class="info-row"><span class="info-label">申請單位</span><span class="info-value">' + (o.department || '-') + '</span></div>';
+  dh += '<div class="info-row"><span class="info-label">成本中心</span><span class="info-value">' + (o.cost_center || '-') + '</span></div>';
+  dh += '<div class="info-row"><span class="info-label">申請事由</span><span class="info-value">' + (o.reason || '-') + '</span></div>';
+  dh += '<div class="info-row"><span class="info-label">訂單狀態</span><span class="info-value"><span class="status-pill ' + getStatusClass(o.status) + '">' + getStatusText(o.status) + '</span></span></div>';
+  dh += '<div class="info-row"><span class="info-label">訂單金額</span><span class="info-value" style="color:var(--primary)">$' + (o.total || 0) + '</span></div>';
+  dh += '</div><h4 style="margin:16px 0 8px 0;color:#0F172A">📦 商品明細</h4><div class="item-list">' + ih + '</div>';
+  
+  document.getElementById('orderDetail').innerHTML = dh;
   document.getElementById('orderModal').classList.add('show');
 }
 function closeModal(){document.getElementById('orderModal').classList.remove('show');}
 document.getElementById('orderModal').addEventListener('click',function(e){if(e.target===this)closeModal();});
 window.onload=function(){loadOrders();};
+    function showEditStatus(tid) {
+  const o = ALL_ORDERS.find(x => x.task_id === tid);
+  if (!o) { alert('找不到此訂單'); return; }
+  
+  let dh = '<div style="margin-bottom:16px">';
+  dh += '<div class="info-row"><span class="info-label">訂單編號</span><span class="info-value">' + (o.task_id || '-') + '</span></div>';
+  dh += '<div class="info-row"><span class="info-label">目前狀態</span><span class="info-value"><span class="status-pill ' + getStatusClass(o.status) + '">' + getStatusText(o.status) + '</span></span></div>';
+  dh += '</div>';
+  dh += '<label style="font-size:14px;font-weight:600;margin-bottom:8px;display:block">變更為：</label>';
+  dh += '<select id="newStatus" style="width:100%">';
+  dh += '<option value="Submitted"' + (o.status === 'Submitted' ? ' selected' : '') + '>申請提出</option>';
+  dh += '<option value="PREPARING"' + (o.status === 'PREPARING' ? ' selected' : '') + '>商品準備中</option>';
+  dh += '<option value="ready"' + (o.status === 'ready' ? ' selected' : '') + '>通知領取</option>';
+  dh += '<option value="EXCEPTION"' + (o.status === 'EXCEPTION' ? ' selected' : '') + '>異常通知</option>';
+  dh += '<option value="End"' + (o.status === 'End' ? ' selected' : '') + '>案件結案</option>';
+  dh += '</select>';
+  dh += '<button class="btn btn-success" style="width:100%;margin-top:16px" onclick="updateStatus(\'' + tid + '\')">💾 儲存變更</button>';
+  
+  document.getElementById('orderDetail').innerHTML = dh;
+  document.getElementById('orderModal').classList.add('show');
+}
+
+function updateStatus(tid) {
+  const newStatus = document.getElementById('newStatus').value;
+  // TODO: 之後接後端 API 更新狀態
+  alert('已將 ' + tid + ' 狀態變更為：' + getStatusText(newStatus) + '\n\n（後端 API 尚未串接）');
+  closeModal();
+}
 </script>
 </body>
 </html>
