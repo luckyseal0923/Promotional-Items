@@ -275,9 +275,38 @@ window.onload=function(){loadOrders();};
 
 function updateStatus(tid) {
   const newStatus = document.getElementById('newStatus').value;
-  // TODO: 之後接後端 API 更新狀態
-  alert('已將 ' + tid + ' 狀態變更為：' + getStatusText(newStatus) + '\n\n（後端 API 尚未串接）');
-  closeModal();
+  const btn = event.target;
+  
+  btn.disabled = true;
+  btn.textContent = '處理中...';
+  
+  fetch('https://chihwei-n8n.zeabur.app/webhook/update-order', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      task_id: tid,
+      status: newStatus,
+      updated_at: new Date().toISOString()
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      alert('✅ 狀態已更新');
+      closeModal();
+      loadOrders();
+    } else {
+      alert('❌ 更新失敗：' + (data.message || '未知錯誤'));
+    }
+  })
+  .catch(e => {
+    alert('❌ 連線錯誤，請稍後再試');
+    console.error(e);
+  })
+  .finally(() => {
+    btn.disabled = false;
+    btn.textContent = '💾 儲存變更';
+  });
 }
 </script>
 </body>
