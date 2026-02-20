@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8" />
+<title>公關品申請系統</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<style>
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Noto Sans TC", Arial, sans-serif;
+  background:#f6f7f9;
+  padding:20px;
+}
+h1 {
+  text-align:center;
+  margin-bottom:24px;
+}
+form {
+  background:#fff;
+  max-width:1200px;
+  margin:auto;
+  padding:24px;
+  border-radius:12px;
+  box-shadow:0 4px 14px rgba(0,0,0,0.08);
+}
+fieldset {
+  border:none;
+  margin-bottom:32px;
+}
+legend {
+  font-weight:bold;
+  margin-bottom:16px;
+  font-size:17px;
+  border-left:4px solid #0A84FF;
+  padding-left:10px;
+}
+.row {
+  display:flex;
+  gap:16px;
+  margin-bottom:14px;
+}
+label {
+  flex:1;
+  font-size:14px;
+}
+input[type="text"],
+input[type="number"] {
+  width:100%;
+  padding:10px;
+  margin-top:6px;
+  border:1px solid #ccc;
+  border-radius:8px;
+  font-size:16px;
+}
+table {
+  width:100%;
+  border-collapse:collapse;
+  margin-top:16px;
+}
+th, td {
+  border-bottom:1px solid #ddd;
+  padding:14px;
+  text-align:center;
+}
+th {
+  background:#f1f3f5;
+}
+td.name {
+  text-align:left;
+  font-weight:600;
+}
+.stock.low {
+  color:#d9534f;
+  font-weight:bold;
+}
+.total-box {
+  margin-top:24px;
+  text-align:right;
+  font-size:22px;
+  font-weight:bold;
+}
+.submit-area {
+  text-align:center;
+  margin-top:32px;
+}
+button {
+  padding:14px 40px;
+  font-size:17px;
+  background:#0A84FF;
+  color:#fff;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+}
+button:hover {
+  background:#006edc;
+}
+.item-toggle {
+  margin-left:8px;
+  font-size:14px;
+  cursor:pointer;
+  color:#0A84FF;
+}
+.modal {
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.6);
+  z-index:999;
+  align-items:center;
+  justify-content:center;
+}
+.modal img {
+  max-width:90%;
+  max-height:90%;
+  border-radius:12px;
+  background:#fff;
+}
+.modal-close {
+  position:absolute;
+  top:20px;
+  right:24px;
+  font-size:30px;
+  color:#fff;
+  cursor:pointer;
+}
+@media (max-width:768px){
+  table, thead, tbody, tr, th, td { display:block; }
+  thead { display:none; }
+  tbody tr {
+    background:#fff;
+    margin-bottom:16px;
+    padding:16px;
+    border-radius:14px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.08);
+  }
+  td { border:none; text-align:left; padding:8px 0; }
+  td.name { display:flex; justify-content:space-between; align-items:center; }
+  button[type="submit"] { width:100%; }
+}
+</style>
+</head>
+
+<body>
+
+<h1>公關品申請系統</h1>
+
+<form id="applyForm">
+
+<fieldset>
+  <legend>一、申請單位資料（必填）</legend>
+
+  <div class="row">
+    <label>申請人*<input type="text" name="applicant_name" required></label>
+    <label>院內員編*<input type="text" name="staff_id" required></label>
+  </div>
+
+  <div class="row">
+    <label>申請者電話*<input type="text" name="phone" required></label>
+    <label>電子信箱*<input type="text" name="applicant_email" required></label>
+  </div>
+
+  <div class="row">
+    <label>申請單位*<input type="text" name="department" required></label>
+    <label>成本中心*<input type="text" name="costCenter" required></label>
+  </div>
+
+  <div class="row">
+    <label>領取事由*<input type="text" name="reason" required></label>
+  </div>
+</fieldset>
+
+<fieldset>
+  <legend>二、公關品申請數量</legend>
+
+  <table>
+    <thead>
+      <tr>
+        <th>品項</th>
+        <th>單價</th>
+        <th>庫存</th>
+        <th>申請數量</th>
+      </tr>
+    </thead>
+    <tbody id="itemsTable"></tbody>
+  </table>
+</fieldset>
+
+<div class="total-box">
+  總金額：NT$ <span id="totalAmount">0</span>
+</div>
+
+<div class="submit-area">
+  <button type="submit">送出申請</button>
+</div>
+
+</form>
+
+<div class="modal" id="imgModal">
+  <span class="modal-close" id="modalClose">✕</span>
+  <img id="modalImg">
+</div>
+
+<script>
+const API_URL = 'https://chihwei-n8n.zeabur.app/webhook/promo-apply';
+const SHEET_ID = '19hRS6fdUnHeDMysq32LWsYXiVovcDqXjSQphBu3wsuk';
+const SHEET_NAME = 'Items-list';
+const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${SHEET_NAME}&tqx=out:json`;
+
+const tbody = document.getElementById('itemsTable');
+const totalAmountEl = document.getElementById('totalAmount');
+const modal = document.getElementById('imgModal');
+const modalImg = document.getElementById('modalImg');
+const modalClose = document.getElementById('modalClose');
+
+let items = [];
+
+function generatetask_id() {
+  const d = new Date();
+  const ymd = d.getFullYear().toString()
+    + String(d.getMonth() + 1).padStart(2, '0')
+    + String(d.getDate()).padStart(2, '0');
+  const rand = Math.floor(Math.random() * 900 + 100);
+  return `task-${ymd}-${rand}`;
+}
+
+fetch(url)
+  .then(r => r.text())
+  .then(t => {
+    const json = JSON.parse(t.substring(47).slice(0, -2));
+    items = json.table.rows.map(r => ({
+      item_id: r.c[0]?.v,
+      item_name: r.c[1]?.v,
+      unit_price: Number(r.c[3]?.v) || 0,
+      stock: Number(r.c[4]?.v) || 0,
+      image: r.c[5]?.v || ''
+    }));
+    renderTable();
+  });
+
+function renderTable(){
+  tbody.innerHTML='';
+  items.forEach(i=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td class="name">
+        ${i.item_name}
+        ${i.image ? `<span class="item-toggle" data-img="${i.image}">看圖 ▸</span>` : ''}
+      </td>
+      <td>NT$ ${i.unit_price}</td>
+      <td class="${i.stock<=10?'stock low':'stock'}">庫存：${i.stock}</td>
+      <td>
+        <input type="number"
+               min="0"
+               max="${i.stock}"
+               data-id="${i.item_id}"
+               placeholder="請輸入數量">
+      </td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+tbody.onclick=e=>{
+  if(!e.target.classList.contains('item-toggle'))return;
+  modalImg.src=e.target.dataset.img;
+  modal.style.display='flex';
+};
+modalClose.onclick=()=>modal.style.display='none';
+modal.onclick=e=>{if(e.target===modal)modalClose.click();};
+
+tbody.oninput=()=>{
+  let total=0;
+  document.querySelectorAll('#itemsTable input').forEach(inp=>{
+    const it=items.find(i=>i.item_id==inp.dataset.id);
+    total+=it?(Number(inp.value)||0)*it.unit_price:0;
+  });
+  totalAmountEl.textContent=total.toFixed(0);
+};
+
+document.getElementById('applyForm').onsubmit=async e=>{
+  e.preventDefault();
+
+  const f=e.target;
+  const task_id = generatetask_id();
+
+  const payload={
+    task_id: task_id,
+    applicant_name: f.applicant_name.value,
+    staff_id: f.staff_id.value,
+    phone: f.phone.value,
+    applicant_email: f.applicant_email.value,
+    department: f.department.value,
+    cost_center: f.costCenter.value,
+    reason: f.reason.value,
+    status: 'SUBMITTED',
+    total_amount: Number(totalAmountEl.textContent),
+    items: []
+  };
+
+  document.querySelectorAll('#itemsTable input').forEach(inp=>{
+    const q=Number(inp.value);
+    if(q>0){
+      const it=items.find(i=>i.item_id==inp.dataset.id);
+      if(it){
+        payload.items.push({
+          task_id: task_id,
+          item_id: it.item_id,
+          item_name: it.item_name,
+          unit_price: it.unit_price,
+          quantity: q,
+          subtotal: it.unit_price * q
+        });
+      }
+    }
+  });
+
+  if(payload.items.length===0){
+    alert('請至少選一項');
+    return;
+  }
+
+  const res = await fetch(API_URL,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(payload)
+  });
+
+  const r = await res.json();
+  if(r.status==='success'){
+    alert('申請完成');
+    f.reset();
+    totalAmountEl.textContent='0';
+  }else{
+    alert('寫入失敗');
+    console.error(r);
+  }
+};
+</script>
+
+
+</body>
+</html>
