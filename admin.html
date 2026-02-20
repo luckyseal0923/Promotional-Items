@@ -3,128 +3,125 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>公關品後臺管理系統 - Phase 3 穩定版</title>
-
+<title>公關品後臺管理系統</title>
 <style>
-:root{
-  --primary:#10B981;--bg:#F8FAFC;--text:#334155;
-  --border:#E2E8F0;--danger:#EF4444;
+:root {
+  --primary: #10B981;
+  --primary-dark: #059669;
+  --bg: #F8FAFC;
+  --text: #334155;
+  --border: #E2E8F0;
+  --danger: #EF4444;
+  --warning: #F59E0B;
 }
 body,html{margin:0;height:100%;font-family:"PingFang TC",sans-serif;background:var(--bg);color:var(--text)}
 .hidden{display:none!important}
-
-/* Sidebar */
-.sidebar{width:260px;background:#fff;height:100vh;position:fixed;
-  padding:24px;border-right:1px solid var(--border);box-sizing:border-box}
+.sidebar{width:260px;background:#fff;height:100vh;position:fixed;padding:24px;border-right:1px solid var(--border);box-sizing:border-box;z-index:100}
 .main-content{margin-left:260px;padding:30px}
-.nav-item{padding:14px 18px;border-radius:10px;margin-bottom:8px;
-  cursor:pointer;color:#64748B;display:flex;gap:12px}
+@media (max-width: 900px) {
+  .sidebar{width:70px;padding:15px 5px;text-align:center}
+  .sidebar h2,.sidebar .nav-text{display:none}
+  .main-content{margin-left:70px;padding:15px}
+}
+.nav-item{padding:14px 18px;border-radius:10px;margin-bottom:8px;cursor:pointer;color:#64748B;display:flex;align-items:center;gap:12px;transition:0.2s}
 .nav-item.active{background:var(--primary);color:#fff;font-weight:bold}
-
-/* Panel / Table */
-.panel{background:#fff;border-radius:12px;padding:24px;border:1px solid var(--border);margin-bottom:24px}
-h1{font-size:22px;border-left:5px solid var(--primary);padding-left:14px}
-table{width:100%;border-collapse:collapse}
-th,td{padding:12px;border-bottom:1px solid var(--border)}
-th{background:#F8FAFC}
-
-/* Buttons */
-.btn{padding:10px 16px;border-radius:8px;border:none;cursor:pointer;font-size:13px}
-.btn-outline{background:#fff;border:1px solid var(--border)}
+.panel{background:#fff;border-radius:12px;padding:24px;border:1px solid var(--border);margin-bottom:24px;box-shadow:0 1px 3px rgba(0,0,0,0.1)}
+h1{font-size:22px;border-left:5px solid var(--primary);padding-left:14px;margin-bottom:24px;color:#0F172A}
+table{width:100%;border-collapse:collapse;min-width:800px}
+th{text-align:left;padding:12px;background:#F8FAFC;border-bottom:2px solid var(--border);font-size:13px}
+td{padding:16px 12px;border-bottom:1px solid var(--border);font-size:14px}
+.table-wrapper{overflow-x:auto}
+.btn{padding:10px 16px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-success{background:#10B981;color:#fff}
+.btn-outline{background:#fff;border:1px solid var(--border);color:var(--text)}
 .btn-danger{background:var(--danger);color:#fff}
-
-/* Status */
 .status-pill{padding:4px 10px;border-radius:6px;font-size:12px;font-weight:bold}
-.status-1{background:#DBEAFE;color:#1E40AF}
-.status-4{background:#FEE2E2;color:#991B1B}
-
-/* Modal */
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center}
-.modal-body{background:#fff;padding:24px;border-radius:14px;width:100%;max-width:520px}
+.status-preparing{background:#DBEAFE;color:#1E40AF}
+.status-submitted{background:#FEF3C7;color:#92400E}
+.status-ready{background:#D1FAE5;color:#065F46}
+.status-exception{background:#FEE2E2;color:#991B1B}
+.status-end{background:#E5E7EB;color:#374151}
+input,select{padding:12px;border:1px solid var(--border);border-radius:8px;outline:none;box-sizing:border-box;font-size:14px}
+input:focus,select:focus{border-color:var(--primary)}
+.modal{position:fixed;inset:0;background:rgba(15,23,42,0.5);display:none;align-items:center;justify-content:center;z-index:5000;padding:15px}
+.modal.show{display:flex}
+.modal-body{background:#fff;padding:30px;border-radius:16px;width:100%;max-width:550px;max-height:90vh;overflow-y:auto}
+.modal-title{margin:0 0 20px 0;font-size:18px;color:#0F172A}
+.info-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px dashed #E2E8F0}
+.info-label{color:#64748B;font-size:14px}
+.info-value{font-weight:600;font-size:14px}
+.item-list{background:#F8FAFC;padding:12px;border-radius:8px;margin:10px 0}
+.item-row{display:flex;justify-content:space-between;padding:6px 0}
 </style>
 </head>
-
 <body>
-
 <div id="adminView">
   <div class="sidebar">
-    <h2 style="color:var(--primary)">公關品後臺</h2>
-    <div class="nav-item active" id="nav-orders" onclick="switchTab('orders')">📋 訂單管理</div>
-    <div class="nav-item" id="nav-inventory" onclick="switchTab('inventory')">⚖️ 庫存盤點</div>
-    <div class="nav-item" id="nav-listing" onclick="switchTab('listing')">🚀 商品管理</div>
-    <div class="nav-item" id="nav-accounts" onclick="switchTab('accounts')">👥 帳號管理</div>
-    <button class="btn btn-outline" style="width:100%;margin-top:40px">安全登出</button>
+    <h2 style="color:var(--primary-dark);margin-bottom:30px">公關品後臺</h2>
+    <div class="nav-item active" id="nav-orders" onclick="switchTab('orders')">📋 <span class="nav-text">訂單管理系統</span></div>
+    <div class="nav-item" id="nav-inventory" onclick="switchTab('inventory')">⚖️ <span class="nav-text">庫存盤點</span></div>
+    <div class="nav-item" id="nav-listing" onclick="switchTab('listing')">🚀 <span class="nav-text">商品管理</span></div>
+    <div class="nav-item" id="nav-accounts" onclick="switchTab('accounts')">👥 <span class="nav-text">帳號管理</span></div>
+    <div style="margin-top:50px"><button class="btn btn-outline" style="width:100%">安全登出</button></div>
   </div>
-
   <div class="main-content">
-
-    <!-- 訂單管理 -->
     <div id="tab-orders">
       <h1>訂單管理系統</h1>
-
-      <!-- 錯誤提示（預設顯示） -->
-      <div id="orderError"
-        style="padding:14px;border-radius:10px;background:#FEE2E2;
-               color:#991B1B;font-weight:bold;margin-bottom:16px">
-        ⚠️ 訂單資料目前無法載入（系統仍可操作，請稍後再試）
-      </div>
-
+      <div id="orderError" class="hidden" style="padding:14px;border-radius:10px;background:#FEE2E2;color:#991B1B;font-weight:bold;margin-bottom:16px">⚠️ 訂單資料目前無法載入，請稍後再試</div>
       <div class="panel">
-        <table>
-          <thead>
-            <tr>
-              <th>日期</th>
-              <th>單號</th>
-              <th>申請人</th>
-              <th>狀態</th>
-              <th>操作</th>
-            </tr>
-          </thead>
-          <tbody id="orderTable">
-            <tr>
-              <td colspan="5" style="text-align:center;color:#666;padding:30px">
-                尚無訂單資料
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;align-items:center">
+          <input type="date" id="dateFrom" onchange="filterOrders()">
+          <span>至</span>
+          <input type="date" id="dateTo" onchange="filterOrders()">
+          <select id="statusFilter" onchange="filterOrders()" style="min-width:120px">
+            <option value="">全部狀態</option>
+            <option value="Submitted">申請提出</option>
+            <option value="PREPARING">商品準備中</option>
+            <option value="ready">通知領取</option>
+            <option value="EXCEPTION">異常通知</option>
+            <option value="End">案件結案</option>
+          </select>
+          <button class="btn btn-primary" onclick="filterOrders()">🔍 篩選</button>
+          <button class="btn btn-outline" onclick="resetFilter()">重置</button>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead><tr><th>日期</th><th>單號</th><th>申請人</th><th>單位</th><th>狀態</th><th>操作</th></tr></thead>
+            <tbody id="orderTable"><tr><td colspan="6" style="text-align:center;color:#666;padding:30px">載入中...</td></tr></tbody>
+          </table>
+        </div>
       </div>
     </div>
-
-    <div id="tab-inventory" class="hidden">
-      <h1>庫存盤點</h1>
-      <div class="panel">（功能保留，未修改）</div>
-    </div>
-
-    <div id="tab-listing" class="hidden">
-      <h1>商品管理</h1>
-      <div class="panel">（功能保留，未修改）</div>
-    </div>
-
-    <div id="tab-accounts" class="hidden">
-      <h1>帳號管理</h1>
-      <div class="panel">（功能保留，未修改）</div>
-    </div>
-
+    <div id="tab-inventory" class="hidden"><h1>庫存盤點</h1><div class="panel">（功能開發中）</div></div>
+    <div id="tab-listing" class="hidden"><h1>商品管理</h1><div class="panel">（功能開發中）</div></div>
+    <div id="tab-accounts" class="hidden"><h1>帳號管理</h1><div class="panel">（功能開發中）</div></div>
+  </div>
+</div>
+<div id="orderModal" class="modal">
+  <div class="modal-body">
+    <h3 class="modal-title">📋 訂單詳細資訊</h3>
+    <div id="orderDetail"></div>
+    <button class="btn btn-primary" style="width:100%;margin-top:20px" onclick="closeModal()">關閉</button>
   </div>
 </div>
 
-<script>
-/* =========================
-   API Endpoint（n8n）
-========================= */
+  <script>
 const API_ORDERS = 'https://chihwei-n8n.zeabur.app/webhook/orders';
-const API_UPDATE_STATUS = 'https://chihwei-n8n.zeabur.app/webhook/update-order';
-const API_INVENTORY = 'https://chihwei-n8n.zeabur.app/webhook/inventory';
-
-/* =========================
-   全域狀態
-========================= */
-let ORDERS = [];
-
-/* =========================
-   Tab 切換（原功能）
-========================= */
+let ALL_ORDERS = [];
+let FILTERED_ORDERS = [];
+const STATUS_MAP = {
+  'Submitted':'申請提出','PREPARING':'商品準備中','preparing':'商品準備中',
+  'ready':'通知領取','EXCEPTION':'異常通知','End':'案件結案','done':'案件結案','closed':'案件結案'
+};
+const STATUS_CLASS_MAP = {
+  'Submitted':'status-submitted','PREPARING':'status-preparing','preparing':'status-preparing',
+  'ready':'status-ready','EXCEPTION':'status-exception','End':'status-end','done':'status-end','closed':'status-end'
+};
+function getStatusText(s){return STATUS_MAP[s]||s||'未知';}
+function getStatusClass(s){return STATUS_CLASS_MAP[s]||'status-preparing';}
+function formatDate(d){if(!d)return'-';const n=new Date(d);return isNaN(n)?d:n.toLocaleDateString('zh-TW');}
+function formatDateTime(d){if(!d)return'-';const n=new Date(d);return isNaN(n)?d:n.toLocaleString('zh-TW');}
 function switchTab(tab){
   ['orders','inventory','listing','accounts'].forEach(t=>{
     document.getElementById('tab-'+t).classList.add('hidden');
@@ -133,88 +130,72 @@ function switchTab(tab){
   document.getElementById('tab-'+tab).classList.remove('hidden');
   document.getElementById('nav-'+tab).classList.add('active');
 }
-
-/* =========================
-   訂單載入（修正版）
-========================= */
 async function loadOrders(){
   try{
-    const res = await fetch(API_ORDERS);
-    if(!res.ok) throw new Error('API error');
-
-    const data = await res.json();
-    
-    // ✅ 修正：合併 active 和 archived 陣列
-    const activeOrders = data.orders?.active || [];
-    const archivedOrders = data.orders?.archived || [];
-    ORDERS = [...activeOrders, ...archivedOrders];
-
-    console.log('載入訂單成功:', ORDERS.length, '筆');
-
+    const res=await fetch(API_ORDERS);
+    if(!res.ok)throw new Error('API error');
+    const data=await res.json();
+    ALL_ORDERS=[...(data.orders?.active||[]),...(data.orders?.archived||[])];
+    FILTERED_ORDERS=[...ALL_ORDERS];
+    console.log('載入訂單成功:',ALL_ORDERS.length,'筆');
     document.getElementById('orderError').classList.add('hidden');
     renderOrders();
   }catch(e){
-    console.warn('訂單載入失敗', e);
+    console.warn('訂單載入失敗',e);
     document.getElementById('orderError').classList.remove('hidden');
+    document.getElementById('orderTable').innerHTML='<tr><td colspan="6" style="text-align:center;color:#991B1B;padding:30px">載入失敗</td></tr>';
   }
 }
-
+function filterOrders(){
+  const df=document.getElementById('dateFrom').value;
+  const dt=document.getElementById('dateTo').value;
+  const sf=document.getElementById('statusFilter').value;
+  FILTERED_ORDERS=ALL_ORDERS.filter(o=>{
+    if(df||dt){
+      const od=o.date?new Date(o.date).toISOString().split('T')[0]:'';
+      if(df&&od<df)return false;
+      if(dt&&od>dt)return false;
+    }
+    if(sf&&o.status!==sf)return false;
+    return true;
+  });
+  renderOrders();
+}
+function resetFilter(){
+  document.getElementById('dateFrom').value='';
+  document.getElementById('dateTo').value='';
+  document.getElementById('statusFilter').value='';
+  FILTERED_ORDERS=[...ALL_ORDERS];
+  renderOrders();
+}
 function renderOrders(){
-  const tbody = document.getElementById('orderTable');
-  if(ORDERS.length === 0){
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="5" style="text-align:center;color:#666;padding:30px">
-          尚無訂單資料
-        </td>
-      </tr>`;
+  const tb=document.getElementById('orderTable');
+  if(FILTERED_ORDERS.length===0){
+    tb.innerHTML='<tr><td colspan="6" style="text-align:center;color:#666;padding:30px">尚無訂單資料</td></tr>';
     return;
   }
-
-  tbody.innerHTML = ORDERS.map(o=>`
-    <tr>
-      <td>${formatDate(o.date)}</td>
-      <td><b>${o.task_id || '-'}</b></td>
-      <td>${o.user || '-'}</td>
-      <td>
-        <span class="status-pill ${getStatusClass(o.status)}">${o.status || '-'}</span>
-      </td>
-      <td>
-        <button class="btn btn-outline" onclick="viewOrder('${o.task_id}')">查看</button>
-      </td>
-    </tr>
-  `).join('');
+  tb.innerHTML=FILTERED_ORDERS.map(o=>
+    '<tr><td>'+formatDate(o.date)+'</td><td><b>'+(o.task_id||'-')+'</b></td><td>'+(o.user||'-')+'</td><td>'+(o.department||'-')+'</td><td><span class="status-pill '+getStatusClass(o.status)+'">'+getStatusText(o.status)+'</span></td><td><button class="btn btn-outline" onclick="showOrderDetail(\''+o.task_id+'\')">📋 訂單查詢</button></td></tr>'
+  ).join('');
 }
-
-/* =========================
-   輔助函式
-========================= */
-function formatDate(dateStr){
-  if(!dateStr) return '-';
-  const d = new Date(dateStr);
-  return d.toLocaleDateString('zh-TW');
+function showOrderDetail(tid){
+  const o=ALL_ORDERS.find(x=>x.task_id===tid);
+  if(!o){alert('找不到此訂單');return;}
+  let ih=o.items&&o.items.length>0?o.items.map(i=>'<div class="item-row"><span>'+(i.item_name||i.name||'未知商品')+'</span><span>x'+(i.quantity||i.qty||1)+' / $'+(i.subtotal||0)+'</span></div>').join(''):'<p style="color:#666">無商品明細</p>';
+  let dh='<div style="background:#F8FAFC;padding:16px;border-radius:10px;margin-bottom:16px">';
+  dh+='<div class="info-row"><span class="info-label">訂單編號</span><span class="info-value">'+(o.task_id||'-')+'</span></div>';
+  dh+='<div class="info-row"><span class="info-label">申請時間</span><span class="info-value">'+formatDateTime(o.date)+'</span></div>';
+  dh+='<div class="info-row"><span class="info-label">申請人</span><span class="info-value">'+(o.user||'-')+'</span></div>';
+  dh+='<div class="info-row"><span class="info-label">單位</span><span class="info-value">'+(o.department||'-')+'</span></div>';
+  dh+='<div class="info-row"><span class="info-label">訂單狀態</span><span class="info-value"><span class="status-pill '+getStatusClass(o.status)+'">'+getStatusText(o.status)+'</span></span></div>';
+  dh+='<div class="info-row"><span class="info-label">訂單金額</span><span class="info-value" style="color:var(--primary)">$'+(o.total||0)+'</span></div>';
+  dh+='</div><h4 style="margin:16px 0 8px 0;color:#0F172A">📦 商品明細</h4><div class="item-list">'+ih+'</div>';
+  document.getElementById('orderDetail').innerHTML=dh;
+  document.getElementById('orderModal').classList.add('show');
 }
-
-function getStatusClass(status){
-  const s = (status || '').toLowerCase();
-  if(['done', 'closed', 'completed'].includes(s)) return 'status-4';
-  return 'status-1';
-}
-
-function viewOrder(taskId){
-  const order = ORDERS.find(o => o.task_id === taskId);
-  if(order){
-    alert(`訂單詳情:\n${JSON.stringify(order, null, 2)}`);
-  }
-}
-
-/* =========================
-   初始化
-========================= */
-window.onload = () => {
-  loadOrders();
-};
+function closeModal(){document.getElementById('orderModal').classList.remove('show');}
+document.getElementById('orderModal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+window.onload=function(){loadOrders();};
 </script>
-
 </body>
 </html>
