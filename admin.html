@@ -82,8 +82,10 @@ input:focus,select:focus{border-color:var(--primary)}
             <option value="EXCEPTION">異常通知</option>
             <option value="End">案件結案</option>
           </select>
-          <button class="btn btn-primary" onclick="filterOrders()">🔍 篩選</button>
-          <button class="btn btn-outline" onclick="resetFilter()">重置</button>
+<input type="text" id="searchKeyword" placeholder="搜尋單號/申請人" style="width:150px">
+<button class="btn btn-primary" onclick="filterOrders()">🔍 篩選</button>
+<button class="btn btn-outline" onclick="resetFilter()">重置</button>
+<button class="btn btn-success" onclick="downloadCSV()">📥 下載報表</button>
         </div>
         <div class="table-wrapper">
           <table>
@@ -146,26 +148,49 @@ async function loadOrders(){
     document.getElementById('orderTable').innerHTML='<tr><td colspan="6" style="text-align:center;color:#991B1B;padding:30px">載入失敗</td></tr>';
   }
 }
-function filterOrders(){
-  const df=document.getElementById('dateFrom').value;
-  const dt=document.getElementById('dateTo').value;
-  const sf=document.getElementById('statusFilter').value;
-  FILTERED_ORDERS=ALL_ORDERS.filter(o=>{
-    if(df||dt){
-      const od=o.date?new Date(o.date).toISOString().split('T')[0]:'';
-      if(df&&od<df)return false;
-      if(dt&&od>dt)return false;
+function downloadCSV() {
+  if (FILTERED_ORDERS.length === 0) {
+    alert('沒有資料可下載');
+    return;
+  }
+  let csv = '\uFEFF日期,單號,申請人,單位,狀態,金額\n';
+  csv += FILTERED_ORDERS.map(o => 
+    '"' + formatDate(o.date) + '","' + (o.task_id || '') + '","' + (o.user || '') + '","' + (o.department || '') + '","' + getStatusText(o.status) + '","' + (o.total || 0) + '"'
+  ).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = '訂單報表_' + new Date().toISOString().slice(0, 10) + '.csv';
+  link.click();
+}    
+function filterOrders() {
+  const df = document.getElementById('dateFrom').value;
+  const dt = document.getElementById('dateTo').value;
+  const sf = document.getElementById('statusFilter').value;
+  const kw = document.getElementById('searchKeyword').value.toLowerCase().trim();
+  
+  FILTERED_ORDERS = ALL_ORDERS.filter(o => {
+    if (df || dt) {
+      const od = o.date ? new Date(o.date).toISOString().split('T')[0] : '';
+      if (df && od < df) return false;
+      if (dt && od > dt) return false;
     }
-    if(sf&&o.status!==sf)return false;
+    if (sf && o.status !== sf) return false;
+    if (kw) {
+      const matchId = (o.task_id || '').toLowerCase().includes(kw);
+      const matchUser = (o.user || '').toLowerCase().includes(kw);
+      if (!matchId && !matchUser) return false;
+    }
     return true;
   });
   renderOrders();
 }
-function resetFilter(){
-  document.getElementById('dateFrom').value='';
-  document.getElementById('dateTo').value='';
-  document.getElementById('statusFilter').value='';
-  FILTERED_ORDERS=[...ALL_ORDERS];
+function resetFilter() {
+  document.getElementById('dateFrom').value = '';
+  document.getElementById('dateTo').value = '';
+  document.getElementById('statusFilter').value = '';
+  document.getElementById('searchKeyword').value = '';
+  FILTERED_ORDERS = [...ALL_ORDERS];
   renderOrders();
 }
 function renderOrders(){
