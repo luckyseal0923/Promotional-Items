@@ -135,7 +135,7 @@ function switchTab(tab){
 }
 
 /* =========================
-   訂單載入（非阻斷）
+   訂單載入（修正版）
 ========================= */
 async function loadOrders(){
   try{
@@ -143,12 +143,19 @@ async function loadOrders(){
     if(!res.ok) throw new Error('API error');
 
     const data = await res.json();
-    ORDERS = data.orders || [];
+    
+    // ✅ 修正：合併 active 和 archived 陣列
+    const activeOrders = data.orders?.active || [];
+    const archivedOrders = data.orders?.archived || [];
+    ORDERS = [...activeOrders, ...archivedOrders];
+
+    console.log('載入訂單成功:', ORDERS.length, '筆');
 
     document.getElementById('orderError').classList.add('hidden');
     renderOrders();
   }catch(e){
     console.warn('訂單載入失敗', e);
+    document.getElementById('orderError').classList.remove('hidden');
   }
 }
 
@@ -166,24 +173,46 @@ function renderOrders(){
 
   tbody.innerHTML = ORDERS.map(o=>`
     <tr>
-      <td>${o.date || '-'}</td>
+      <td>${formatDate(o.date)}</td>
       <td><b>${o.task_id || '-'}</b></td>
       <td>${o.user || '-'}</td>
       <td>
-        <span class="status-pill status-1">${o.status || '-'}</span>
+        <span class="status-pill ${getStatusClass(o.status)}">${o.status || '-'}</span>
       </td>
       <td>
-        <button class="btn btn-outline">查看</button>
+        <button class="btn btn-outline" onclick="viewOrder('${o.task_id}')">查看</button>
       </td>
     </tr>
   `).join('');
 }
 
 /* =========================
-   初始化（不阻斷）
+   輔助函式
+========================= */
+function formatDate(dateStr){
+  if(!dateStr) return '-';
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('zh-TW');
+}
+
+function getStatusClass(status){
+  const s = (status || '').toLowerCase();
+  if(['done', 'closed', 'completed'].includes(s)) return 'status-4';
+  return 'status-1';
+}
+
+function viewOrder(taskId){
+  const order = ORDERS.find(o => o.task_id === taskId);
+  if(order){
+    alert(`訂單詳情:\n${JSON.stringify(order, null, 2)}`);
+  }
+}
+
+/* =========================
+   初始化
 ========================= */
 window.onload = () => {
-  loadOrders(); // 失敗也不影響進頁
+  loadOrders();
 };
 </script>
 
