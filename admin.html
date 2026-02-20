@@ -89,8 +89,8 @@ input:focus,select:focus{border-color:var(--primary)}
         </div>
         <div class="table-wrapper">
           <table>
-            <thead><tr><th>日期</th><th>單號</th><th>申請人</th><th>單位</th><th>狀態</th><th>操作</th></tr></thead>
-            <tbody id="orderTable"><tr><td colspan="6" style="text-align:center;color:#666;padding:30px">載入中...</td></tr></tbody>
+            <<thead><tr><th>日期 / 單號</th><th>申請人</th><th>單位</th><th>狀態</th><th>操作</th></tr></thead>
+            <tbody id="orderTable"><tr><td colspan="5" style="text-align:center;color:#666;padding:30px">載入中...</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -122,7 +122,15 @@ const STATUS_CLASS_MAP = {
 };
 function getStatusText(s){return STATUS_MAP[s]||s||'未知';}
 function getStatusClass(s){return STATUS_CLASS_MAP[s]||'status-preparing';}
-function formatDate(d){if(!d)return'-';const n=new Date(d);return isNaN(n)?d:n.toLocaleDateString('zh-TW');}
+function formatDate(d) {
+  if (!d) return '-';
+  const n = new Date(d);
+  if (isNaN(n)) return d;
+  const y = n.getFullYear();
+  const m = String(n.getMonth() + 1).padStart(2, '0');
+  const day = String(n.getDate()).padStart(2, '0');
+  return y + '/' + m + '/' + day;
+}
 function formatDateTime(d){if(!d)return'-';const n=new Date(d);return isNaN(n)?d:n.toLocaleString('zh-TW');}
 function switchTab(tab){
   ['orders','inventory','listing','accounts'].forEach(t=>{
@@ -199,9 +207,18 @@ function renderOrders(){
     tb.innerHTML='<tr><td colspan="6" style="text-align:center;color:#666;padding:30px">尚無訂單資料</td></tr>';
     return;
   }
-  tb.innerHTML=FILTERED_ORDERS.map(o=>
-    '<tr><td>'+formatDate(o.date)+'</td><td><b>'+(o.task_id||'-')+'</b></td><td>'+(o.user||'-')+'</td><td>'+(o.department||'-')+'</td><td><span class="status-pill '+getStatusClass(o.status)+'">'+getStatusText(o.status)+'</span></td><td><button class="btn btn-outline" onclick="showOrderDetail(\''+o.task_id+'\')">📋 訂單查詢</button></td></tr>'
-  ).join('');
+tb.innerHTML = FILTERED_ORDERS.map(o =>
+  '<tr>' +
+    '<td style="line-height:1.6">' +
+      '<div style="font-size:15px;font-weight:600;color:#0F172A">' + formatDate(o.date) + '</div>' +
+      '<div style="font-size:12px;color:#64748B">' + (o.task_id || '-') + '</div>' +
+    '</td>' +
+    '<td>' + (o.user || '-') + '</td>' +
+    '<td>' + (o.department || '-') + '</td>' +
+    '<td><span class="status-pill ' + getStatusClass(o.status) + '">' + getStatusText(o.status) + '</span></td>' +
+    '<td><button class="btn btn-outline" onclick="showOrderDetail(\'' + o.task_id + '\')">📋 訂單查詢</button></td>' +
+  '</tr>'
+).join('');
 }
 function showOrderDetail(tid){
   const o=ALL_ORDERS.find(x=>x.task_id===tid);
