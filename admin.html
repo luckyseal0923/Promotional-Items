@@ -256,7 +256,7 @@ function showOrderDetail(tid) {
   
   document.getElementById('orderDetail').innerHTML = dh;
   document.getElementById('orderModal').classList.add('show');
-}
+
 function closeModal(){document.getElementById('orderModal').classList.remove('show');}
 document.getElementById('orderModal').addEventListener('click',function(e){if(e.target===this)closeModal();});
 window.onload=function(){loadOrders();};
