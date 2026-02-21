@@ -166,20 +166,50 @@ function renderInventory(items) {
   let html = '<table style="width:100%"><thead><tr><th>圖片</th><th>品名</th><th>目前庫存</th><th>盤點操作</th></tr></thead><tbody>';
   
   items.forEach(item => {
+    // 1. 圖片加大：從原本的 40px 加大到 60px
+    // 2. 點擊放大：加入 onclick="showBigImage(...)"
+    const imgHtml = item.image 
+      ? `<img src="${item.image}" style="height:60px;width:60px;object-fit:cover;border-radius:6px;cursor:pointer;border:1px solid #ddd;" onclick="showBigImage('${item.image}')" title="點擊放大">` 
+      : '<span style="color:#ccc;font-size:12px;">無圖片</span>';
+
     html += `<tr>
-      <td>${item.image ? `<img src="${item.image}" style="height:40px;border-radius:4px;">` : '-'}</td>
-      <td style="font-weight:bold;">${item.item_name}</td>
+      <td style="width:80px;text-align:center;">${imgHtml}</td>
+      <td style="font-weight:bold;font-size:15px;">${item.item_name}</td>
       <td style="font-size:16px;color:${item.stock < 10 ? 'red' : 'black'}">${item.stock}</td>
       <td>
         <div style="display:flex;gap:8px;align-items:center;">
-          <input type="number" id="stock-${item.item_id}" value="${item.stock}" style="width:80px;padding:6px;">
+          <input type="number" id="stock-${item.item_id}" value="${item.stock}" style="width:80px;padding:8px;border-radius:6px;border:1px solid #ddd;">
           <button class="btn btn-primary" onclick="updateStock('${item.item_id}')">更新</button>
         </div>
       </td>
     </tr>`;
   });
   html += '</tbody></table>';
+  
+  // 🔥 新增：大圖預覽 Modal (只插入一次)
+  if (!document.getElementById('imgModal')) {
+    const modalHtml = `
+      <div id="imgModal" class="modal" onclick="closeBigImage()">
+        <span class="modal-close" style="position:absolute;top:20px;right:30px;font-size:40px;color:white;cursor:pointer;">&times;</span>
+        <img id="bigImage" style="max-width:90%;max-height:90%;border-radius:8px;box-shadow:0 0 20px rgba(0,0,0,0.5);">
+      </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+  }
+  
   panel.innerHTML = html;
+}
+
+// 🔥 新增：控制大圖顯示的函式
+function showBigImage(src) {
+  const modal = document.getElementById('imgModal');
+  const img = document.getElementById('bigImage');
+  img.src = src;
+  modal.style.display = 'flex'; // 顯示 Modal
+}
+
+function closeBigImage() {
+  document.getElementById('imgModal').style.display = 'none'; // 隱藏 Modal
 }
 
 async function updateStock(itemId) {
