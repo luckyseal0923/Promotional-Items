@@ -110,6 +110,8 @@ input:focus,select:focus{border-color:var(--primary)}
 
 <script>
 const API_ORDERS = 'https://chihwei-n8n.zeabur.app/webhook/orders';
+const API_INVENTORY_LIST = 'https://chihwei-n8n.zeabur.app/webhook/inventory-list';
+const API_INVENTORY_UPDATE = 'https://chihwei-n8n.zeabur.app/webhook/inventory-update';
 let ALL_ORDERS = [];
 let FILTERED_ORDERS = [];
 
@@ -139,8 +141,76 @@ function switchTab(tab){
   });
   document.getElementById('tab-'+tab).classList.remove('hidden');
   document.getElementById('nav-'+tab).classList.add('active');
+    // 如果切換到庫存頁，自動載入資料
+  if(tab === 'inventory') {
+    loadInventory();
+  }
+}
+/* === 庫存盤點系統 === */
+async function loadInventory() {
+  const panel = document.querySelector('#tab-inventory .panel');
+  panel.innerHTML = '<p style="text-align:center;color:#666;">載入庫存中...</p>';
+  
+  try {
+    const res = await fetch(API_INVENTORY_LIST);
+    const data = await res.json();
+    renderInventory(data.items || []);
+  } catch(e) {
+    console.error(e);
+    panel.innerHTML = '<p style="color:red;text-align:center;">載入失敗</p>';
+  }
 }
 
+function renderInventory(items) {
+  const panel = document.querySelector('#tab-inventory .panel');
+  let html = '<table style="width:100%"><thead><tr><th>圖片</th><th>品名</th><th>目前庫存</th><th>盤點操作</th></tr></thead><tbody>';
+  
+  items.forEach(item => {
+    html += `<tr>
+      <td>${item.image ? `<img src="${item.image}" style="height:40px;border-radius:4px;">` : '-'}</td>
+      <td style="font-weight:bold;">${item.item_name}</td>
+      <td style="font-size:16px;color:${item.stock < 10 ? 'red' : 'black'}">${item.stock}</td>
+      <td>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input type="number" id="stock-${item.item_id}" value="${item.stock}" style="width:80px;padding:6px;">
+          <button class="btn btn-primary" onclick="updateStock('${item.item_id}')">更新</button>
+        </div>
+      </td>
+    </tr>`;
+  });
+  html += '</tbody></table>';
+  panel.innerHTML = html;
+}
+
+async function updateStock(itemId) {
+  const input = document.getElementById(`stock-${itemId}`);
+  const newStock = input.value;
+  const btn = event.target;
+  
+  btn.disabled = true;
+  btn.textContent = '...';
+  
+  try {
+    const res = await fetch(API_INVENTORY_UPDATE, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ item_id: itemId, stock: newStock })
+    });
+    const data = await res.json();
+    if(data.success) {
+      alert('✅ 庫存已更新');
+      loadInventory(); // 重新載入列表
+    } else {
+      alert('❌ 更新失敗');
+    }
+  } catch(e) {
+    alert('連線錯誤');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '更新';
+  }
+}
+  
 async function loadOrders(){
   try{
     const res=await fetch(API_ORDERS);
@@ -284,7 +354,7 @@ function showEditStatus(tid) {
   dh += '<label style="color:#EF4444;font-size:13px;font-weight:bold;margin-bottom:4px;display:block">異常原因 (必填)：</label>';
   dh += '<textarea id="statusNote" rows="3" style="width:100%;padding:8px;border:1px solid #EF4444;border-radius:6px;" placeholder="請說明異常原因..."></textarea>';
   dh += '</div>';
-
+  
   dh += '<button class="btn btn-success" style="width:100%;margin-top:16px" onclick="updateStatus(\'' + tid + '\')">💾 儲存變更</button>';
   
   document.getElementById('orderDetail').innerHTML = dh;
@@ -349,7 +419,10 @@ function updateStatus(tid) {
 
 function closeModal(){document.getElementById('orderModal').classList.remove('show');}
 document.getElementById('orderModal').addEventListener('click',function(e){if(e.target===this)closeModal();});
-window.onload=function(){loadOrders();};
+window.onload=function(){
+  loadOrders();
+  // 如果有切換到庫存分頁，也可以在這裡預載
+};
 </script>
 
 </body>
