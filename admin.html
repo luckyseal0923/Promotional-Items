@@ -267,61 +267,151 @@ async function updStock(id){
     alert('已更新');
   }catch(e){ alert('失敗'); }
 }
-  async function loadListing(){
-  const p=document.querySelector('#tab-listing .panel');
-  p.innerHTML='<div style="text-align:right;margin-bottom:10px"><button class="btn btn-success" onclick="editProd()">➕ 新增</button></div>';
-  try{
-    if(ALL_PRODUCTS.length===0){ const res=await fetch(API_INVENTORY_LIST); const d=await res.json(); ALL_PRODUCTS=d.items||[]; }
-    renderListing(ALL_PRODUCTS);
-  }catch(e){ p.innerHTML='載入失敗'; }
+/* =========================
+   3. 商品管理 (Listing) - v2.0 (含刪除/庫存/圖片上傳)
+========================= */
+const API_PRODUCT_DELETE = 'https://chihwei-n8n.zeabur.app/webhook/product-delete'; // 新增刪除 API
+
+async function loadListing() {
+  const p = document.querySelector('#tab-listing .panel');
+  p.innerHTML = '<div style="text-align:right;margin-bottom:10px"><button class="btn btn-success" onclick="editProd()">➕ 新增商品</button></div>';
+  try {
+    // 每次都重新抓取最新資料
+    const res = await fetch(API_INVENTORY_LIST); 
+    const d = await res.json(); 
+    ALL_PRODUCTS = d.items || []; 
+    
+    let h = '<table style="width:100%"><thead><tr><th>圖片</th><th>商品編號</th><th>品名</th><th>售價</th><th>庫存</th><th>操作</th></tr></thead><tbody>';
+    ALL_PRODUCTS.forEach(i => {
+      h += `<tr>
+        <td>${i.image ? `<img src="${i.image}" style="height:50px;width:50px;object-fit:cover;border-radius:4px;">` : '-'}</td>
+        <td style="color:#666;">${i.item_id}</td>
+        <td style="font-weight:bold;">${i.item_name}</td>
+        <td>$${i.unit_price}</td>
+        <td>${i.stock}</td>
+        <td><button class="btn btn-primary" onclick="editProd('${i.item_id}')">編輯</button></td>
+      </tr>`;
+    });
+    p.innerHTML += h + '</tbody></table>';
+  } catch(e) { p.innerHTML = '載入失敗'; }
 }
 
-function renderListing(items) {
-  const panel = document.querySelector('#tab-listing .panel');
-  let html = '<div style="margin-bottom:16px;text-align:right;"><button class="btn btn-success" onclick="editProd()">➕ 新增商品</button></div>';
-  html += '<table style="width:100%"><thead><tr><th>圖片</th><th>ID</th><th>品名</th><th>單價</th><th>操作</th></tr></thead><tbody>';
-  items.forEach(item => {
-    html += `<tr>
-      <td>${item.image ? `<img src="${item.image}" style="height:40px;border-radius:4px;">` : '-'}</td>
-      <td style="font-size:12px;color:#666;">${item.item_id}</td>
-      <td style="font-weight:bold;">${item.item_name}</td>
-      <td>$${item.unit_price}</td>
-      <td><button class="btn btn-primary" onclick="editProd('${item.item_id}')">✏️ 編輯</button></td>
-    </tr>`;
-  });
-  if (!document.getElementById('productModal')) { /* Modal HTML in editProd, just ensuring structure */ }
-  panel.innerHTML = html + '</tbody></table>';
-}
+function editProd(id) {
+  const i = id ? ALL_PRODUCTS.find(x => x.item_id == id) : null;
+  const isNew = !i;
+  
+  // Modal HTML: 加入庫存欄位、圖片網址唯讀、刪除按鈕
+  const h = `
+  <div id="prodModal" class="modal show" style="display:flex;">
+    <div class="modal-body">
+      <h3 style="margin-top:0;">${isNew ? '➕ 商品上架' : '✏️ 編輯商品'}</h3>
+      
+      <input type="hidden" id="pid" value="${i?.item_id || 'new_' + Math.floor(Date.now()/1000)}">
+      
+      <label style="display:block;margin:10px 0 5px;font-weight:bold;">品名</label>
+      <input type="text" id="pname" style="width:100%;padding:8px;" value="${i?.item_name || ''}">
+      
+      <div style="display:flex;gap:10px;">
+        <div style="flex:1;">
+          <label style="display:block;margin:10px 0 5px;font-weight:bold;">售價</label>
+          <input type="number" id="pprice" style="width:100%;padding:8px;" value="${i?.unit_price || ''}">
+        </div>
+        <div style="flex:1;">
+          <label style="display:block;margin:10px 0 5px;font-weight:bold;">庫存量</label>
+          <input type="number" id="pstock" style="width:100%;padding:8px;" value="${i?.stock || '0'}">
+        </div>
+      </div>
 
-function editProd(id){
-  const i=id?ALL_PRODUCTS.find(x=>x.item_id==id):null;
-  const h=`<div id="prodModal" class="modal show"><div class="modal-body">
-    <h3>${id?'編輯':'新增'}</h3>
-    <input type="hidden" id="pid" value="${i?.item_id||'new_'+Date.now()}">
-    <label>品名</label><input type="text" id="pname" style="width:100%;margin-bottom:10px" value="${i?.item_name||''}">
-    <label>價格</label><input type="number" id="pprice" style="width:100%;margin-bottom:10px" value="${i?.unit_price||''}">
-    <label>圖片</label><div style="display:flex;gap:5px"><input type="text" id="pimg" style="flex:1" value="${i?.image||''}"><label class="btn btn-outline">📤<input type="file" hidden onchange="upImg(this)"></label></div>
-    <div style="margin-top:15px;text-align:right"><button class="btn btn-outline" onclick="this.closest('.modal').remove()">取消</button> <button class="btn btn-success" onclick="saveProd()">儲存</button></div>
-  </div></div>`;
+      <label style="display:block;margin:10px 0 5px;font-weight:bold;">商品圖片</label>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <!-- 網址欄位設為 readonly (唯讀)，背景灰色 -->
+        <input type="text" id="pimg" style="flex:1;padding:8px;background:#f5f5f5;color:#666;" placeholder="請使用右側按鈕上傳..." value="${i?.image || ''}" readonly>
+        <label class="btn btn-outline" style="cursor:pointer;white-space:nowrap;">
+          📤 上傳
+          <input type="file" hidden onchange="upImg(this)">
+        </label>
+      </div>
+      <div id="upStatus" style="font-size:12px;color:#666;margin-top:4px;min-height:20px;"></div>
+
+      <div style="margin-top:20px;text-align:right;border-top:1px solid #eee;padding-top:15px;display:flex;justify-content:space-between;">
+        <!-- 左側：刪除按鈕 (只有編輯模式才顯示) -->
+        <div>
+          ${!isNew ? `<button class="btn btn-danger" onclick="delProd('${id}')">🗑️ 下架移除</button>` : ''}
+        </div>
+        <!-- 右側：取消與儲存 -->
+        <div style="display:flex;gap:10px;">
+          <button class="btn btn-outline" onclick="this.closest('.modal').remove()">取消</button> 
+          <button class="btn btn-success" onclick="saveProd()">儲存</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+  
   document.body.insertAdjacentHTML('beforeend', h);
 }
-  async function upImg(inp){
-  const f=inp.files[0]; if(!f)return;
-  const fd=new FormData(); fd.append('file', f);
-  try{
-    const res=await fetch(API_PRODUCT_UPLOAD, {method:'POST', body:fd});
-    const d=await res.json();
-    if(d.success) document.getElementById('pimg').value=d.url;
-    else alert('上傳失敗');
-  }catch(e){ alert('錯誤'); }
+
+async function upImg(inp) {
+  const f = inp.files[0]; if (!f) return;
+  const stat = document.getElementById('upStatus');
+  stat.textContent = '⏳ 上傳中...';
+  
+  const fd = new FormData(); fd.append('file', f);
+  try {
+    const res = await fetch(API_PRODUCT_UPLOAD, { method: 'POST', body: fd });
+    const d = await res.json();
+    if (d.success) {
+      document.getElementById('pimg').value = d.url;
+      stat.innerHTML = `<span style="color:green">✅ 上傳成功</span>`;
+    } else {
+      stat.textContent = '❌ 上傳失敗';
+    }
+  } catch (e) { stat.textContent = '❌ 錯誤'; }
+  inp.value = ''; // Reset input
 }
 
-async function saveProd(){
-  const id=document.getElementById('pid').value, name=document.getElementById('pname').value, price=document.getElementById('pprice').value, img=document.getElementById('pimg').value;
-  try{
-    await fetch(API_PRODUCT_SAVE, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({item_id:id, item_name:name, unit_price:price, image:img})});
-    alert('儲存成功'); document.getElementById('prodModal').remove(); loadListing();
-  }catch(e){ alert('失敗'); }
+async function saveProd() {
+  const id = document.getElementById('pid').value;
+  const name = document.getElementById('pname').value;
+  const price = document.getElementById('pprice').value;
+  const stock = document.getElementById('pstock').value;
+  const img = document.getElementById('pimg').value;
+
+  if (!name || !price) { alert('品名與售價為必填'); return; }
+
+  const btn = event.target; btn.disabled = true; btn.textContent = '處理中...';
+
+  try {
+    await fetch(API_PRODUCT_SAVE, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        item_id: id,
+        item_name: name,
+        unit_price: price,
+        stock: stock,
+        image: img
+      })
+    });
+    alert('✅ 儲存成功');
+    document.getElementById('prodModal').remove();
+    loadListing();
+  } catch (e) { alert('❌ 失敗'); console.error(e); } 
+  finally { btn.disabled = false; }
+}
+
+async function delProd(id) {
+  if (!confirm('⚠️ 確定要將此商品下架移除嗎？此動作無法復原。')) return;
+  
+  try {
+    await fetch(API_PRODUCT_DELETE, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ item_id: id })
+    });
+    alert('🗑️ 商品已下架');
+    document.getElementById('prodModal').remove();
+    loadListing();
+  } catch (e) { alert('移除失敗'); }
 }
 
 function showBig(src){
