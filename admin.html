@@ -108,10 +108,11 @@ input:focus,select:focus{border-color:var(--primary)}
   </div>
 </div>
 
-  <script>
+<script>
 const API_ORDERS = 'https://chihwei-n8n.zeabur.app/webhook/orders';
 let ALL_ORDERS = [];
 let FILTERED_ORDERS = [];
+
 const STATUS_MAP = {
   'Submitted':'申請提出','PREPARING':'商品準備中','preparing':'商品準備中',
   'ready':'通知領取','EXCEPTION':'異常通知','End':'案件結案','done':'案件結案','closed':'案件結案'
@@ -120,18 +121,17 @@ const STATUS_CLASS_MAP = {
   'Submitted':'status-submitted','PREPARING':'status-preparing','preparing':'status-preparing',
   'ready':'status-ready','EXCEPTION':'status-exception','End':'status-end','done':'status-end','closed':'status-end'
 };
+
 function getStatusText(s){return STATUS_MAP[s]||s||'未知';}
 function getStatusClass(s){return STATUS_CLASS_MAP[s]||'status-preparing';}
 function formatDate(d) {
   if (!d) return '-';
   const n = new Date(d);
   if (isNaN(n)) return d;
-  const y = n.getFullYear();
-  const m = String(n.getMonth() + 1).padStart(2, '0');
-  const day = String(n.getDate()).padStart(2, '0');
-  return y + '/' + m + '/' + day;
+  return n.toLocaleDateString('zh-TW');
 }
 function formatDateTime(d){if(!d)return'-';const n=new Date(d);return isNaN(n)?d:n.toLocaleString('zh-TW');}
+
 function switchTab(tab){
   ['orders','inventory','listing','accounts'].forEach(t=>{
     document.getElementById('tab-'+t).classList.add('hidden');
@@ -140,6 +140,7 @@ function switchTab(tab){
   document.getElementById('tab-'+tab).classList.remove('hidden');
   document.getElementById('nav-'+tab).classList.add('active');
 }
+
 async function loadOrders(){
   try{
     const res=await fetch(API_ORDERS);
@@ -156,11 +157,9 @@ async function loadOrders(){
     document.getElementById('orderTable').innerHTML='<tr><td colspan="6" style="text-align:center;color:#991B1B;padding:30px">載入失敗</td></tr>';
   }
 }
+
 function downloadCSV() {
-  if (FILTERED_ORDERS.length === 0) {
-    alert('沒有資料可下載');
-    return;
-  }
+  if (FILTERED_ORDERS.length === 0) { alert('沒有資料可下載'); return; }
   let csv = '\uFEFF日期,單號,申請人,單位,狀態,金額\n';
   csv += FILTERED_ORDERS.map(o => 
     '"' + formatDate(o.date) + '","' + (o.task_id || '') + '","' + (o.user || '') + '","' + (o.department || '') + '","' + getStatusText(o.status) + '","' + (o.total || 0) + '"'
@@ -171,6 +170,7 @@ function downloadCSV() {
   link.download = '訂單報表_' + new Date().toISOString().slice(0, 10) + '.csv';
   link.click();
 }    
+
 function filterOrders() {
   const df = document.getElementById('dateFrom').value;
   const dt = document.getElementById('dateTo').value;
@@ -193,6 +193,7 @@ function filterOrders() {
   });
   renderOrders();
 }
+
 function resetFilter() {
   document.getElementById('dateFrom').value = '';
   document.getElementById('dateTo').value = '';
@@ -201,6 +202,7 @@ function resetFilter() {
   FILTERED_ORDERS = [...ALL_ORDERS];
   renderOrders();
 }
+
 function renderOrders() {
   const tb = document.getElementById('orderTable');
   if (FILTERED_ORDERS.length === 0) {
@@ -223,6 +225,7 @@ function renderOrders() {
     '</tr>'
   ).join('');
 }
+
 function showOrderDetail(tid) {
   const o = ALL_ORDERS.find(x => x.task_id === tid);
   if (!o) { alert('找不到此訂單'); return; }
@@ -242,24 +245,22 @@ function showOrderDetail(tid) {
   dh += '<div class="info-row"><span class="info-label">成本中心</span><span class="info-value">' + (o.cost_center || '-') + '</span></div>';
   dh += '<div class="info-row"><span class="info-label">申請事由</span><span class="info-value">' + (o.reason || '-') + '</span></div>';
   dh += '<div class="info-row"><span class="info-label">訂單狀態</span><span class="info-value"><span class="status-pill ' + getStatusClass(o.status) + '">' + getStatusText(o.status) + '</span></span></div>';
- 
-  // 🔥 新增：異常原因顯示區塊
+
+  // 🔥 異常原因顯示區塊 (新增)
   if (o.status === 'EXCEPTION' && o.comment) {
     dh += '<div style="margin:10px 0;padding:12px;background:#FEF2F2;border-left:4px solid #EF4444;border-radius:4px;">';
     dh += '<strong style="color:#991B1B;display:block;margin-bottom:4px;font-size:13px;">🔴 異常原因：</strong>';
     dh += '<span style="color:#7F1D1D;font-weight:bold;">' + o.comment + '</span>';
     dh += '</div>';
   }
-  
+
   dh += '<div class="info-row"><span class="info-label">訂單金額</span><span class="info-value" style="color:var(--primary)">$' + (o.total || 0) + '</span></div>';
   dh += '</div><h4 style="margin:16px 0 8px 0;color:#0F172A">📦 商品明細</h4><div class="item-list">' + ih + '</div>';
   
   document.getElementById('orderDetail').innerHTML = dh;
   document.getElementById('orderModal').classList.add('show');
+}
 
-function closeModal(){document.getElementById('orderModal').classList.remove('show');}
-document.getElementById('orderModal').addEventListener('click',function(e){if(e.target===this)closeModal();});
-window.onload=function(){loadOrders();};
 function showEditStatus(tid) {
   const o = ALL_ORDERS.find(x => x.task_id === tid);
   if (!o) { alert('找不到此訂單'); return; }
@@ -270,7 +271,6 @@ function showEditStatus(tid) {
   dh += '</div>';
   
   dh += '<label style="font-size:14px;font-weight:600;margin-bottom:8px;display:block">變更為：</label>';
-  // 加入 onchange 事件
   dh += '<select id="newStatus" style="width:100%" onchange="toggleReasonField()">';
   dh += '<option value="Submitted"' + (o.status === 'Submitted' ? ' selected' : '') + '>申請提出</option>';
   dh += '<option value="PREPARING"' + (o.status === 'PREPARING' ? ' selected' : '') + '>商品準備中</option>';
@@ -279,7 +279,7 @@ function showEditStatus(tid) {
   dh += '<option value="End"' + (o.status === 'End' ? ' selected' : '') + '>案件結案</option>';
   dh += '</select>';
   
-  // 新增異常原因輸入框
+  // 異常原因輸入框
   dh += '<div id="reasonField" style="display:none; margin-top:12px;">';
   dh += '<label style="color:#EF4444;font-size:13px;font-weight:bold;margin-bottom:4px;display:block">異常原因 (必填)：</label>';
   dh += '<textarea id="statusNote" rows="3" style="width:100%;padding:8px;border:1px solid #EF4444;border-radius:6px;" placeholder="請說明異常原因..."></textarea>';
@@ -290,11 +290,9 @@ function showEditStatus(tid) {
   document.getElementById('orderDetail').innerHTML = dh;
   document.getElementById('orderModal').classList.add('show');
   
-  // 初始化檢查
-  toggleReasonField();
+  toggleReasonField(); // 初始化
 }
 
-// 新增 Helper 函式
 function toggleReasonField() {
   const status = document.getElementById('newStatus').value;
   const reasonDiv = document.getElementById('reasonField');
@@ -310,7 +308,6 @@ function updateStatus(tid) {
   const note = document.getElementById('statusNote') ? document.getElementById('statusNote').value.trim() : '';
   const btn = event.target;
   
-  // 防呆檢查：異常狀態必填原因
   if (newStatus === 'EXCEPTION' && !note) {
     alert('❌ 請填寫異常原因！');
     document.getElementById('statusNote').focus();
@@ -326,7 +323,7 @@ function updateStatus(tid) {
     body: JSON.stringify({
       task_id: tid,
       status: newStatus,
-      comment: note, // 新增欄位
+      comment: note,
       updated_at: new Date().toISOString()
     })
   })
@@ -349,6 +346,11 @@ function updateStatus(tid) {
     btn.textContent = '💾 儲存變更';
   });
 }
+
+function closeModal(){document.getElementById('orderModal').classList.remove('show');}
+document.getElementById('orderModal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+window.onload=function(){loadOrders();};
 </script>
+
 </body>
 </html>
