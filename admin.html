@@ -112,6 +112,10 @@ input:focus,select:focus{border-color:var(--primary)}
 const API_ORDERS = 'https://chihwei-n8n.zeabur.app/webhook/orders';
 const API_INVENTORY_LIST = 'https://chihwei-n8n.zeabur.app/webhook/inventory-list';
 const API_INVENTORY_UPDATE = 'https://chihwei-n8n.zeabur.app/webhook/inventory-update';
+// 🔥 新增這兩行：商品儲存與圖片上傳
+const API_PRODUCT_SAVE = 'https://chihwei-n8n.zeabur.app/webhook/product-save';
+const API_PRODUCT_UPLOAD = 'https://chihwei-n8n.zeabur.app/webhook/product-upload-image';
+  
 let ALL_ORDERS = [];
 let FILTERED_ORDERS = [];
 
@@ -528,20 +532,32 @@ function renderListing(items) {
   html += '</tbody></table>';
   
   // 插入編輯 Modal (只插一次)
-  if (!document.getElementById('productModal')) {
+    if (!document.getElementById('productModal')) {
     const modalHtml = `
       <div id="productModal" class="modal">
         <div class="modal-body">
           <h3 id="modalTitle" class="modal-title">編輯商品</h3>
           <input type="hidden" id="p_id">
-          <label style="display:block;margin-bottom:8px;">商品名稱</label>
-          <input type="text" id="p_name" style="width:100%;margin-bottom:16px;">
-          <label style="display:block;margin-bottom:8px;">單價</label>
-          <input type="number" id="p_price" style="width:100%;margin-bottom:16px;">
-          <label style="display:block;margin-bottom:8px;">圖片網址 (URL)</label>
-          <input type="text" id="p_image" style="width:100%;margin-bottom:16px;" placeholder="https://...">
           
-          <div style="display:flex;gap:10px;justify-content:flex-end;">
+          <label style="display:block;margin-bottom:8px;">商品名稱</label>
+          <input type="text" id="p_name" style="width:100%;margin-bottom:16px;padding:8px;border:1px solid #ddd;border-radius:4px;">
+          
+          <label style="display:block;margin-bottom:8px;">單價</label>
+          <input type="number" id="p_price" style="width:100%;margin-bottom:16px;padding:8px;border:1px solid #ddd;border-radius:4px;">
+          
+          <label style="display:block;margin-bottom:8px;">商品圖片</label>
+          <div style="display:flex;gap:10px;margin-bottom:8px;">
+            <input type="text" id="p_image" style="flex:1;padding:8px;border:1px solid #ddd;border-radius:4px;" placeholder="圖片網址...">
+            <!-- 上傳按鈕 -->
+            <label class="btn btn-outline" style="cursor:pointer;display:flex;align-items:center;">
+              📤 上傳
+              <input type="file" id="p_file" style="display:none;" onchange="uploadImage(this)">
+            </label>
+          </div>
+          <!-- 上傳狀態顯示 -->
+          <div id="uploadStatus" style="font-size:12px;color:#666;margin-bottom:16px;height:20px;"></div>
+          
+          <div style="display:flex;gap:10px;justify-content:flex-end;border-top:1px solid #eee;padding-top:16px;">
             <button class="btn btn-outline" onclick="document.getElementById('productModal').classList.remove('show')">取消</button>
             <button class="btn btn-success" onclick="saveProduct()">儲存</button>
           </div>
@@ -618,6 +634,43 @@ async function saveProduct() {
   } finally {
     btn.disabled = false;
     btn.textContent = '儲存';
+  }
+}
+  async function uploadImage(input) {
+  const file = input.files[0];
+  if (!file) return;
+  
+  const status = document.getElementById('uploadStatus');
+  const urlInput = document.getElementById('p_image');
+  
+  status.textContent = '⏳ 上傳中...';
+  status.style.color = '#666';
+  
+  const formData = new FormData();
+  formData.append('file', file); // 對應 n8n Webhook 的欄位
+  
+  try {
+    const res = await fetch(API_PRODUCT_UPLOAD, {
+      method: 'POST',
+      body: formData // Fetch 會自動設定 multipart/form-data
+    });
+    const data = await res.json();
+    
+    if (data.success) {
+      status.textContent = '✅ 上傳成功！';
+      status.style.color = 'green';
+      urlInput.value = data.url; // 自動填入網址
+    } else {
+      status.textContent = '❌ 上傳失敗: ' + (data.message || '未知錯誤');
+      status.style.color = 'red';
+    }
+  } catch(e) {
+    status.textContent = '❌ 連線錯誤';
+    status.style.color = 'red';
+    console.error(e);
+  } finally {
+    // 清空 input 讓同一檔案可重複選取
+    input.value = '';
   }
 }
   window.onload=function(){
