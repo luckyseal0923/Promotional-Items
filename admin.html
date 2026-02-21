@@ -242,6 +242,15 @@ function showOrderDetail(tid) {
   dh += '<div class="info-row"><span class="info-label">成本中心</span><span class="info-value">' + (o.cost_center || '-') + '</span></div>';
   dh += '<div class="info-row"><span class="info-label">申請事由</span><span class="info-value">' + (o.reason || '-') + '</span></div>';
   dh += '<div class="info-row"><span class="info-label">訂單狀態</span><span class="info-value"><span class="status-pill ' + getStatusClass(o.status) + '">' + getStatusText(o.status) + '</span></span></div>';
+ 
+  // 🔥 新增：異常原因顯示區塊
+  if (o.status === 'EXCEPTION' && o.comment) {
+    dh += '<div style="margin:10px 0;padding:12px;background:#FEF2F2;border-left:4px solid #EF4444;border-radius:4px;">';
+    dh += '<strong style="color:#991B1B;display:block;margin-bottom:4px;font-size:13px;">🔴 異常原因：</strong>';
+    dh += '<span style="color:#7F1D1D;font-weight:bold;">' + o.comment + '</span>';
+    dh += '</div>';
+  }
+  
   dh += '<div class="info-row"><span class="info-label">訂單金額</span><span class="info-value" style="color:var(--primary)">$' + (o.total || 0) + '</span></div>';
   dh += '</div><h4 style="margin:16px 0 8px 0;color:#0F172A">📦 商品明細</h4><div class="item-list">' + ih + '</div>';
   
