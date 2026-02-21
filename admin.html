@@ -134,11 +134,24 @@ function formatDate(d) {
 }
 function formatDateTime(d){if(!d)return'-';const n=new Date(d);return isNaN(n)?d:n.toLocaleString('zh-TW');}
 
-function switchTab(tab){
-  ['orders','inventory','listing','accounts'].forEach(t=>{
-    document.getElementById('tab-'+t).classList.add('hidden');
-    document.getElementById('nav-'+t).classList.remove('active');
+function switchTab(tab) {
+  // 1. 先隱藏所有分頁，移除所有 active 樣式
+  ['orders','inventory','listing','accounts'].forEach(t => {
+    document.getElementById('tab-' + t).classList.add('hidden');
+    document.getElementById('nav-' + t).classList.remove('active');
   });
+  
+  // 2. 顯示目前選到的分頁，加上 active 樣式
+  document.getElementById('tab-' + tab).classList.remove('hidden');
+  document.getElementById('nav-' + tab).classList.add('active');
+
+  // 🔥 新增：根據切換的分頁，自動載入對應資料
+  if (tab === 'inventory') {
+    loadInventory(); // 載入庫存
+  } else if (tab === 'listing') {
+    loadListing();   // 載入商品列表 (這是新增的!)
+  }
+}
   document.getElementById('tab-'+tab).classList.remove('hidden');
   document.getElementById('nav-'+tab).classList.add('active');
     // 如果切換到庫存頁，自動載入資料
