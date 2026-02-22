@@ -167,22 +167,30 @@
             `).join('');
         }
 
-        function showOrderDetail(id) {
+function showOrderDetail(id) {
             const o = ORDERS.find(ord => ord.id === id);
             openModal(`
                 <h3 style="margin-top:0">📋 訂單詳細資訊</h3>
                 <div class="panel" style="background:#F8FAFC">
-                    <div class="info-row"><b>申請人</b><span>${o.user}</span></div>
-                    <div class="info-row"><b>電話</b><span>${o.phone}</span></div>
-                    <div class="info-row"><b>信箱</b><span>${o.email}</span></div>
-                    <div class="info-row"><b>單位</b><span>${o.dept}</span></div>
+                    <div class="info-row"><b>訂單編號</b><span>${o.id}</span></div>
+                    <div class="info-row"><b>申請日期</b><span>${o.date}</span></div>
+                    <div class="info-row"><b>申請人姓名</b><span>${o.user}</span></div>
+                    
+                    <div class="info-row"><b>院內員編 (Task ID)</b><span>${o.task_id || '未提供'}</span></div>
+                    <div class="info-row"><b>申請者電話</b><span>${o.phone}</span></div>
+                    <div class="info-row"><b>電子信箱</b><span>${o.email}</span></div>
+                    <div class="info-row"><b>申請單位</b><span>${o.dept}</span></div>
                     <div class="info-row"><b>成本中心</b><span>${o.cost_center}</span></div>
-                    <div class="info-row"><b>事由</b><span>${o.reason}</span></div>
+                    <div class="info-row"><b>領取事由</b><span>${o.reason}</span></div>
                 </div>
+                
                 <h4>📦 商品內容</h4>
-                ${o.items.map(i => `<p>● ${i.n} x ${i.q}</p>`).join('')}
-                ${o.memo ? `<p style="color:red"><b>⚠️ 異常備註：</b>${o.memo}</p>` : ''}
-                <button class="btn btn-primary" style="width:100%; margin-top:15px" onclick="closeModal()">關閉</button>
+                <div class="panel">
+                    ${o.items.map(i => `<p style="margin:5px 0">● ${i.n} x ${i.q}</p>`).join('')}
+                    ${o.memo ? `<p style="color:red; margin-top:10px"><b>⚠️ 異常備註：</b>${o.memo}</p>` : ''}
+                </div>
+                
+                <button class="btn btn-primary" style="width:100%; margin-top:15px; padding:12px" onclick="closeModal()">關閉視窗</button>
             `);
         }
 
