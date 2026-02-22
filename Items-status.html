@@ -217,7 +217,7 @@ function renderArchive(list){
       <td>${o.department}</td>
       <td>${o.items.map(i=>`${i.name} × ${i.qty}`).join('<br>')}</td>
       <td>NT$ ${o.total_amount}</td>
-      <td>${o.close_date || ''}</td>
+      <td>${fmtDateTime(o.close_date || o.updated_at)}</td>
     </tr>`;
   });
 }
