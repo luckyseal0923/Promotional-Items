@@ -40,7 +40,7 @@ input,select{padding:12px;border:1px solid var(--border);border-radius:8px;outli
 <body>
   <div id="adminView">
   <div class="sidebar">
-    <h2 style="color:var(--primary-dark);margin-bottom:30px">公關品後臺</h2>
+    <h2 style="color:var(--primary-dark);margin-bottom:30px">公關品後臺管理</h2>
     <div class="nav-item active" id="nav-orders" onclick="switchTab('orders')">📋 <span class="nav-text">訂單管理系統</span></div>
     <div class="nav-item" id="nav-inventory" onclick="switchTab('inventory')">⚖️ <span class="nav-text">庫存盤點</span></div>
     <div class="nav-item" id="nav-listing" onclick="switchTab('listing')">🚀 <span class="nav-text">商品管理</span></div>
@@ -327,7 +327,7 @@ function renderInventory(items) {
       <td>
         <div style="display:flex;gap:8px;align-items:center;">
           <input type="number" id="stock-${item.item_id}" value="${item.stock}" style="width:60px">
-          <button class="btn btn-primary" onclick="updStock('${item.item_id}')">更</button>
+          <button class="btn btn-primary" onclick="updStock('${item.item_id}')">儲存</button>
         </div>
       </td>
     </tr>`;
