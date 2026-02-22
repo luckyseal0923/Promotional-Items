@@ -182,7 +182,7 @@ function showOrderDetail(taskId) {
       <div class="info-row"><b>單號</b><span>${o.task_id || '-'}</span></div>
       <div class="info-row"><b>申請日期</b><span>${formatDate(o.date)}</span></div>
       <div class="info-row"><b>申請人姓名</b><span>${o.user || '-'}</span></div>
-      <div class="info-row"><b>院內員編</b><span>${o.staff_id || '-'}</span></div>
+      <div class="info-row"><b>院內員編</b><span>${o.employee_id || '-'}</span></div>
       <div class="info-row"><b>申請者電話</b><span>${o.phone || '-'}</span></div>
       <div class="info-row"><b>電子信箱</b><span>${o.email || '-'}</span></div>
       <div class="info-row"><b>申請單位</b><span>${o.department || '-'}</span></div>
@@ -193,21 +193,17 @@ function showOrderDetail(taskId) {
     <h4 style="margin-top:20px">📦 商品內容</h4>
     <div class="panel">
       ${(o.items || []).map(i => `
-        <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-          <span>• ${i.item_name || i.n}</span>
-          <span style="color:#64748B">x ${i.qty || i.q}</span>
-        </div>
+        <div>• ${i.item_name || i.n} × ${i.qty || i.q}</div>
       `).join('')}
     </div>
 
-    ${o.memo ? `
-    <div class="panel" style="border: 1px solid #EF4444; background: #FEF2F2; margin-top:15px">
-        <h4 style="margin-top:0; color: #B91C1C; display:flex; align-items:center; gap:8px">
-            <span>⚠️</span> 異常備註
-        </h4>
-        <p style="color: #B91C1C; margin-bottom:0; line-height:1.6">${o.memo}</p>
-    </div>
-    ` : ''}
+    ${
+      o.status === 'EXCEPTION' && o.comment
+        ? `<div class="panel" style="margin-top:15px;background:#FEE2E2;color:#991B1B">
+             ⚠️ <b>異常備註：</b>${o.comment}
+           </div>`
+        : ''
+    }
   `;
 
   document.getElementById('orderModal').classList.add('show');
