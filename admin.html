@@ -170,19 +170,32 @@ function renderOrders(){
     </tr>`
   ).join('');
 }
-  function showOrderDetail(tid){
-  const o=ALL_ORDERS.find(x=>x.task_id===tid); if(!o)return;
-  let ih=(o.items||[]).map(i=>`<div style="display:flex;justify-content:space-between;padding:5px 0"><span>${i.item_name||i.name}</span><span>x${i.quantity||i.qty}</span></div>`).join('')||'無明細';
-  let h=`<div style="background:#F8FAFC;padding:15px;border-radius:8px">
-    <div class="info-row"><span class="info-label">單號</span><span>${o.task_id}</span></div>
-    <div class="info-row"><span class="info-label">申請人</span><span>${o.user}</span></div>
-    <div class="info-row"><span class="info-label">狀態</span><span>${getStatusText(o.status)}</span></div>
-    ${(o.status==='EXCEPTION'&&o.comment)?`<div style="background:#FEE2E2;color:#991B1B;padding:10px;margin-top:10px;border-radius:4px">🔴 異常：${o.comment}</div>`:''}
-    <div class="info-row"><span class="info-label">金額</span><span style="color:var(--primary)">$${o.total||0}</span></div>
-  </div><h4 style="margin:15px 0 5px">📦 明細</h4>${ih}`;
-  document.getElementById('orderDetail').innerHTML=h;
-  document.getElementById('orderModal').classList.add('show');
-}
+function showOrderDetail(id) {
+            const o = ORDERS.find(ord => ord.id === id);
+            openModal(`
+                <h3 style="margin-top:0">📋 訂單詳細資訊</h3>
+                <div class="panel" style="background:#F8FAFC">
+                    <div class="info-row"><b>訂單編號</b><span>${o.id}</span></div>
+                    <div class="info-row"><b>申請日期</b><span>${o.date}</span></div>
+                    <div class="info-row"><b>申請人姓名</b><span>${o.user}</span></div>
+                    
+                    <div class="info-row"><b>院內員編 (Task ID)</b><span>${o.task_id || '未提供'}</span></div>
+                    <div class="info-row"><b>申請者電話</b><span>${o.phone}</span></div>
+                    <div class="info-row"><b>電子信箱</b><span>${o.email}</span></div>
+                    <div class="info-row"><b>申請單位</b><span>${o.dept}</span></div>
+                    <div class="info-row"><b>成本中心</b><span>${o.cost_center}</span></div>
+                    <div class="info-row"><b>領取事由</b><span>${o.reason}</span></div>
+                </div>
+                
+                <h4>📦 商品內容</h4>
+                <div class="panel">
+                    ${o.items.map(i => `<p style="margin:5px 0">● ${i.n} x ${i.q}</p>`).join('')}
+                    ${o.memo ? `<p style="color:red; margin-top:10px"><b>⚠️ 異常備註：</b>${o.memo}</p>` : ''}
+                </div>
+                
+                <button class="btn btn-primary" style="width:100%; margin-top:15px; padding:12px" onclick="closeModal()">關閉視窗</button>
+            `);
+        }
 
 function showEditStatus(tid){
   const o=ALL_ORDERS.find(x=>x.task_id===tid); if(!o)return;
