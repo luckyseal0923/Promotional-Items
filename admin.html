@@ -158,12 +158,29 @@ function filterOrders(){
     // 狀態篩選
     if (sf && o.status !== sf) return false;
 
-    // 關鍵字搜尋（單號 / 申請人）
-    if (kw) {
-      const hitTask = (o.task_id || '').toLowerCase().includes(kw);
-      const hitUser = (o.user || '').toLowerCase().includes(kw);
-      if (!hitTask && !hitUser) return false;
-    }
+// 關鍵字搜尋（單號 / 申請人）
+if (kw) {
+  const taskStr = String(o.task_id ?? '').toLowerCase();
+
+  // user 可能是 string / object / array / null
+  let userStr = '';
+  if (typeof o.user === 'string') {
+    userStr = o.user;
+  } else if (o.user && typeof o.user === 'object') {
+    // 嘗試常見欄位
+    userStr =
+      o.user.name ||
+      o.user.fullname ||
+      JSON.stringify(o.user);
+  }
+
+  userStr = String(userStr).toLowerCase();
+
+  const hitTask = taskStr.includes(kw);
+  const hitUser = userStr.includes(kw);
+
+  if (!hitTask && !hitUser) return false;
+}
 
     return true;
   });
