@@ -190,12 +190,25 @@ function showOrderDetail(taskId) {
       <div class="info-row"><b>領取事由</b><span>${o.reason || '-'}</span></div>
     </div>
 
-    <h4 style="margin-top:20px">📦 商品內容</h4>
-    <div class="panel">
-      ${(o.items || []).map(i => `
-        <div>• ${i.item_name || i.n} × ${i.qty || i.q}</div>
-      `).join('')}
-    </div>
+<h4 style="margin-top:20px">📦 商品內容</h4>
+<div class="panel">
+  ${(o.items || []).map(i => {
+    const name =
+      i.item_name ||
+      i.name ||
+      i.n ||
+      '未命名商品';
+
+    const qty =
+      i.qty ??
+      i.q ??
+      i.quantity ??
+      i.count ??
+      1; // 最後保底給 1，避免顯示空白
+
+    return `<div>• ${name} × ${qty}</div>`;
+  }).join('')}
+</div>
 
     ${
       o.status === 'EXCEPTION' && o.comment
