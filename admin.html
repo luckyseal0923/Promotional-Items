@@ -64,14 +64,15 @@ input,select{padding:12px;border:1px solid var(--border);border-radius:8px;outli
             <option value="EXCEPTION">異常通知</option>
             <option value="End">案件結案</option>
           </select>
-          <input type="text" id="searchKeyword" placeholder="搜尋單號/申請人" style="width:150px">
+          <input type="text" id="searchKeyword" placeholder="搜尋單號/申請人" style="width:150px"oninput="filterOrders()">
           <button class="btn btn-primary" onclick="filterOrders()">🔍 篩選</button>
           <button class="btn btn-outline" onclick="resetFilter()">重置</button>
           <button class="btn btn-success" onclick="downloadCSV()">📥 下載報表</button>
         </div>
         <div class="table-wrapper">
           <table>
-            <thead><tr><th>日期 / 單號</th><th>申請人</th><th>單位</th><th>狀態</th><th>操作</th></tr></thead>
+            <thead><tr>    <th style="cursor:pointer" onclick="toggleSortByDate()">
+      日期 / 單號<span id="dateSortIcon">⬇️</span></th><th>申請人</th><th>單位</th><th>狀態</th><th>操作</th></tr></thead>
             <tbody id="orderTable"><tr><td colspan="5" style="text-align:center;padding:30px">載入中...</td></tr></tbody>
           </table>
         </div>
@@ -101,6 +102,7 @@ input,select{padding:12px;border:1px solid var(--border);border-radius:8px;outli
 <div id="orderModal" class="modal"><div class="modal-body"><h3 class="modal-title">📋 訂單詳細資訊</h3><div id="orderDetail"></div><button class="btn btn-primary" style="width:100%;margin-top:20px" onclick="document.getElementById('orderModal').classList.remove('show')">關閉</button></div></div>
 
 <script>
+let SORT_DATE_DESC = true; // 預設：由新到舊
 const API_ORDERS = 'https://chihwei-n8n.zeabur.app/webhook/orders';
 const API_INVENTORY_LIST = 'https://chihwei-n8n.zeabur.app/webhook/inventory-list';
 const API_INVENTORY_UPDATE = 'https://chihwei-n8n.zeabur.app/webhook/inventory-update';
@@ -139,15 +141,40 @@ async function loadOrders(){
     renderOrders();
   }catch(e){ console.error(e); document.getElementById('orderError').classList.remove('hidden'); }
 }
-  function filterOrders(){
-  const df=document.getElementById('dateFrom').value, dt=document.getElementById('dateTo').value;
-  const sf=document.getElementById('statusFilter').value, kw=document.getElementById('searchKeyword').value.toLowerCase().trim();
-  FILTERED_ORDERS=ALL_ORDERS.filter(o=>{
-    if(df || dt){ const od=o.date?new Date(o.date).toISOString().split('T')[0]:''; if(df&&od<df)return false; if(dt&&od>dt)return false; }
-    if(sf && o.status!==sf) return false;
-    if(kw && !(o.task_id||'').toLowerCase().includes(kw) && !(o.user||'').toLowerCase().includes(kw)) return false;
+function filterOrders(){
+  const df = document.getElementById('dateFrom').value;
+  const dt = document.getElementById('dateTo').value;
+  const sf = document.getElementById('statusFilter').value;
+  const kw = document.getElementById('searchKeyword').value.trim().toLowerCase();
+
+  FILTERED_ORDERS = ALL_ORDERS.filter(o => {
+    // 日期篩選
+    if (df || dt) {
+      const od = o.date ? new Date(o.date).toISOString().slice(0,10) : '';
+      if (df && od < df) return false;
+      if (dt && od > dt) return false;
+    }
+
+    // 狀態篩選
+    if (sf && o.status !== sf) return false;
+
+    // 關鍵字搜尋（單號 / 申請人）
+    if (kw) {
+      const hitTask = (o.task_id || '').toLowerCase().includes(kw);
+      const hitUser = (o.user || '').toLowerCase().includes(kw);
+      if (!hitTask && !hitUser) return false;
+    }
+
     return true;
   });
+
+  // 套用目前排序方向（維持一致性）
+  FILTERED_ORDERS.sort((a, b) => {
+    const da = new Date(a.date || 0).getTime();
+    const db = new Date(b.date || 0).getTime();
+    return SORT_DATE_DESC ? db - da : da - db;
+  });
+
   renderOrders();
 }
 function resetFilter(){
@@ -155,6 +182,20 @@ function resetFilter(){
   FILTERED_ORDERS=[...ALL_ORDERS]; renderOrders();
 }
 
+function toggleSortByDate() {
+  SORT_DATE_DESC = !SORT_DATE_DESC;
+
+  FILTERED_ORDERS.sort((a, b) => {
+    const da = new Date(a.date || 0).getTime();
+    const db = new Date(b.date || 0).getTime();
+    return SORT_DATE_DESC ? db - da : da - db;
+  });
+
+  document.getElementById('dateSortIcon').textContent =
+    SORT_DATE_DESC ? '⬇️' : '⬆️';
+
+  renderOrders();
+}
 function renderOrders(){
   const tb=document.getElementById('orderTable');
   if(FILTERED_ORDERS.length===0){ tb.innerHTML='<tr><td colspan="5" style="text-align:center;padding:30px">無資料</td></tr>'; return; }
