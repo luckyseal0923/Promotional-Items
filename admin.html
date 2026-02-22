@@ -356,9 +356,9 @@ async function upImg(inp) {
   
   const reader = new FileReader();
   reader.onload = function(e) {
-    // 將 Base64 存入原本顯示網址的欄位，作為暫存
+    // 將 Base64 資料暫存在 pimg 欄位中，不即時上傳
     document.getElementById('pimg').value = e.target.result;
-    stat.innerHTML = `<span style="color:blue">📸 圖片已就緒（儲存後上傳）</span>`;
+    stat.innerHTML = `<span style="color:blue">📸 圖片已選取（儲存後正式上傳）</span>`;
   };
   reader.readAsDataURL(f);
   inp.value = ''; 
@@ -369,16 +369,16 @@ async function saveProd() {
   const name = document.getElementById('pname').value;
   const price = document.getElementById('pprice').value;
   const stock = document.getElementById('pstock').value;
-  const img = document.getElementById('pimg').value;
+  const imgData = document.getElementById('pimg').value; // 這可能是舊連結或新 Base64
 
   if (!name || !price) { alert('品名與售價為必填'); return; }
 
   const btn = event.target; btn.disabled = true; btn.textContent = '處理中...';
 
-try {
-    // 判斷圖片是否為新選擇的 Base64
-    const isBase64 = img.startsWith('data:image');
-    
+  try {
+    // 判斷是否為新選擇的圖片 (Base64)
+    const isNewImage = imgData.startsWith('data:image');
+
     await fetch(API_PRODUCT_SAVE, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -387,11 +387,12 @@ try {
         item_name: name,
         unit_price: price,
         stock: stock,
-        image_data: isBase64 ? img.split(',')[1] : null, // 傳送純 Base64 字串
-        image_url: isBase64 ? null : img // 如果沒換圖，傳回原本網址
+        // 如果是新圖，傳送 Base64 給後端上傳；如果是舊圖，傳送原本網址
+        image_data: isNewImage ? imgData.split(',')[1] : null, 
+        image_url: isNewImage ? null : imgData
       })
     });
-    alert('✅ 儲存成功（圖片已同步上傳）');
+    alert('✅ 商品資料與圖片已儲存');
     document.getElementById('prodModal').remove();
     loadListing();
   } catch (e) { alert('❌ 失敗'); console.error(e); } 
