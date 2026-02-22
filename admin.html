@@ -353,20 +353,15 @@ function editProd(id) {
 async function upImg(inp) {
   const f = inp.files[0]; if (!f) return;
   const stat = document.getElementById('upStatus');
-  stat.textContent = '⏳ 上傳中...';
   
-  const fd = new FormData(); fd.append('file', f);
-  try {
-    const res = await fetch(API_PRODUCT_UPLOAD, { method: 'POST', body: fd });
-    const d = await res.json();
-    if (d.success) {
-      document.getElementById('pimg').value = d.url;
-      stat.innerHTML = `<span style="color:green">✅ 上傳成功</span>`;
-    } else {
-      stat.textContent = '❌ 上傳失敗';
-    }
-  } catch (e) { stat.textContent = '❌ 錯誤'; }
-  inp.value = ''; // Reset input
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    // 將 Base64 存入原本顯示網址的欄位，作為暫存
+    document.getElementById('pimg').value = e.target.result;
+    stat.innerHTML = `<span style="color:blue">📸 圖片已就緒（儲存後上傳）</span>`;
+  };
+  reader.readAsDataURL(f);
+  inp.value = ''; 
 }
 
 async function saveProd() {
@@ -380,7 +375,10 @@ async function saveProd() {
 
   const btn = event.target; btn.disabled = true; btn.textContent = '處理中...';
 
-  try {
+try {
+    // 判斷圖片是否為新選擇的 Base64
+    const isBase64 = img.startsWith('data:image');
+    
     await fetch(API_PRODUCT_SAVE, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -389,10 +387,11 @@ async function saveProd() {
         item_name: name,
         unit_price: price,
         stock: stock,
-        image: img
+        image_data: isBase64 ? img.split(',')[1] : null, // 傳送純 Base64 字串
+        image_url: isBase64 ? null : img // 如果沒換圖，傳回原本網址
       })
     });
-    alert('✅ 儲存成功');
+    alert('✅ 儲存成功（圖片已同步上傳）');
     document.getElementById('prodModal').remove();
     loadListing();
   } catch (e) { alert('❌ 失敗'); console.error(e); } 
