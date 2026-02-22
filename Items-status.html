@@ -134,8 +134,28 @@ async function loadData(){
   const res = await fetch(url);
   const data = await res.json();
 
-  renderActive(data.active || []);
-  renderArchive(data.archived || []);
+async function loadData(){
+  const staff = document.getElementById('staffInput').value.trim();
+  const url = staff ? `${API_URL}?staff_id=${staff}` : API_URL;
+
+  const res = await fetch(url);
+  const data = await res.json();
+
+  const all = [
+    ...(data.active || []),
+    ...(data.archived || [])
+  ];
+
+  // 👉 上方卡片：未結案狀態
+  const ACTIVE_STATUS = ['Submitted', 'PREPARING', 'ready', 'EXCEPTION'];
+  const activeList = all.filter(o => ACTIVE_STATUS.includes(o.status));
+
+  // 👉 下方結案清單
+  const archiveList = all.filter(o => o.status === 'End');
+
+  renderActive(activeList);
+  renderArchive(archiveList);
+}
 }
 
 function renderActive(list){
@@ -150,12 +170,23 @@ function renderActive(list){
       <div class="sub">申請日期：${o.apply_date}</div>
       <div class="money">總金額：NT$ ${o.total_amount}</div>
 
-      <div class="timeline">
-        <div class="step done">申請提出</div>
-        <div class="step ${o.status==='PREPARING'?'current':''}">商品準備中</div>
-        <div class="step">已通知領取</div>
-        <div class="step ${o.status==='EXCEPTION'?'exception current':''}">異常通知</div>
-      </div>
+<div class="timeline">
+  <div class="step done">申請提出</div>
+
+  <div class="step ${
+    o.status === 'PREPARING' ? 'current'
+    : ['ready','EXCEPTION','End'].includes(o.status) ? 'done' : ''
+  }">商品準備中</div>
+
+  <div class="step ${
+    o.status === 'ready' ? 'current'
+    : ['End'].includes(o.status) ? 'done' : ''
+  }">已通知領取</div>
+
+  <div class="step ${
+    o.status === 'EXCEPTION' ? 'exception current' : ''
+  }">異常通知</div>
+</div>
 
       <button class="toggle-btn" onclick="toggleDetails(this)">查看案件明細</button>
       <div class="details">
