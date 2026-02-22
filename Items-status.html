@@ -127,35 +127,44 @@ h1 { text-align:center; margin-bottom:20px; }
 <script>
 const API_URL = 'https://chihwei-n8n.zeabur.app/webhook/items-status';
 
-async function loadData(){
-  const staff = document.getElementById('staffInput').value.trim();
-  const url = staff ? `${API_URL}?staff_id=${staff}` : API_URL;
+/* ===== 時間格式統一 ===== */
+function fmtDateTime(v) {
+  if (!v) return '';
+  const d = new Date(v);
+  if (isNaN(d)) return v;
 
-  const res = await fetch(url);
-  const data = await res.json();
-
-async function loadData(){
-  const staff = document.getElementById('staffInput').value.trim();
-  const url = staff ? `${API_URL}?staff_id=${staff}` : API_URL;
-
-  const res = await fetch(url);
-  const data = await res.json();
-
-  const all = [
-    ...(data.active || []),
-    ...(data.archived || [])
-  ];
-
-  // 👉 上方卡片：未結案狀態
-  const ACTIVE_STATUS = ['Submitted', 'PREPARING', 'ready', 'EXCEPTION'];
-  const activeList = all.filter(o => ACTIVE_STATUS.includes(o.status));
-
-  // 👉 下方結案清單
-  const archiveList = all.filter(o => o.status === 'End');
-
-  renderActive(activeList);
-  renderArchive(archiveList);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  const h = String(d.getHours()).padStart(2, '0');
+  const min = String(d.getMinutes()).padStart(2, '0');
+  return `${y}-${m}-${day} ${h}:${min}`;
 }
+
+/* ===== 主要載入 ===== */
+async function loadData(){
+  const staff = document.getElementById('staffInput').value.trim();
+  const url = staff ? `${API_URL}?staff_id=${staff}` : API_URL;
+
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+
+    const all = [
+      ...(data.active || []),
+      ...(data.archived || [])
+    ];
+
+    const ACTIVE_STATUS = ['Submitted', 'PREPARING', 'ready', 'EXCEPTION'];
+    const activeList = all.filter(o => ACTIVE_STATUS.includes(o.status));
+    const archiveList = all.filter(o => o.status === 'End');
+
+    renderActive(activeList);
+    renderArchive(archiveList);
+
+  } catch (e) {
+    console.error('loadData failed', e);
+  }
 }
 
 function renderActive(list){
@@ -167,7 +176,7 @@ function renderActive(list){
     <div class="card">
       <div class="title">${o.applicant_name}（${o.staff_id}）｜${o.department}</div>
       <div class="sub">訂單編號：${o.task_id}</div>
-      <div class="sub">申請日期：${o.apply_date}</div>
+      <div class="sub">申請日期：${fmtDateTime(o.apply_date)}</div>
       <div class="money">總金額：NT$ ${o.total_amount}</div>
 
 <div class="timeline">
@@ -190,7 +199,7 @@ function renderActive(list){
 
       <button class="toggle-btn" onclick="toggleDetails(this)">查看案件明細</button>
       <div class="details">
-        ${o.items.map(i=>`${i.name} × ${i.qty}`).join('<br>')}
+        ${(o.items || []).map(i=>`${i.name} × ${i.qty}`).join('<br>')}
       </div>
     </div>`;
   });
