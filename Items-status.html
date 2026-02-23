@@ -185,11 +185,13 @@ async function loadData(){
 const ACTIVE_STATUS = ['SUBMITTED', 'PREPARING', 'READY', 'EXCEPTION'];
 
 const activeList = all.filter(o =>
-  ACTIVE_STATUS.includes(String(o.status).toUpperCase())
+  ACTIVE_STATUS.includes(
+    String(o.status).trim().toUpperCase()
+  )
 );
 
 const archiveList = all.filter(o =>
-  String(o.status).toUpperCase() === 'END'
+  String(o.status).trim().toUpperCase() === 'END'
 );
 
     renderActive(activeList);
