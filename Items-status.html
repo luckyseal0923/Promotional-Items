@@ -182,7 +182,7 @@ async function loadData(){
       ...(data.archived || [])
     ];
 
-const ACTIVE_STATUS = ['Submitted', 'PREPARING', 'ready', 'EXCEPTION'];
+const ACTIVE_STATUS = ['SUBMITTED', 'PREPARING', 'READY', 'EXCEPTION'];
 
 const activeList = all.filter(o =>
   ACTIVE_STATUS.includes(String(o.status).toUpperCase())
