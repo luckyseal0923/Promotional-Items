@@ -35,6 +35,15 @@ input,select{padding:12px;border:1px solid var(--border);border-radius:8px;outli
 .modal-body{background:#fff;padding:30px;border-radius:16px;width:100%;max-width:550px;max-height:90vh;overflow-y:auto}
 .info-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px dashed #E2E8F0}
 .info-label{color:#64748B;font-size:14px} .info-value{font-weight:600;font-size:14px}
+  /* Sidebar 快速連結：緊湊版 */
+.quick-link{
+  width:100%;
+  justify-content:flex-start;
+  padding:8px 14px;        /* 原本 14px 24px → 縮 */
+  font-size:14px;          /* 原本 17px */
+  border-radius:10px;
+  margin-bottom:6px;
+}
 </style>
 </head>
 <body>
@@ -52,19 +61,17 @@ input,select{padding:12px;border:1px solid var(--border);border-radius:8px;outli
     🔗 公關品快速連結
   </div>
 
-  <a href="https://promotional-items-booking.zeabur.app/"
-     target="_blank"
-     class="btn btn-outline"
-     style="width:100%;margin-bottom:8px;justify-content:flex-start">
-    📝 訂單申請
-  </a>
+<a href="https://promotional-items-booking.zeabur.app/"
+   target="_blank"
+   class="btn btn-outline quick-link">
+  📝 訂單申請
+</a>
 
-  <a href="https://promotional-items-booking.zeabur.app/Items-status.html"
-     target="_blank"
-     class="btn btn-outline"
-     style="width:100%;justify-content:flex-start">
-    📊 狀態看板
-  </a>
+<a href="https://promotional-items-booking.zeabur.app/Items-status.html"
+   target="_blank"
+   class="btn btn-outline quick-link">
+  📊 狀態看板
+</a>
 
   <div style="margin-top:16px">
     <button class="btn btn-outline" style="width:100%">安全登出</button>
