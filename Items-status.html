@@ -93,13 +93,40 @@ h1 { text-align:center; margin-bottom:20px; }
 }
 .sort-icon { margin-left:6px; font-size:11px; color:#888; }
 .sort-active { color:#0A84FF; font-weight:bold; }
+
+  .nav-actions {
+  max-width: 1200px;
+  margin: 0 auto 16px;
+  text-align: right;
+}
+
+.apply-btn {
+  padding: 8px 16px;
+  font-size: 14px;
+  background: #0A84FF;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.apply-btn:hover {
+  background: #006edc;
+}
 </style>
 </head>
 
 <body>
 
 <h1>📦 公關品申請狀態看板</h1>
-
+<div class="nav-actions">
+  <button
+    class="apply-btn"
+    onclick="window.location.href='https://promotional-items-booking.zeabur.app/'"
+  >
+    ➕ 新增案件申請
+  </button>
+</div>
 <div class="search-box">
   <input id="staffInput" placeholder="輸入員編（6碼）查詢" />
   <button onclick="loadData()">查詢</button>
