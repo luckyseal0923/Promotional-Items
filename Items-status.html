@@ -182,9 +182,15 @@ async function loadData(){
       ...(data.archived || [])
     ];
 
-    const ACTIVE_STATUS = ['Submitted', 'PREPARING', 'ready', 'EXCEPTION'];
-    const activeList = all.filter(o => ACTIVE_STATUS.includes(o.status));
-    const archiveList = all.filter(o => o.status === 'End');
+const ACTIVE_STATUS = ['SUBMITTED', 'PREPARING', 'READY', 'EXCEPTION'];
+
+const activeList = all.filter(o =>
+  ACTIVE_STATUS.includes(String(o.status).toUpperCase())
+);
+
+const archiveList = all.filter(o =>
+  String(o.status).toUpperCase() === 'END'
+);
 
     renderActive(activeList);
     renderArchive(archiveList);
