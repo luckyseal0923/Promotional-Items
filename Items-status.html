@@ -152,6 +152,7 @@ h1 { text-align:center; margin-bottom:20px; }
 </div>
 
 <script>
+let ALL_DATA = [];
 const API_URL = 'https://chihwei-n8n.zeabur.app/webhook/items-status';
 
 /* ===== 時間格式統一 ===== */
@@ -170,8 +171,15 @@ function fmtDateTime(v) {
 
 /* ===== 主要載入 ===== */
 async function loadData(){
-  const staff = document.getElementById('staffInput').value.trim();
-  const url = staff ? `${API_URL}?staff_id=${staff}` : API_URL;
+const res = await fetch(API_URL);
+const data = await res.json();
+
+ALL_DATA = [
+  ...(data.active || []),
+  ...(data.archived || [])
+];
+
+applyFilter();   // ← 改成呼叫前端查詢
 
   try {
     const res = await fetch(url);
@@ -271,6 +279,28 @@ function toggleArchive(){
 
 // 初始載入（可視需求拿掉）
 loadData();
+  function applyFilter() {
+  const staff = document.getElementById('staffInput').value.trim();
+
+  const filtered = staff
+    ? ALL_DATA.filter(o => String(o.staff_id).includes(staff))
+    : ALL_DATA;
+
+  const ACTIVE_STATUS = ['SUBMITTED', 'PREPARING', 'READY', 'EXCEPTION'];
+
+  const activeList = filtered.filter(o =>
+    ACTIVE_STATUS.includes(
+      String(o.status).trim().toUpperCase()
+    )
+  );
+
+  const archiveList = filtered.filter(o =>
+    String(o.status).trim().toUpperCase() === 'END'
+  );
+
+  renderActive(activeList);
+  renderArchive(archiveList);
+}
 </script>
 
 </body>
