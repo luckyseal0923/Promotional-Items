@@ -80,20 +80,41 @@ td.name {
   font-weight:bold;
 }
 .submit-area {
-  text-align:center;
-  margin-top:32px;
+  display: flex;
+  justify-content: center;
+  gap: 32px;              /* ✅ 按鈕間距加大 */
+  margin-top: 36px;
 }
-button {
-  padding:14px 40px;
-  font-size:17px;
-  background:#0A84FF;
-  color:#fff;
-  border:none;
-  border-radius:10px;
-  cursor:pointer;
+
+/* 送出申請：主按鈕（更突出） */
+button[type="submit"] {
+  padding: 16px 48px;     /* ✅ 比較大顆 */
+  font-size: 18px;
+  font-weight: 600;
+  background: #0A84FF;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
 }
-button:hover {
-  background:#006edc;
+
+button[type="submit"]:hover {
+  background: #006edc;
+}
+
+/* 狀態看板：次要按鈕 */
+button.status-btn {
+  padding: 14px 40px;
+  font-size: 16px;
+  background: #e9ecef;    /* ✅ 淺色，退一階 */
+  color: #333;
+  border: 1px solid #ced4da;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+button.status-btn:hover {
+  background: #dee2e6;
 }
 .item-toggle {
   margin-left:8px;
