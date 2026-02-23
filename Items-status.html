@@ -133,7 +133,15 @@ h1 { text-align:center; margin-bottom:20px; }
 </div>
 
 <div class="board" id="activeBoard"></div>
-
+<div id="loadingHint" style="
+  max-width:1200px;
+  margin:40px auto;
+  text-align:center;
+  color:#666;
+  font-size:16px;
+">
+  ⏳ 資料載入中，請稍候…
+</div>
 <div class="archive">
   <h3 onclick="toggleArchive()">▸ 結案清單（近半年）</h3>
   <table id="archiveTable">
@@ -171,39 +179,35 @@ function fmtDateTime(v) {
 
 /* ===== 主要載入 ===== */
 async function loadData(){
-const res = await fetch(API_URL);
-const data = await res.json();
 
-ALL_DATA = [
-  ...(data.active || []),
-  ...(data.archived || [])
-];
-
-applyFilter();   // ← 改成呼叫前端查詢
+  // 顯示 loading
+  document.getElementById('loadingHint').style.display = 'block';
+  document.getElementById('activeBoard').innerHTML = '';
+  document.getElementById('archiveBody').innerHTML = '';
 
   try {
-    const res = await fetch(url);
+    const res = await fetch(API_URL);
     const data = await res.json();
 
-    const all = [
+    // ✅ 統一資料來源
+    ALL_DATA = [
       ...(data.active || []),
       ...(data.archived || [])
     ];
 
-const ACTIVE_STATUS = ['SUBMITTED', 'PREPARING', 'READY', 'EXCEPTION'];
+    // ✅ 只交給前端篩選（applyFilter 內部會做 status 分類）
+    applyFilter();
 
-const activeList = all.filter(o =>
-  ACTIVE_STATUS.includes(
-    String(o.status).trim().toUpperCase()
-  )
-);
+    // 隱藏 loading
+    document.getElementById('loadingHint').style.display = 'none';
 
-const archiveList = all.filter(o =>
-  String(o.status).trim().toUpperCase() === 'END'
-);
+  } catch (e) {
+    console.error('loadData failed', e);
+    document.getElementById('loadingHint').textContent =
+      '⚠️ 資料載入失敗，請稍後再試';
+  }
+}
 
-    renderActive(activeList);
-    renderArchive(archiveList);
 
   } catch (e) {
     console.error('loadData failed', e);
