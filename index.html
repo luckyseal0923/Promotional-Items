@@ -315,14 +315,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if(modalClose) modalClose.onclick = () => modal.style.display = 'none';
     window.onclick = e => { if (e.target === modal) modal.style.display = 'none'; };
-
-    // 7. 表單送出處理
+// 7. 表單送出處理
     applyForm.onsubmit = async (e) => {
         e.preventDefault();
-        const task_id = generatetask_id();
-        
+
+        // ✅ 修改點：在前端先產生唯一的 task_id，確保主檔與明細使用同一個單號
+        const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+        const randomStr = Math.floor(Math.random() * 900 + 100);
+        const task_id = `task-${dateStr}-${randomStr}`; 
+
         const payload = {
-            task_id: task_id,
+            task_id: task_id, 
             applicant_name: applyForm.applicant_name.value,
             staff_id: applyForm.staff_id.value,
             phone: applyForm.phone.value,
@@ -330,7 +333,7 @@ document.addEventListener('DOMContentLoaded', () => {
             department: applyForm.department.value,
             cost_center: applyForm.costCenter.value,
             reason: applyForm.reason.value,
-            status: 'SUBMITTED',
+            status: 'Submitted', // 確保與 n8n 判斷邏輯的大小寫一致
             total_amount: Number(totalAmountEl.textContent.replace(/,/g, '')),
             items: []
         };
@@ -342,7 +345,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const it = items.find(item => item.item_id == inp.dataset.id);
                 if (it) {
                     payload.items.push({
-                        task_id: task_id,
+                        task_id: task_id, // ✅ 使用與主檔相同的 task_id
                         item_id: it.item_id,
                         item_name: it.item_name,
                         unit_price: it.unit_price,
@@ -367,13 +370,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const result = await res.json();
             
-            // 判斷 n8n 是否成功處理 (根據您的 n8n Respond 節點)
             if (result.status === 'success' || res.ok) {
                 alert('申請成功！單號：' + task_id);
                 applyForm.reset();
                 totalAmountEl.textContent = '0';
                 
-                // ✅ 送出成功後更新庫存，這會重新執行 renderTable
+                // 送出成功後更新畫面庫存
                 await fetchItems(); 
             } else {
                 alert('伺服器回應錯誤，請檢查 n8n 流程');
@@ -383,6 +385,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Submit Error:', err);
         }
     };
+
 });
 </script>
 
