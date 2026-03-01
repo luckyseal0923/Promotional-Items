@@ -234,41 +234,15 @@ button.status-btn:hover {
 </div>
 
 <script>
-const API_URL = 'https://chihwei-n8n.zeabur.app/webhook/promo-apply';
-const SHEET_ID = '19hRS6fdUnHeDMysq32LWsYXiVovcDqXjSQphBu3wsuk';
-const SHEET_NAME = 'Items-list';
-const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${SHEET_NAME}&tqx=out:json`;
+const API_URL = 'https://chihwei-n8n.zeabur.app/webhook/inventory-list';
 
-const tbody = document.getElementById('itemsTable');
-const totalAmountEl = document.getElementById('totalAmount');
-const modal = document.getElementById('imgModal');
-const modalImg = document.getElementById('modalImg');
-const modalClose = document.getElementById('modalClose');
-
-let items = [];
-
-function generatetask_id() {
-  const d = new Date();
-  const ymd = d.getFullYear().toString()
-    + String(d.getMonth() + 1).padStart(2, '0')
-    + String(d.getDate()).padStart(2, '0');
-  const rand = Math.floor(Math.random() * 900 + 100);
-  return `task-${ymd}-${rand}`;
-}
-
-fetch(url)
-  .then(r => r.text())
-  .then(t => {
-    const json = JSON.parse(t.substring(47).slice(0, -2));
-    items = json.table.rows.map(r => ({
-      item_id: r.c[0]?.v,
-      item_name: r.c[1]?.v,
-      unit_price: Number(r.c[3]?.v) || 0,
-      stock: Number(r.c[4]?.v) || 0,
-      image: r.c[5]?.v || ''
-    }));
+fetch(API_URL, { method: 'GET' })
+  .then(res => res.json())
+  .then(data => {
+    items = data.items; // 根據你的 webhook 回傳格式調整
     renderTable();
-  });
+  })
+  .catch(err => console.error('讀取商品異常', err));
 
 function renderTable(){
   tbody.innerHTML='';
@@ -367,13 +341,15 @@ document.getElementById('applyForm').onsubmit=async e=>{
     console.error(r);
   }
 };
-    window.onload = function() {
-    fetch('https://chihwei-n8n.zeabur.app/webhook/inventory-list', {
-      method: 'GET'
+window.onload = function() {
+  fetch('https://chihwei-n8n.zeabur.app/webhook/inventory-list', { method: 'GET' })
+    .then(res => res.json())
+    .then(data => {
+      items = data.items;
+      renderTable();
     })
-    .then(response => console.log('Inventory webhook triggered'))
-    .catch(error => console.error('Error triggering inventory webhook:', error));
-  };
+    .catch(error => console.error('Error fetching inventory:', error));
+};
 </script>
 
 
