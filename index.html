@@ -234,120 +234,150 @@ button.status-btn:hover {
 </div>
 
 <script>
+// 1. 全域變數宣告
+let items = [];
+const API_URL = 'https://chihwei-n8n.zeabur.app/webhook/inventory-list';
+
+// 2. 輔助函式：產生 Task ID (例如：REQ1714567890)
+function generatetask_id() {
+    return 'REQ' + Date.now();
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-  const tbody = document.getElementById('itemsTable');
+    // 取得所有需要的 DOM 元素
+    const tbody = document.getElementById('itemsTable');
+    const totalAmountEl = document.getElementById('totalAmount');
+    const modal = document.getElementById('imgModal');
+    const modalImg = document.getElementById('modalImg');
+    const modalClose = document.getElementById('modalClose');
+    const applyForm = document.getElementById('applyForm');
 
-  const API_URL = 'https://chihwei-n8n.zeabur.app/webhook/inventory-list';
-
-  fetch(API_URL, { method: 'GET' })
-    .then(res => res.json())
-    .then(data => {
-      items = data.items;
-      renderTable();
-    })
-    .catch(err => console.error('讀取商品異常', err));
-
-  function renderTable() {
-    tbody.innerHTML = '';
-    items.forEach(i => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td class="name">
-          ${i.item_name} ${i.image ? `<span class="item-toggle" data-img="${i.image}">看圖 ▸</span>` : ''}
-        </td>
-        <td>NT$ ${i.unit_price}</td>
-        <td class="${i.stock <= 10 ? 'stock low' : 'stock'}">庫存：${i.stock}</td>
-        <td><input type="number" min="0" max="${i.stock}" data-id="${i.item_id}" placeholder="請輸入數量"></td>
-      `;
-      tbody.appendChild(tr);
-    });
-  }
-
-  tbody.onclick = e => {
-    if (!e.target.classList.contains('item-toggle')) return;
-    modalImg.src = e.target.dataset.img;
-    modal.style.display = 'flex';
-  };
-});
-modalClose.onclick=()=>modal.style.display='none';
-modal.onclick=e=>{if(e.target===modal)modalClose.click();};
-
-tbody.oninput=()=>{
-  let total=0;
-  document.querySelectorAll('#itemsTable input').forEach(inp=>{
-    const it=items.find(i=>i.item_id==inp.dataset.id);
-    total+=it?(Number(inp.value)||0)*it.unit_price:0;
-  });
-  totalAmountEl.textContent=total.toFixed(0);
-};
-
-document.getElementById('applyForm').onsubmit=async e=>{
-  e.preventDefault();
-
-  const f=e.target;
-  const task_id = generatetask_id();
-
-  const payload={
-    task_id: task_id,
-    applicant_name: f.applicant_name.value,
-    staff_id: f.staff_id.value,
-    phone: f.phone.value,
-    applicant_email: f.applicant_email.value,
-    department: f.department.value,
-    cost_center: f.costCenter.value,
-    reason: f.reason.value,
-    status: 'SUBMITTED',
-    total_amount: Number(totalAmountEl.textContent),
-    items: []
-  };
-
-  document.querySelectorAll('#itemsTable input').forEach(inp=>{
-    const q=Number(inp.value);
-    if(q>0){
-      const it=items.find(i=>i.item_id==inp.dataset.id);
-      if(it){
-        payload.items.push({
-          task_id: task_id,
-          item_id: it.item_id,
-          item_name: it.item_name,
-          unit_price: it.unit_price,
-          quantity: q,
-          subtotal: it.unit_price * q
+    // 3. 從 API 讀取商品資料
+    fetch(API_URL, { method: 'GET' })
+        .then(res => res.json())
+        .then(data => {
+            // 判斷 API 回傳格式，確保 items 是陣列
+            items = data.items || [];
+            renderTable();
+        })
+        .catch(err => {
+            console.error('讀取商品異常:', err);
+            alert('無法載入庫存資料，請檢查網路連線。');
         });
-      }
+
+    // 4. 渲染表格函式
+    function renderTable() {
+        tbody.innerHTML = '';
+        items.forEach(i => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="name">
+                    ${i.item_name} 
+                    ${i.image ? `<span class="item-toggle" data-img="${i.image}" style="color:#0A84FF; cursor:pointer; margin-left:8px;">看圖 ▸</span>` : ''}
+                </td>
+                <td>NT$ ${i.unit_price}</td>
+                <td class="${i.stock <= 10 ? 'stock low' : 'stock'}">庫存：${i.stock}</td>
+                <td>
+                    <input type="number" min="0" max="${i.stock}" 
+                           data-id="${i.item_id}" 
+                           placeholder="請輸入數量" 
+                           class="qty-input">
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
     }
-  });
 
-  if(payload.items.length===0){
-    alert('請至少選一項');
-    return;
-  }
+    // 5. 即時計算總金額 (事件委派)
+    tbody.oninput = (e) => {
+        if (!e.target.classList.contains('qty-input')) return;
+        
+        let total = 0;
+        const inputs = tbody.querySelectorAll('.qty-input');
+        inputs.forEach(inp => {
+            const it = items.find(item => item.item_id == inp.dataset.id);
+            const qty = parseInt(inp.value) || 0;
+            if (it) {
+                total += qty * it.unit_price;
+            }
+        });
+        totalAmountEl.textContent = total.toLocaleString(); 
+    };
 
-  const res = await fetch(API_URL,{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify(payload)
-  });
+    // 6. 燈箱看圖功能
+    tbody.onclick = e => {
+        if (!e.target.classList.contains('item-toggle')) return;
+        modalImg.src = e.target.dataset.img;
+        modal.style.display = 'flex';
+    };
 
-  const r = await res.json();
-  if(r.status==='success'){
-    alert('申請完成');
-    f.reset();
-    totalAmountEl.textContent='0';
-  }else{
-    alert('寫入失敗');
-    console.error(r);
-  }
-};
-window.onload = function() {
-  fetch('https://chihwei-n8n.zeabur.app/webhook/inventory-list', { method: 'GET' })
-    .then(res => res.json())
-    .then(data => {
-      items = data.items;
-      renderTable();
-    })
-    .catch(error => console.error('Error fetching inventory:', error));
-};
+    modalClose.onclick = () => modal.style.display = 'none';
+    modal.onclick = e => { if (e.target === modal) modal.style.display = 'none'; };
+
+    // 7. 表單送出處理
+    applyForm.onsubmit = async (e) => {
+        e.preventDefault();
+
+        const task_id = generatetask_id();
+        const payload = {
+            task_id: task_id,
+            applicant_name: applyForm.applicant_name.value,
+            staff_id: applyForm.staff_id.value,
+            phone: applyForm.phone.value,
+            applicant_email: applyForm.applicant_email.value,
+            department: applyForm.department.value,
+            cost_center: applyForm.costCenter.value,
+            reason: applyForm.reason.value,
+            status: 'SUBMITTED',
+            total_amount: Number(totalAmountEl.textContent.replace(/,/g, '')),
+            items: []
+        };
+
+        // 收集有輸入數量的品項
+        tbody.querySelectorAll('.qty-input').forEach(inp => {
+            const q = parseInt(inp.value) || 0;
+            if (q > 0) {
+                const it = items.find(item => item.item_id == inp.dataset.id);
+                if (it) {
+                    payload.items.push({
+                        task_id: task_id,
+                        item_id: it.item_id,
+                        item_name: it.item_name,
+                        unit_price: it.unit_price,
+                        quantity: q,
+                        subtotal: it.unit_price * q
+                    });
+                }
+            }
+        });
+
+        if (payload.items.length === 0) {
+            alert('請至少填寫一個品項的數量');
+            return;
+        }
+
+        try {
+            const res = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await res.json();
+            if (result.status === 'success' || result.message === 'success') {
+                alert('申請成功！您的單號為：' + task_id);
+                applyForm.reset();
+                totalAmountEl.textContent = '0';
+            } else {
+                alert('申請失敗，後端回傳錯誤');
+                console.error('Server error:', result);
+            }
+        } catch (err) {
+            alert('連線至伺服器失敗，請檢查網路或 API 位址');
+            console.error('Fetch error:', err);
+        }
+    };
+});
 </script>
 
 
