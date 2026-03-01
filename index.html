@@ -234,43 +234,41 @@ button.status-btn:hover {
 </div>
 
 <script>
-const API_URL = 'https://chihwei-n8n.zeabur.app/webhook/inventory-list';
+document.addEventListener('DOMContentLoaded', () => {
+  const tbody = document.getElementById('itemsTable');
 
-fetch(API_URL, { method: 'GET' })
-  .then(res => res.json())
-  .then(data => {
-    items = data.items; // 根據你的 webhook 回傳格式調整
-    renderTable();
-  })
-  .catch(err => console.error('讀取商品異常', err));
+  const API_URL = 'https://chihwei-n8n.zeabur.app/webhook/inventory-list';
 
-function renderTable(){
-  tbody.innerHTML='';
-  items.forEach(i=>{
-    const tr=document.createElement('tr');
-    tr.innerHTML=`
-      <td class="name">
-        ${i.item_name}
-        ${i.image ? `<span class="item-toggle" data-img="${i.image}">看圖 ▸</span>` : ''}
-      </td>
-      <td>NT$ ${i.unit_price}</td>
-      <td class="${i.stock<=10?'stock low':'stock'}">庫存：${i.stock}</td>
-      <td>
-        <input type="number"
-               min="0"
-               max="${i.stock}"
-               data-id="${i.item_id}"
-               placeholder="請輸入數量">
-      </td>`;
-    tbody.appendChild(tr);
-  });
-}
+  fetch(API_URL, { method: 'GET' })
+    .then(res => res.json())
+    .then(data => {
+      items = data.items;
+      renderTable();
+    })
+    .catch(err => console.error('讀取商品異常', err));
 
-tbody.onclick=e=>{
-  if(!e.target.classList.contains('item-toggle'))return;
-  modalImg.src=e.target.dataset.img;
-  modal.style.display='flex';
-};
+  function renderTable() {
+    tbody.innerHTML = '';
+    items.forEach(i => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="name">
+          ${i.item_name} ${i.image ? `<span class="item-toggle" data-img="${i.image}">看圖 ▸</span>` : ''}
+        </td>
+        <td>NT$ ${i.unit_price}</td>
+        <td class="${i.stock <= 10 ? 'stock low' : 'stock'}">庫存：${i.stock}</td>
+        <td><input type="number" min="0" max="${i.stock}" data-id="${i.item_id}" placeholder="請輸入數量"></td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  tbody.onclick = e => {
+    if (!e.target.classList.contains('item-toggle')) return;
+    modalImg.src = e.target.dataset.img;
+    modal.style.display = 'flex';
+  };
+});
 modalClose.onclick=()=>modal.style.display='none';
 modal.onclick=e=>{if(e.target===modal)modalClose.click();};
 
