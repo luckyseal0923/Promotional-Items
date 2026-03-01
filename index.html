@@ -369,7 +369,7 @@ document.getElementById('applyForm').onsubmit=async e=>{
 };
     window.onload = function() {
     fetch('https://chihwei-n8n.zeabur.app/webhook/inventory-list', {
-      method: 'POST'
+      method: 'GET'
     })
     .then(response => console.log('Inventory webhook triggered'))
     .catch(error => console.error('Error triggering inventory webhook:', error));
