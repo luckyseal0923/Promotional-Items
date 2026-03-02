@@ -401,32 +401,63 @@ async function updStock(id){
   }catch(e){ alert('失敗'); }
 }
 /* =========================
-   3. 商品管理 (Listing) - v2.0 (含刪除/庫存/圖片上傳)
+   3. 商品管理 (Listing) - 修正版
 ========================= */
-const API_PRODUCT_DELETE = 'https://chihwei-n8n.zeabur.app/webhook/product-delete'; // 新增刪除 API
-
 async function loadListing() {
   const p = document.querySelector('#tab-listing .panel');
-  p.innerHTML = '<div style="text-align:right;margin-bottom:10px"><button class="btn btn-success" onclick="editProd()">➕ 新增商品</button></div>';
+  
+  // 1. 先建立頂部操作列（新增按鈕），這部分不放在 try 裡面，確保永遠看得到
+  let topHtml = `
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+      <span style="color:#64748B; font-size:14px;">管理您的公關品清單與庫存</span>
+      <button class="btn btn-success" onclick="editProd()">➕ 新增商品</button>
+    </div>
+  `;
+
   try {
-    // 每次都重新抓取最新資料
-    const res = await fetch(API_INVENTORY_LIST); 
-    const d = await res.json(); 
-    ALL_PRODUCTS = d.items || []; 
+    const res = await fetch(API_INVENTORY_LIST);
+    const d = await res.json();
+    ALL_PRODUCTS = d.items || [];
     
-    let h = '<table style="width:100%"><thead><tr><th>圖片</th><th>商品編號</th><th>品名</th><th>售價</th><th>庫存</th><th>操作</th></tr></thead><tbody>';
-    ALL_PRODUCTS.forEach(i => {
-      h += `<tr>
-        <td>${i.image ? `<img src="${i.image}" style="height:50px;width:50px;object-fit:cover;border-radius:4px;">` : '-'}</td>
-        <td style="color:#666;">${i.item_id}</td>
-        <td style="font-weight:bold;">${i.item_name}</td>
-        <td>$${i.unit_price}</td>
-        <td>${i.stock}</td>
-        <td><button class="btn btn-primary" onclick="editProd('${i.item_id}')">編輯</button></td>
-      </tr>`;
-    });
-    p.innerHTML += h + '</tbody></table>';
-  } catch(e) { p.innerHTML = '載入失敗'; }
+    let tableHtml = `
+      <div class="table-wrapper">
+        <table style="width:100%">
+          <thead>
+            <tr><th>圖片</th><th>商品編號</th><th>品名</th><th>售價</th><th>庫存</th><th>操作</th></tr>
+          </thead>
+          <tbody>
+    `;
+
+    if (ALL_PRODUCTS.length === 0) {
+      tableHtml += '<tr><td colspan="6" style="text-align:center;padding:30px">尚無商品資料</td></tr>';
+    } else {
+      ALL_PRODUCTS.forEach(i => {
+        tableHtml += `
+          <tr>
+            <td>${i.image ? `<img src="${i.image}" style="height:50px;width:50px;object-fit:cover;border-radius:4px;">` : '-'}</td>
+            <td style="color:#666;">${i.item_id}</td>
+            <td style="font-weight:bold;">${i.item_name}</td>
+            <td>$${i.unit_price}</td>
+            <td>${i.stock}</td>
+            <td><button class="btn btn-primary" onclick="editProd('${i.item_id}')">編輯</button></td>
+          </tr>`;
+      });
+    }
+
+    tableHtml += '</tbody></table></div>';
+    
+    // 組合按鈕與表格
+    p.innerHTML = topHtml + tableHtml;
+
+  } catch(e) {
+    console.error("載入商品失敗:", e);
+    // 即使失敗，也要保留新增按鈕，並顯示錯誤訊息
+    p.innerHTML = topHtml + `
+      <div style="padding:20px; background:#FEE2E2; color:#991B1B; border-radius:8px; text-align:center;">
+        ⚠️ 無法讀取商品清單 (API 異常)，但您仍可嘗試點擊上方按鈕新增商品。
+      </div>
+    `;
+  }
 }
 
 function editProd(id) {
