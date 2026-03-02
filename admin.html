@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
+<meta name="referrer" content="no-referrer">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>公關品後臺管理系統</title>
@@ -415,16 +416,26 @@ async function loadListing() {
     ALL_PRODUCTS = d.items || []; 
     
     let h = '<table style="width:100%"><thead><tr><th>圖片</th><th>商品編號</th><th>品名</th><th>售價</th><th>庫存</th><th>操作</th></tr></thead><tbody>';
-    ALL_PRODUCTS.forEach(i => {
-      h += `<tr>
-        <td>${i.image ? `<img src="${i.image}" style="height:50px;width:50px;object-fit:cover;border-radius:4px;">` : '-'}</td>
-        <td style="color:#666;">${i.item_id}</td>
-        <td style="font-weight:bold;">${i.item_name}</td>
-        <td>$${i.unit_price}</td>
-        <td>${i.stock}</td>
-        <td><button class="btn btn-primary" onclick="editProd('${i.item_id}')">編輯</button></td>
-      </tr>`;
-    });
+// 🔍 找到這一段並替換
+ALL_PRODUCTS.forEach(i => {
+  // 核心修正：同時檢查小寫 image 與大寫 Image 欄位
+  const rawImg = i.image || i.Image || ''; 
+  let imgHtml = '-';
+
+  if (rawImg && rawImg.includes('http')) {
+    // 修正：確保網址是 https 並去除可能的多餘空格
+    const secureImg = rawImg.trim().replace('http://', 'https://');
+    imgHtml = `<img src="${secureImg}" style="height:50px;width:50px;object-fit:cover;border-radius:4px;" onerror="this.src='https://placehold.co/50x50?text=Error'">`;
+  }
+
+  h += `<tr>
+    <td>${imgHtml}</td> <td style="color:#666;">${i.item_id}</td>
+    <td style="font-weight:bold;">${i.item_name}</td>
+    <td>$${i.unit_price}</td>
+    <td>${i.stock}</td>
+    <td><button class="btn btn-primary" onclick="editProd('${i.item_id}')">編輯</button></td>
+  </tr>`;
+});
     p.innerHTML += h + '</tbody></table>';
   } catch(e) { p.innerHTML = '載入失敗'; }
 }
