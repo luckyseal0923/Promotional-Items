@@ -358,14 +358,36 @@ function downloadCSV() {
   link.download = '訂單報表_' + new Date().toISOString().slice(0, 10) + '.csv';
   link.click();
 }
-  /* 庫存與商品 */
-async function loadInventory(){
-  const p=document.querySelector('#tab-inventory .panel');
-  try{
-    const res=await fetch(API_INVENTORY_LIST); const d=await res.json();
-    ALL_PRODUCTS=d.items||[];
+/* =========================
+   2. 庫存盤點 (Inventory) - 修正空資料顯示
+========================= */
+async function loadInventory() {
+  const p = document.querySelector('#tab-inventory .panel');
+  p.innerHTML = '<div style="text-align:center;padding:20px;">正在讀取庫存資料...</div>';
+
+  try {
+    const res = await fetch(API_INVENTORY_LIST); 
+    const d = await res.json();
+    ALL_PRODUCTS = d.items || [];
+    
+    // 🔍 檢查是否有商品資料
+    if (ALL_PRODUCTS.length === 0) {
+      p.innerHTML = `
+        <div style="text-align:center;padding:40px;color:#64748B;">
+          <div style="font-size:40px;margin-bottom:10px;">⚖️</div>
+          <div>目前無商品庫存資料。</div>
+          <div style="font-size:13px;margin-top:5px;">請先至「商品管理」分頁新增商品。</div>
+        </div>`;
+      return;
+    }
+
+    // 若有資料，則渲染表格
     renderInventory(ALL_PRODUCTS);
-  }catch(e){ p.innerHTML='載入失敗'; }
+    
+  } catch(e) { 
+    console.error('載入庫存失敗:', e);
+    p.innerHTML = '<div style="text-align:center;padding:40px;color:#EF4444;">⚠️ 庫存資料讀取失敗，請確認資料庫連線。</div>'; 
+  }
 }
 
 function renderInventory(items) {
@@ -402,42 +424,50 @@ async function updStock(id){
   }catch(e){ alert('失敗'); }
 }
 /* =========================
-   3. 商品管理 (Listing) - v2.0 (含刪除/庫存/圖片上傳)
+   3. 商品管理 (Listing) - 修正空資料顯示
 ========================= */
-const API_PRODUCT_DELETE = 'https://chihwei-n8n.zeabur.app/webhook/product-delete'; // 新增刪除 API
-
 async function loadListing() {
   const p = document.querySelector('#tab-listing .panel');
-  p.innerHTML = '<div style="text-align:right;margin-bottom:10px"><button class="btn btn-success" onclick="editProd()">➕ 新增商品</button></div>';
+  // 預先產生新增按鈕，避免載入中或無資料時按鈕消失
+  const headerHtml = '<div style="text-align:right;margin-bottom:10px"><button class="btn btn-success" onclick="editProd()">➕ 新增商品</button></div>';
+  
   try {
-    // 每次都重新抓取最新資料
     const res = await fetch(API_INVENTORY_LIST); 
     const d = await res.json(); 
     ALL_PRODUCTS = d.items || []; 
     
+    // 檢查是否有商品資料
+    if (ALL_PRODUCTS.length === 0) {
+      p.innerHTML = headerHtml + '<div style="text-align:center;padding:40px;color:#64748B;">📦 目前尚無商品資料，請點擊右上方按鈕新增。</div>';
+      return;
+    }
+    
     let h = '<table style="width:100%"><thead><tr><th>圖片</th><th>商品編號</th><th>品名</th><th>售價</th><th>庫存</th><th>操作</th></tr></thead><tbody>';
-// 🔍 找到這一段並替換
-ALL_PRODUCTS.forEach(i => {
-  // 核心修正：同時檢查小寫 image 與大寫 Image 欄位
-  const rawImg = i.image || i.Image || ''; 
-  let imgHtml = '-';
+    
+    ALL_PRODUCTS.forEach(i => {
+      // 相容大小寫欄位與 HTTPS 修正
+      const rawImg = i.image || i.Image || ''; 
+      let imgHtml = '-';
+      if (rawImg && rawImg.includes('http')) {
+        const secureImg = rawImg.trim().replace('http://', 'https://');
+        imgHtml = `<img src="${secureImg}" style="height:50px;width:50px;object-fit:cover;border-radius:4px;" onerror="this.src='https://placehold.co/50x50?text=Error'">`;
+      }
 
-  if (rawImg && rawImg.includes('http')) {
-    // 修正：確保網址是 https 並去除可能的多餘空格
-    const secureImg = rawImg.trim().replace('http://', 'https://');
-    imgHtml = `<img src="${secureImg}" style="height:50px;width:50px;object-fit:cover;border-radius:4px;" onerror="this.src='https://placehold.co/50x50?text=Error'">`;
+      h += `<tr>
+        <td>${imgHtml}</td>
+        <td style="color:#666;">${i.item_id}</td>
+        <td style="font-weight:bold;">${i.item_name}</td>
+        <td>$${i.unit_price}</td>
+        <td>${i.stock}</td>
+        <td><button class="btn btn-primary" onclick="editProd('${i.item_id}')">編輯</button></td>
+      </tr>`;
+    });
+    
+    p.innerHTML = headerHtml + h + '</tbody></table>';
+  } catch(e) { 
+    console.error('載入商品清單失敗:', e);
+    p.innerHTML = headerHtml + '<div style="text-align:center;padding:40px;color:#EF4444;">⚠️ 讀取資料庫失敗，請檢查網路連線或後端設定。</div>'; 
   }
-
-  h += `<tr>
-    <td>${imgHtml}</td> <td style="color:#666;">${i.item_id}</td>
-    <td style="font-weight:bold;">${i.item_name}</td>
-    <td>$${i.unit_price}</td>
-    <td>${i.stock}</td>
-    <td><button class="btn btn-primary" onclick="editProd('${i.item_id}')">編輯</button></td>
-  </tr>`;
-});
-    p.innerHTML += h + '</tbody></table>';
-  } catch(e) { p.innerHTML = '載入失敗'; }
 }
 
 function editProd(id) {
