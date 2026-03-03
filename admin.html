@@ -362,10 +362,17 @@ function downloadCSV() {
 async function loadInventory(){
   const p=document.querySelector('#tab-inventory .panel');
   try{
-    const res=await fetch(API_INVENTORY_LIST); const d=await res.json();
-    ALL_PRODUCTS=d.items||[];
-    renderInventory(ALL_PRODUCTS);
-  }catch(e){ p.innerHTML='載入失敗'; }
+    const res=await fetch(API_INVENTORY_LIST);
+    const d=await res.json();
+    ALL_PRODUCTS=d.items || [];
+    if (ALL_PRODUCTS.length === 0) {
+      p.innerHTML = '<div style="padding:20px; color:#666; text-align:center;">查無相關商品訊息</div>';
+    } else {
+      renderInventory(ALL_PRODUCTS);
+    }
+  }catch(e){
+    p.innerHTML='載入失敗';
+  }
 }
 
 function renderInventory(items) {
