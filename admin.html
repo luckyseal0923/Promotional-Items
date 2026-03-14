@@ -321,21 +321,59 @@ function showOrderDetail(taskId) {
 function showEditStatus(tid){
   const o=ALL_ORDERS.find(x=>x.task_id===tid); if(!o)return;
   let h=`<div style="margin-bottom:15px">目前狀態：<span class="status-pill ${getStatusClass(o.status)}">${getStatusText(o.status)}</span></div>`;
-  h+=`<select id="newStatus" style="width:100%" onchange="toggleReason()"><option value="Submitted">申請提出</option><option value="PREPARING">商品準備中</option><option value="ready">通知領取</option><option value="EXCEPTION">異常通知</option><option value="End">案件結案</option></select>`;
-  h+=`<div id="reasonField" style="display:none;margin-top:10px"><textarea id="statusNote" style="width:100%" placeholder="輸入異常原因..."></textarea></div>`;
+h+=`<select id="newStatus" style="width:100%" onchange="toggleReason()">
+<option value="Submitted">申請提出</option>
+<option value="PREPARING">商品準備中</option>
+<option value="ready">通知領取</option>
+<option value="EXCEPTION">異常通知</option>
+<option value="End">案件結案</option>
+<option disabled>──────────</option>
+<option value="DELETE">🗑 刪除申請</option>
+</select>`;  h+=`<div id="reasonField" style="display:none;margin-top:10px"><textarea id="statusNote" style="width:100%" placeholder="輸入異常原因..."></textarea></div>`;
   h+=`<button class="btn btn-success" style="width:100%;margin-top:15px" onclick="updateStatus('${tid}')">💾 儲存</button>`;
   document.getElementById('orderDetail').innerHTML=h;
   document.getElementById('orderModal').classList.add('show');
-  setTimeout(()=>{document.getElementById('newStatus').value=o.status; toggleReason();},0);
-}
+setTimeout(()=>{
+  const sel=document.getElementById('newStatus');
+  if([...sel.options].some(x=>x.value===o.status)){
+    sel.value=o.status;
+  }
+  toggleReason();
+},0);}
 
 function toggleReason(){
-  const s=document.getElementById('newStatus').value;
-  document.getElementById('reasonField').style.display = (s==='EXCEPTION'?'block':'none');
+  const sel = document.getElementById('newStatus');
+  if(!sel) return;
+
+  const s = sel.value;
+
+  const reason = document.getElementById('reasonField');
+  if(reason){
+    reason.style.display = (s === 'EXCEPTION') ? 'block' : 'none';
+  }
 }
   async function updateStatus(tid){
   const s=document.getElementById('newStatus').value, n=document.getElementById('statusNote')?.value;
-  if(s==='EXCEPTION' && !n){ alert('請填寫異常原因'); return; }
+  if(s === "DELETE"){
+  const ok = confirm("⚠️ 確定要刪除此申請嗎？\n\n刪除後資料將無法回復");
+  if(!ok) return;
+
+const res = await fetch('https://chihwei-n8n.zeabur.app/webhook/delete-order', {
+  method:'POST',
+  headers:{'Content-Type':'application/json'},
+  body:JSON.stringify({task_id:tid})
+});
+
+if(!res.ok){
+  throw new Error("delete fail");
+}
+
+  alert("🗑 訂單已刪除");
+  document.getElementById('orderModal').classList.remove('show');
+  loadOrders();
+  return;
+}
+    if(s==='EXCEPTION' && !n){ alert('請填寫異常原因'); return; }
   
   try{
     await fetch('https://chihwei-n8n.zeabur.app/webhook/update-order', {
