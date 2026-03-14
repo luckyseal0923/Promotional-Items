@@ -261,11 +261,18 @@ function renderOrders(){
       <td><div style="font-weight:bold">${formatDate(o.date)}</div><div style="font-size:11px;color:#999">${o.task_id||'-'}</div></td>
       <td>${o.user||'-'}</td><td>${o.department||'-'}</td>
       <td><span class="status-pill ${getStatusClass(o.status)}">${getStatusText(o.status)}</span></td>
-      <td>
-  <button class="btn btn-outline" onclick="showOrderDetail('${o.task_id}')">📋 查詢</button>
-  <button class="btn btn-primary" onclick="showEditStatus('${o.task_id}')">✏️ 狀態</button>
-  <button class="btn btn-danger" onclick="deleteOrder('${o.task_id}')">🗑️ 刪除</button>
-      </td>
+<td>
+
+  <div style="display:flex; gap:8px; margin-bottom:6px;">
+    <button class="btn btn-outline" onclick="showOrderDetail('${o.task_id}')">📋 查詢</button>
+    <button class="btn btn-danger" onclick="deleteOrder('${o.task_id}')">🗑️ 刪除</button>
+  </div>
+
+  <div>
+    <button class="btn btn-primary" onclick="showEditStatus('${o.task_id}')">✏️ 狀態</button>
+  </div>
+
+</td>
     </tr>`
   ).join('');
 }
