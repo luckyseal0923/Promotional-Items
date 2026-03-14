@@ -426,8 +426,8 @@ function renderInventory(items) {
       <td style="font-size:16px;color:${item.stock < 10 ? 'red' : 'black'}">${item.stock}</td>
       <td>
         <div style="display:flex;gap:8px;align-items:center;">
-          <input type="number" id="stock-${item.item_id}" value="${item.stock}" style="width:60px">
-          <button class="btn btn-primary" onclick="updStock('${item.item_id}')">儲存</button>
+<input type="number" id="stock-${item.item_id}" value="${item.stock}" style="width:100px">
+<button class="btn btn-primary" onclick="updStock('${item.item_id}')">儲存</button>
         </div>
       </td>
     </tr>`;
