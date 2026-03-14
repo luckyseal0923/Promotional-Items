@@ -28,6 +28,8 @@ td{padding:16px 12px;border-bottom:1px solid var(--border);font-size:14px}
 .btn-primary{background:var(--primary);color:#fff}
 .btn-success{background:#10B981;color:#fff}
 .btn-outline{background:#fff;border:1px solid var(--border);color:var(--text)}
+.btn-danger{background:#EF4444;color:#fff;}
+.btn-danger:hover{background:#DC2626;}
 .status-pill{padding:4px 10px;border-radius:6px;font-size:12px;font-weight:bold}
 .status-preparing{background:#DBEAFE;color:#1E40AF}
 .status-submitted{background:#FEF3C7;color:#92400E}
@@ -260,8 +262,9 @@ function renderOrders(){
       <td>${o.user||'-'}</td><td>${o.department||'-'}</td>
       <td><span class="status-pill ${getStatusClass(o.status)}">${getStatusText(o.status)}</span></td>
       <td>
-        <button class="btn btn-outline" onclick="showOrderDetail('${o.task_id}')">📋 查詢</button>
-        <button class="btn btn-primary" onclick="showEditStatus('${o.task_id}')">✏️ 狀態</button>
+  <button class="btn btn-outline" onclick="showOrderDetail('${o.task_id}')">📋 查詢</button>
+  <button class="btn btn-primary" onclick="showEditStatus('${o.task_id}')">✏️ 狀態</button>
+  <button class="btn btn-danger" onclick="deleteOrder('${o.task_id}')">🗑️ 刪除</button>
       </td>
     </tr>`
   ).join('');
@@ -597,6 +600,35 @@ function showBig(src){
 function closeModal(){document.getElementById('orderModal').classList.remove('show');}
 document.getElementById('orderModal').addEventListener('click',function(e){if(e.target===this)closeModal();});
 window.onload=function(){ loadOrders(); };
+
+async function deleteOrder(taskId){
+
+  const confirmDelete = confirm(
+    "⚠️ 確定要刪除此訂單嗎？\n\n刪除後資料將無法復原！"
+  );
+
+  if(!confirmDelete) return;
+
+  try{
+
+    await fetch('https://chihwei-n8n.zeabur.app/webhook/delete-order', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        task_id:taskId
+      })
+    });
+
+    alert('🗑️ 訂單已刪除');
+
+    loadOrders(); // 重新載入
+
+  }catch(e){
+
+    alert('刪除失敗');
+
+  }
+}
 </script>
 </body>
 </html>
