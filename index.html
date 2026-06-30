@@ -1,394 +1,408 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-<meta charset="UTF-8" />
-<title>公關品申請系統</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>公關品申請系統 - 升級遷移通知</title>
+  <!-- 引入 Google Fonts: Outfit & Noto Sans TC -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --primary: #6366F1;
+      --primary-hover: #4F46E5;
+      --primary-rgb: 99, 102, 241;
+      --bg-dark: #0B0F19;
+      --card-bg: rgba(17, 24, 39, 0.7);
+      --glass-border: rgba(255, 255, 255, 0.06);
+      --text-main: #F3F4F6;
+      --text-muted: #9CA3AF;
+      --accent: #10B981;
+    }
 
-<style>
-body {
-  font-family: -apple-system, BlinkMacSystemFont, "Noto Sans TC", Arial, sans-serif;
-  background:#f6f7f9;
-  padding:20px;
-}
-h1 {
-  text-align:center;
-  margin-bottom:24px;
-}
-form {
-  background:#fff;
-  max-width:1200px;
-  margin:auto;
-  padding:24px;
-  border-radius:12px;
-  box-shadow:0 4px 14px rgba(0,0,0,0.08);
-}
-fieldset {
-  border:none;
-  margin-bottom:32px;
-}
-legend {
-  font-weight:bold;
-  margin-bottom:16px;
-  font-size:17px;
-  border-left:4px solid #0A84FF;
-  padding-left:10px;
-}
-.row {
-  display:flex;
-  gap:14px;
-  margin-bottom:12px;
-}
-label {
-  flex:1;
-  font-size:14px;
-}
-input[type="text"],
-input[type="number"] {
-  width:100%;
-  padding:10px;
-  margin-top:6px;
-  border:1px solid #ccc;
-  border-radius:8px;
-  font-size:16px;
-}
-table {
-  width:100%;
-  border-collapse:collapse;
-  margin-top:16px;
-}
-th, td {
-  border-bottom:1px solid #ddd;
-  padding:14px;
-  text-align:center;
-}
-th {
-  background:#f1f3f5;
-}
-td.name {
-  text-align:left;
-  font-weight:600;
-}
-.stock.low {
-  color:#d9534f;
-  font-weight:bold;
-}
-.total-box {
-  margin-top:24px;
-  text-align:right;
-  font-size:22px;
-  font-weight:bold;
-}
-.submit-area {
-  display: flex;
-  justify-content: center;
-  gap: 32px;              /* ✅ 按鈕間距加大 */
-  margin-top: 36px;
-}
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-/* 送出申請：主按鈕（更突出） */
-button[type="submit"] {
-  padding: 16px 48px;     /* ✅ 比較大顆 */
-  font-size: 18px;
-  font-weight: 600;
-  background: #0A84FF;
-  color: #fff;
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-}
+    body {
+      font-family: 'Outfit', 'Noto Sans TC', sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow: hidden;
+      position: relative;
+    }
 
-button[type="submit"]:hover {
-  background: #006edc;
-}
+    /* 背景發光球 */
+    body::before, body::after {
+      content: "";
+      position: absolute;
+      width: 400px;
+      height: 400px;
+      border-radius: 50%;
+      z-index: -1;
+      filter: blur(120px);
+      opacity: 0.25;
+      pointer-events: none;
+      animation: pulse 10s infinite alternate;
+    }
 
-/* 狀態看板：次要按鈕 */
-button.status-btn {
-  padding: 14px 40px;
-  font-size: 16px;
-  background: #e9ecef;    /* ✅ 淺色，退一階 */
-  color: #333;
-  border: 1px solid #ced4da;
-  border-radius: 12px;
-  cursor: pointer;
-}
+    body::before {
+      background: rgba(99, 102, 241, 0.4);
+      top: 10%;
+      left: 15%;
+    }
 
-button.status-btn:hover {
-  background: #dee2e6;
-}
-.item-toggle {
-  margin-left:8px;
-  font-size:14px;
-  cursor:pointer;
-  color:#0A84FF;
-}
-.modal {
-  display:none;
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.6);
-  z-index:999;
-  align-items:center;
-  justify-content:center;
-}
-.modal img {
-  max-width:90%;
-  max-height:90%;
-  border-radius:12px;
-  background:#fff;
-}
-.modal-close {
-  position:absolute;
-  top:20px;
-  right:24px;
-  font-size:30px;
-  color:#fff;
-  cursor:pointer;
-}
-@media (max-width:768px){
-  table, thead, tbody, tr, th, td { display:block; }
-  thead { display:none; }
-  tbody tr {
-    background:#fff;
-    margin-bottom:16px;
-    padding:16px;
-    border-radius:14px;
-    box-shadow:0 2px 10px rgba(0,0,0,0.08);
-  }
-  td { border:none; text-align:left; padding:8px 0; }
-  td.name { display:flex; justify-content:space-between; align-items:center; }
-  button[type="submit"] { width:100%; }
-}
-</style>
+    body::after {
+      background: rgba(16, 185, 129, 0.3);
+      bottom: 10%;
+      right: 15%;
+      animation-delay: -5s;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1) translate(0, 0); }
+      100% { transform: scale(1.2) translate(30px, 30px); }
+    }
+
+    /* 玻璃擬物化卡片 */
+    .container {
+      background: var(--card-bg);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--glass-border);
+      border-radius: 32px;
+      padding: 50px 40px;
+      width: 100%;
+      max-width: 540px;
+      text-align: center;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4), 
+                  inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      position: relative;
+      z-index: 10;
+      animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 圖示設計 */
+    .icon-wrapper {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 30px;
+      background: rgba(var(--primary-rgb), 0.1);
+      border: 1px solid rgba(var(--primary-rgb), 0.2);
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      box-shadow: 0 10px 25px rgba(99, 102, 241, 0.15);
+    }
+
+    .icon-wrapper svg {
+      width: 40px;
+      height: 40px;
+      color: var(--primary);
+      animation: bounce 2s infinite ease-in-out;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+
+    /* 徽章 */
+    .badge {
+      display: inline-block;
+      padding: 6px 14px;
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: 20px;
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      margin-bottom: 20px;
+      letter-spacing: 1px;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 800;
+      margin-bottom: 12px;
+      color: #FFFFFF;
+      letter-spacing: -0.5px;
+    }
+
+    .subtitle {
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 35px;
+    }
+
+    /* 前往按鈕 */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 16px 28px;
+      font-size: 16px;
+      font-weight: 700;
+      color: #FFFFFF;
+      background: linear-gradient(135deg, var(--primary) 0%, #4F46E5 100%);
+      border: none;
+      border-radius: 16px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to right, transparent, rgba(255,255,255,0.2), transparent);
+      transform: translateX(-100%);
+      transition: transform 0.6s ease;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(99, 102, 241, 0.45);
+    }
+
+    .btn-primary:hover::before {
+      transform: translateX(100%);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    /* 倒數計時容器 */
+    .timer-container {
+      margin-top: 30px;
+      font-size: 14px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .countdown-num {
+      font-weight: 800;
+      color: var(--primary);
+      font-size: 16px;
+      display: inline-block;
+      min-width: 12px;
+    }
+
+    /* 暫停與網址複製區 */
+    .controls {
+      margin-top: 25px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .btn-sec {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-muted);
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-sec:hover {
+      border-color: rgba(255, 255, 255, 0.25);
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .url-text {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-family: 'Outfit', monospace;
+      user-select: all;
+    }
+
+    /* Toast 通知 */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: rgba(16, 185, 129, 0.95);
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
+      opacity: 0;
+      z-index: 1000;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+  </style>
 </head>
-
 <body>
 
-<h1>公關品申請系統</h1>
+  <div class="container">
+    <div class="badge">SYSTEM UPGRADE</div>
+    
+    <div class="icon-wrapper">
+      <!-- 升級與遷移火箭圖示 -->
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15.59 14.37a6 6 0 0 1-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 0 0 6.16-12.12A14.98 14.98 0 0 0 9.63 1.25a14.98 14.98 0 0 0-6.17 12.12A14.98 14.98 0 0 0 9.63 21.5c.22.02.45.03.67.03M10.85 17.5c-1.57-.45-2.73-1.63-3.18-3.2m10.15-5.3h.008v.008H17.85V9Z" />
+      </svg>
+    </div>
 
-<form id="applyForm">
+    <h1>系統升級移轉通知</h1>
+    <p class="subtitle">
+      為提供更流暢的服務體驗，公關品資源管理系統已全面升級至 V2.0 版本。本舊版申請系統即將停止服務，請移至全新平台進行申請。
+    </p>
 
-<fieldset>
-  <legend>一、申請單位資料（必填）</legend>
+    <!-- 主前往按鈕 -->
+    <a href="https://prrms.zeabur.app/" id="redirectBtn" class="btn-primary">
+      <span>前往新版申請系統 (PRRMS V2.0)</span>
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" style="width: 18px; height: 18px;">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+      </svg>
+    </a>
 
-  <div class="row">
-    <label>申請人*<input type="text" name="applicant_name" required></label>
-    <label>院內員編*<input type="text" name="staff_id" required></label>
+    <!-- 倒數計時 -->
+    <div class="timer-container" id="timerContainer">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 16px; height: 16px; animation: spin 4s linear infinite;">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+      </svg>
+      <span>網頁將在 <span id="countdown" class="countdown-num">5</span> 秒後自動跳轉...</span>
+    </div>
+
+    <style>
+      @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+    </style>
+
+    <!-- 控制區 -->
+    <div class="controls">
+      <button id="pauseBtn" class="btn-sec">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 14px; height: 14px;" id="pauseIcon">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25v13.5m-7.5-13.5v13.5" />
+        </svg>
+        <span id="pauseText">暫停自動跳轉</span>
+      </button>
+
+      <button id="copyBtn" class="btn-sec">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 14px; height: 14px;">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 7.5V6.108c0-1.135.845-2.098 1.976-2.192.373-.03.748-.057 1.123-.08M15.75 18H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08M15.75 18.75v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5A3.375 3.375 0 0 0 6.375 7.5H5.25m11.9-3.664A2.251 2.251 0 0 0 15 2.25h-1.5a2.251 2.251 0 0 0-2.15 1.586m5.8 0c.065.21.1.433.1.664v.75h-6V4.5c0-.231.035-.454.1-.664M6.75 7.5H4.875c-.621 0-1.125.504-1.125 1.125v12c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V16.5a9 9 0 0 0-9-9Z" />
+        </svg>
+        <span>複製新版網址</span>
+      </button>
+    </div>
   </div>
 
-  <div class="row">
-    <label>申請者電話*<input type="text" name="phone" required></label>
-    <label>電子信箱*<input type="text" name="applicant_email" required></label>
-  </div>
+  <!-- Toast -->
+  <div id="toast" class="toast">新版網址已成功複製！</div>
 
-  <div class="row">
-    <label>申請單位*<input type="text" name="department" required></label>
-    <label>成本中心*<input type="text" name="costCenter" required></label>
-  </div>
+  <script>
+    const targetUrl = "https://prrms.zeabur.app/";
+    let secondsLeft = 5;
+    let countdownInterval = null;
+    let isPaused = false;
 
-  <div class="row">
-    <label>領取事由*<input type="text" name="reason" required></label>
-  </div>
-</fieldset>
+    const countdownEl = document.getElementById("countdown");
+    const pauseBtn = document.getElementById("pauseBtn");
+    const pauseText = document.getElementById("pauseText");
+    const pauseIcon = document.getElementById("pauseIcon");
+    const timerContainer = document.getElementById("timerContainer");
+    const copyBtn = document.getElementById("copyBtn");
+    const toast = document.getElementById("toast");
 
-<fieldset>
-  <legend>二、公關品申請數量</legend>
-
-  <table>
-    <thead>
-      <tr>
-        <th>品項</th>
-        <th>單價</th>
-        <th>庫存</th>
-        <th>申請數量</th>
-      </tr>
-    </thead>
-    <tbody id="itemsTable"></tbody>
-  </table>
-</fieldset>
-
-<div class="total-box">
-  總金額：NT$ <span id="totalAmount">0</span>
-</div>
-
-<div class="submit-area">
-  <button type="submit">送出申請</button>
-
-  <button
-    type="button"
-    class="status-btn"
-    onclick="window.open(
-      'https://promotional-items-booking.zeabur.app/Items-status.html',
-      '_blank'
-    )"
-  >
-    狀態看板
-  </button>
-</div>
-
-</form>
-
-<div class="modal" id="imgModal">
-  <span class="modal-close" id="modalClose">✕</span>
-  <img id="modalImg">
-</div>
-
-<script>
-// 1. 全域變數與 API 位址
-let items = [];
-const GET_URL = 'https://chihwei-n8n.zeabur.app/webhook/inventory-list';
-const POST_URL = 'https://chihwei-n8n.zeabur.app/webhook/promo-apply';
-
-// 產生 Task ID (例如：REQ1714567890)
-function generatetask_id() {
-    return 'REQ' + Date.now();
-}
-
-// 函式：從 API 讀取並更新畫面
-async function fetchItems() {
-    try {
-        const res = await fetch(GET_URL);
-        const data = await res.json();
-        items = data.items || [];
-        renderTable();
-    } catch (err) {
-        console.error('讀取庫存失敗:', err);
+    // 啟動倒數計時
+    function startTimer() {
+      countdownInterval = setInterval(() => {
+        if (!isPaused) {
+          secondsLeft--;
+          countdownEl.textContent = secondsLeft;
+          if (secondsLeft <= 0) {
+            clearInterval(countdownInterval);
+            window.location.href = targetUrl;
+          }
+        }
+      }, 1000);
     }
-}
 
-// 函式：渲染表格
-function renderTable() {
-    const tbody = document.getElementById('itemsTable');
-    if (!tbody) return;
-    tbody.innerHTML = '';
-    items.forEach(i => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td class="name">
-                ${i.item_name} 
-                ${i.image ? `<span class="item-toggle" data-img="${i.image}" style="color:#0A84FF; cursor:pointer; margin-left:8px;">看圖 ▸</span>` : ''}
-            </td>
-            <td>NT$ ${i.unit_price}</td>
-            <td class="${i.stock <= 10 ? 'stock low' : 'stock'}">庫存：${i.stock}</td>
-            <td>
-                <input type="number" min="0" max="${i.stock}" 
-                       data-id="${i.item_id}" 
-                       placeholder="請輸入數量" 
-                       class="qty-input">
-            </td>
-        `;
-        tbody.appendChild(tr);
+    // 暫停/繼續功能
+    pauseBtn.addEventListener("click", () => {
+      isPaused = !isPaused;
+      if (isPaused) {
+        pauseText.textContent = "啟動自動跳轉";
+        pauseIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z" />`;
+        timerContainer.style.opacity = "0.5";
+      } else {
+        pauseText.textContent = "暫停自動跳轉";
+        pauseIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25v13.5m-7.5-13.5v13.5" />`;
+        timerContainer.style.opacity = "1";
+        // 如果已經到0秒了，重設回5秒
+        if (secondsLeft <= 0) {
+          secondsLeft = 5;
+          countdownEl.textContent = secondsLeft;
+        }
+      }
     });
-}
 
-document.addEventListener('DOMContentLoaded', () => {
-    // 獲取 DOM 元素
-    const applyForm = document.getElementById('applyForm');
-    const totalAmountEl = document.getElementById('totalAmount');
-    const tbody = document.getElementById('itemsTable');
-    const modal = document.getElementById('imgModal');
-    const modalImg = document.getElementById('modalImg');
-    const modalClose = document.getElementById('modalClose');
+    // 複製新網址功能
+    copyBtn.addEventListener("click", () => {
+      navigator.clipboard.writeText(targetUrl).then(() => {
+        toast.classList.add("show");
+        setTimeout(() => {
+          toast.classList.remove("show");
+        }, 2500);
+      }).catch(err => {
+        console.error("複製失敗: ", err);
+      });
+    });
 
-    // 初始載入庫存
-    fetchItems();
-
-    // 5. 即時計算總金額
-    tbody.oninput = (e) => {
-        if (!e.target.classList.contains('qty-input')) return;
-        let total = 0;
-        const inputs = tbody.querySelectorAll('.qty-input');
-        inputs.forEach(inp => {
-            const it = items.find(item => item.item_id == inp.dataset.id);
-            if (it) total += (parseInt(inp.value) || 0) * it.unit_price;
-        });
-        totalAmountEl.textContent = total.toLocaleString();
-    };
-
-    // 6. 看圖燈箱功能
-    tbody.onclick = e => {
-        if (e.target.classList.contains('item-toggle')) {
-            modalImg.src = e.target.dataset.img;
-            modal.style.display = 'flex';
-        }
-    };
-
-    if(modalClose) modalClose.onclick = () => modal.style.display = 'none';
-    window.onclick = e => { if (e.target === modal) modal.style.display = 'none'; };
-// 7. 表單送出處理
-    applyForm.onsubmit = async (e) => {
-        e.preventDefault();
-
-        // ✅ 修改點：在前端先產生唯一的 task_id，確保主檔與明細使用同一個單號
-        const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-        const randomStr = Math.floor(Math.random() * 900 + 100);
-        const task_id = `task-${dateStr}-${randomStr}`; 
-
-        const payload = {
-            task_id: task_id, 
-            applicant_name: applyForm.applicant_name.value,
-            staff_id: applyForm.staff_id.value,
-            phone: applyForm.phone.value,
-            applicant_email: applyForm.applicant_email.value,
-            department: applyForm.department.value,
-            cost_center: applyForm.costCenter.value,
-            reason: applyForm.reason.value,
-            status: 'Submitted', // 確保與 n8n 判斷邏輯的大小寫一致
-            total_amount: Number(totalAmountEl.textContent.replace(/,/g, '')),
-            items: []
-        };
-
-        // 收集申請品項
-        tbody.querySelectorAll('.qty-input').forEach(inp => {
-            const q = parseInt(inp.value) || 0;
-            if (q > 0) {
-                const it = items.find(item => item.item_id == inp.dataset.id);
-                if (it) {
-                    payload.items.push({
-                        task_id: task_id, // ✅ 使用與主檔相同的 task_id
-                        item_id: it.item_id,
-                        item_name: it.item_name,
-                        unit_price: it.unit_price,
-                        quantity: q,
-                        subtotal: it.unit_price * q
-                    });
-                }
-            }
-        });
-
-        if (payload.items.length === 0) {
-            alert('請至少填寫一個品項的數量');
-            return;
-        }
-
-        try {
-            const res = await fetch(POST_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            const result = await res.json();
-            
-            if (result.status === 'success' || res.ok) {
-                alert('申請成功！單號：' + task_id);
-                applyForm.reset();
-                totalAmountEl.textContent = '0';
-                
-                // 送出成功後更新畫面庫存
-                await fetchItems(); 
-            } else {
-                alert('伺服器回應錯誤，請檢查 n8n 流程');
-            }
-        } catch (err) {
-            alert('連線失敗，請檢查網路或 n8n CORS 設定');
-            console.error('Submit Error:', err);
-        }
-    };
-
-});
-</script>
-
-
+    // 初始化啟動
+    startTimer();
+  </script>
 </body>
 </html>
