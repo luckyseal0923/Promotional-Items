@@ -3,22 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>公關品申請系統 - 系統遷移通知</title>
+  <title>公關品申請系統 - 系統升級移轉通知</title>
   <!-- 引入 Google Fonts: Outfit & Noto Sans TC -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
   
   <style>
     :root {
-      --bg: #F9FAFB;
+      --bg: #F4F6F8;
       --card-bg: #FFFFFF;
       --border: #E5E7EB;
-      --text-main: #111827;
-      --text-muted: #6B7280;
-      --primary: #1F2937;
-      --primary-hover: #111827;
+      --border-accent: #D1D5DB;
+      --text-main: #1F2937;
+      --text-muted: #4B5563;
+      --text-light: #9CA3AF;
+      --primary: #111827;
+      --primary-hover: #030712;
       --accent: #059669;
+      --accent-light: #D1FAE5;
+      --danger: #DC2626;
+      --danger-light: #FEE2E2;
     }
 
     * {
@@ -35,70 +40,184 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 24px;
+      padding: 32px 24px;
     }
 
-    /* 簡約置中卡片 */
+    /* 放大版主卡片 */
     .container {
       background: var(--card-bg);
       border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 56px 48px;
+      border-radius: 24px;
+      padding: 64px 56px;
       width: 100%;
-      max-width: 500px;
+      max-width: 680px;
       text-align: center;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
       position: relative;
     }
 
-    /* 簡約圖示 */
     .icon-wrapper {
-      width: 64px;
-      height: 64px;
-      margin: 0 auto 28px;
-      border: 1.5px solid var(--text-main);
+      width: 72px;
+      height: 72px;
+      margin: 0 auto 24px;
+      border: 2px solid var(--primary);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
+      background-color: #F9FAFB;
     }
 
     .icon-wrapper svg {
-      width: 28px;
-      height: 28px;
-      color: var(--text-main);
+      width: 32px;
+      height: 32px;
+      color: var(--primary);
     }
 
     h1 {
-      font-size: 24px;
-      font-weight: 700;
+      font-size: 28px;
+      font-weight: 800;
       margin-bottom: 12px;
-      color: var(--text-main);
-      letter-spacing: -0.3px;
+      color: var(--primary);
+      letter-spacing: -0.5px;
     }
 
     .subtitle {
-      font-size: 14px;
+      font-size: 15px;
       color: var(--text-muted);
       line-height: 1.6;
-      margin-bottom: 32px;
+      margin-bottom: 36px;
       font-weight: 400;
     }
 
-    /* 簡約按鈕 */
+    /* 系統版本對照區塊 (資訊豐富化) */
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 36px;
+      text-align: left;
+    }
+
+    .info-card {
+      background: #F9FAFB;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px 24px;
+      transition: all 0.2s ease;
+    }
+
+    .info-card.new-version {
+      border-color: #A7F3D0;
+      background-color: #F6FDF9;
+    }
+
+    .info-card .tag {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+      margin-bottom: 12px;
+      letter-spacing: 0.5px;
+    }
+
+    .info-card.old-version .tag {
+      background: var(--danger-light);
+      color: var(--danger);
+    }
+
+    .info-card.new-version .tag {
+      background: var(--accent-light);
+      color: var(--accent);
+    }
+
+    .info-card h3 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .info-card p {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* 清晰網址展示區塊 */
+    .url-display-box {
+      background-color: #F3F4F6;
+      border: 1px dashed var(--border-accent);
+      border-radius: 14px;
+      padding: 16px 20px;
+      margin-bottom: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .url-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      white-space: nowrap;
+    }
+
+    .url-link {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--primary);
+      text-decoration: none;
+      font-family: 'Outfit', monospace;
+      word-break: break-all;
+      text-align: left;
+      flex: 1;
+      transition: color 0.15s ease;
+    }
+
+    .url-link:hover {
+      color: #2563EB;
+      text-decoration: underline;
+    }
+
+    .btn-copy-inline {
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+      color: var(--text-main);
+    }
+
+    .btn-copy-inline:hover {
+      background: #F9FAFB;
+      border-color: #9CA3AF;
+    }
+
+    /* 前往新版系統主按鈕 */
     .btn-primary {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
       width: 100%;
-      padding: 14px 24px;
-      font-size: 14px;
-      font-weight: 600;
+      padding: 18px 28px;
+      font-size: 15px;
+      font-weight: 700;
       color: #FFFFFF;
       background-color: var(--primary);
       border: none;
-      border-radius: 12px;
+      border-radius: 14px;
       cursor: pointer;
       text-decoration: none;
       transition: all 0.2s ease;
@@ -106,93 +225,87 @@
 
     .btn-primary:hover {
       background-color: var(--primary-hover);
-      transform: translateY(-1px);
+      transform: translateY(-1.5px);
     }
 
     .btn-primary:active {
       transform: translateY(0);
     }
 
-    /* 簡約進度條 */
+    /* 倒數進度條 */
     .progress-bar-container {
       width: 100%;
-      height: 3px;
-      background: #F3F4F6;
+      height: 4px;
+      background: #E5E7EB;
       border-radius: 2px;
-      margin-top: 32px;
+      margin-top: 36px;
       overflow: hidden;
-      position: relative;
     }
 
     .progress-bar {
       height: 100%;
-      background: var(--text-main);
+      background: var(--primary);
       width: 100%;
       transform-origin: left;
       transform: scaleX(0);
       transition: transform 10s linear;
     }
 
-    .progress-bar.paused {
-      animation-play-state: paused !important;
-      transition: none !important;
-    }
-
     .timer-text {
-      margin-top: 12px;
+      margin-top: 14px;
       font-size: 13px;
       color: var(--text-muted);
     }
 
     .countdown-num {
-      font-weight: 600;
-      color: var(--text-main);
+      font-weight: 700;
+      color: var(--primary);
+      font-size: 15px;
     }
 
-    /* 控制區 */
+    /* 控制列 */
     .controls {
-      margin-top: 32px;
+      margin-top: 36px;
       padding-top: 24px;
       border-top: 1px solid var(--border);
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
+      justify-content: center;
     }
 
     .btn-sec {
       background: transparent;
       border: 1px solid var(--border);
       color: var(--text-muted);
-      padding: 8px 14px;
-      font-size: 12px;
-      font-weight: 500;
-      border-radius: 8px;
+      padding: 10px 20px;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 10px;
       cursor: pointer;
       transition: all 0.15s ease;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
     }
 
     .btn-sec:hover {
       border-color: #9CA3AF;
       color: var(--text-main);
+      background: #F9FAFB;
     }
 
     /* Toast 通知 */
     .toast {
       position: fixed;
-      bottom: 24px;
+      bottom: 32px;
       left: 50%;
       transform: translateX(-50%) translateY(100px);
-      background: var(--text-main);
+      background: var(--primary);
       color: #FFFFFF;
-      padding: 10px 20px;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 500;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
       transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s;
       opacity: 0;
       z-index: 1000;
@@ -202,6 +315,25 @@
       transform: translateX(-50%) translateY(0);
       opacity: 1;
     }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 40px 24px;
+      }
+      .comparison-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      .url-display-box {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+      .btn-copy-inline {
+        width: 100%;
+        justify-content: center;
+      }
+    }
   </style>
 </head>
 <body>
@@ -209,25 +341,51 @@
   <div class="container">
     <div class="icon-wrapper">
       <!-- 簡約指向箭頭圖示 -->
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
       </svg>
     </div>
 
-    <h1>系統升級移轉通知</h1>
+    <h1>公關品申請系統已升級 V2.0</h1>
     <p class="subtitle">
-      公關品資源管理系統已全面升級至 V2.0 版本。<br>請前往全新平台進行申請。
+      為提升系統性能與操作流暢度，舊版公關品系統已終止申請服務。<br>請前往全新平台填寫公關品申請單。
     </p>
+
+    <!-- 升級與移轉資訊方塊對照 -->
+    <div class="comparison-grid">
+      <div class="info-card old-version">
+        <span class="tag">停止使用</span>
+        <h3>舊版申請系統 (V1.0)</h3>
+        <p>系統已於今日停止運作，不再受理任何新的公關品訂單申請，僅保留後台作歷史數據核對。</p>
+      </div>
+      <div class="info-card new-version">
+        <span class="tag">全面啟用</span>
+        <h3>新版系統 PRRMS V2.0</h3>
+        <p>優化了前端填單流程，提昇庫存顯示即時性，並搭配全新的後台與自動化信件通知。</p>
+      </div>
+    </div>
+
+    <!-- 顯眼新網址顯示區 -->
+    <div class="url-display-box">
+      <span class="url-label">新版網址</span>
+      <a href="https://prrms.zeabur.app/" class="url-link" id="urlLink">https://prrms.zeabur.app/</a>
+      <button class="btn-copy-inline" id="copyBtnInline">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor" style="width: 13px; height: 13px;">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 7.5V6.108c0-1.135.845-2.098 1.976-2.192.373-.03.748-.057 1.123-.08M15.75 18H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08M15.75 18.75v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5A3.375 3.375 0 0 0 6.375 7.5H5.25m11.9-3.664A2.251 2.251 0 0 0 15 2.25h-1.5a2.251 2.251 0 0 0-2.15 1.586m5.8 0c.065.21.1.433.1.664v.75h-6V4.5c0-.231.035-.454.1-.664M6.75 7.5H4.875c-.621 0-1.125.504-1.125 1.125v12c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V16.5a9 9 0 0 0-9-9Z" />
+        </svg>
+        <span>複製網址</span>
+      </button>
+    </div>
 
     <!-- 主前往按鈕 -->
     <a href="https://prrms.zeabur.app/" id="redirectBtn" class="btn-primary">
-      <span>前往新版申請系統 (PRRMS V2.0)</span>
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 14px; height: 14px;">
+      <span>立即前往新版系統 (PRRMS V2.0)</span>
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor" style="width: 16px; height: 16px;">
         <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
       </svg>
     </a>
 
-    <!-- 簡約進度條與時間 -->
+    <!-- 倒數進度條與時間 -->
     <div class="progress-bar-container">
       <div id="progressBar" class="progress-bar"></div>
     </div>
@@ -238,17 +396,10 @@
     <!-- 控制區 -->
     <div class="controls">
       <button id="pauseBtn" class="btn-sec">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 12px; height: 12px;" id="pauseIcon">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 14px; height: 14px;" id="pauseIcon">
           <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25v13.5m-7.5-13.5v13.5" />
         </svg>
         <span id="pauseText">暫停自動跳轉</span>
-      </button>
-
-      <button id="copyBtn" class="btn-sec">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 12px; height: 12px;">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 7.5V6.108c0-1.135.845-2.098 1.976-2.192.373-.03.748-.057 1.123-.08M15.75 18H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08M15.75 18.75v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5A3.375 3.375 0 0 0 6.375 7.5H5.25m11.9-3.664A2.251 2.251 0 0 0 15 2.25h-1.5a2.251 2.251 0 0 0-2.15 1.586m5.8 0c.065.21.1.433.1.664v.75h-6V4.5c0-.231.035-.454.1-.664M6.75 7.5H4.875c-.621 0-1.125.504-1.125 1.125v12c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V16.5a9 9 0 0 0-9-9Z" />
-        </svg>
-        <span>複製新版網址</span>
       </button>
     </div>
   </div>
@@ -269,7 +420,7 @@
     const pauseIcon = document.getElementById("pauseIcon");
     const progressBar = document.getElementById("progressBar");
     const timerText = document.getElementById("timerText");
-    const copyBtn = document.getElementById("copyBtn");
+    const copyBtnInline = document.getElementById("copyBtnInline");
     const toast = document.getElementById("toast");
 
     // 啟動 CSS 進度條動畫
@@ -334,7 +485,7 @@
     });
 
     // 複製新網址功能
-    copyBtn.addEventListener("click", () => {
+    copyBtnInline.addEventListener("click", () => {
       navigator.clipboard.writeText(targetUrl).then(() => {
         toast.classList.add("show");
         setTimeout(() => {
